@@ -530,7 +530,7 @@
   --color-dimmed: #888 !important;
   border-top: 4px solid var(--color-highlight);
 }
-" lang="en-IN" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-marpit-fragments="2" data-theme="gaia" data-style=":root {
+" lang="en-IN" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-marpit-fragments="3" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -547,9 +547,13 @@
 ;">
 <h2 id="beyond-search-discovery-api">Beyond search: Discovery API</h2>
 <ul>
-<li data-marpit-fragment="1">Unique iterative search by Qdrant</li>
-<li data-marpit-fragment="2">Combine multi-modal vectors in single query</li>
-</ul>
+<li data-marpit-fragment="1">
+<p>Unique iterative search by Qdrant</p>
+</li>
+<li data-marpit-fragment="2">
+<p>Combine multi-modal vectors in single query</p>
+</li>
+<li data-marpit-fragment="3">
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-js"><span class="hljs-variable constant_">POST</span> collections/my-collection/points/discover
 {
   <span class="hljs-string">&quot;target&quot;</span>: [<span class="hljs-number">0.63</span>, <span class="hljs-number">0.10</span>, <span class="hljs-number">0.91</span>, <span class="hljs-number">0.55</span>],
@@ -561,6 +565,8 @@
   ],
 }
 </code></pre>
+</li>
+</ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-theme="gaia" data-style=":root {
   --color-background: #fff !important;

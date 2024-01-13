@@ -195,18 +195,19 @@ POST /collections/rentals/points/search
 * Unique iterative search by Qdrant
 * Combine multi-modal vectors in single query
 
-```js
-POST collections/my-collection/points/discover
-{
-  "target": [0.63, 0.10, 0.91, 0.55],
-  "context": [
-    {
-      "positive": 7125, // <-- ID of the example
-      "negative": 122   // <-- This can also be a vector
-    }
-  ],
-}
-```
+* ```js
+  POST collections/my-collection/points/discover
+  {
+    "target": [0.63, 0.10, 0.91, 0.55],
+    "context": [
+      {
+        "positive": 7125, // <-- ID of the example
+        "negative": 122   // <-- This can also be a vector
+      }
+    ],
+  }
+  ```
+
 ---
 <!-- ---
 

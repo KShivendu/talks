@@ -230,7 +230,7 @@ POST /collections/rentals/points/search
 
 --- -->
 
-
+<!--
 ## How multi-modal embeddings look like?
 
 
@@ -248,7 +248,7 @@ POST /collections/rentals/points/search
 
 ![bg](./imgs/complex-context-search.png)
 
----
+--- -->
 
 <!-- ## Sparse vectors
 

@@ -23,7 +23,7 @@ inlineSVG: true
 
 ## $ whoami
 
-![bg right:40% 80%](./imgs/ks.jpg)
+![bg right:40% 80%](./imgs/shivendu.jpg)
 
 * Kumar Shivendu
 
@@ -123,6 +123,27 @@ inlineSVG: true
 * Approximate and Tunable
 * Filter during search
 * Quantization
+
+---
+
+## Running search:
+
+```js
+POST /collections/rentals/points/search
+{
+  "query": [0.2, 0.3, 0.4, 0.5], // vector generated from image/text/video
+  "filter": { "must": [{"key": "locality", "match": {"value": "Indiranagar"}}] },
+  "limit": 10
+}
+```
+
+* ```js
+  [
+    {"id": 4, "score": 0.56, "payload": {...}},
+    {"id": 2, "score": 0.40, "payload": {...}},
+    {"id": 5, "score": 0.23, "payload": {...}},
+  ]
+  ```
 
 ---
 

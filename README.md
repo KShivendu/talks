@@ -1,3 +1,5 @@
 # Talks
 
-- [FOSS United Jan 2024](https://forum.fossunited.org/t/foss-meetups-bangalore-2024/2702) - [Qdrant: Vector search and beyond](https://drive.google.com/file/d/1kqPfxOqBppqkfOytYJPON08sQPXGDXTE/view?usp=sharing)
+- Qdrant: Future of search and beyond @ FOSS United Jan 2024 Meetup BLR 
+  - [Youtube video](https://youtu.be/dGO_Kxo_x6o)
+  - [Slides](https://drive.google.com/file/d/1kqPfxOqBppqkfOytYJPON08sQPXGDXTE/view?usp=sharing)

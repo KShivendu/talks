@@ -19,12 +19,7 @@ inlineSVG: true
 # paginate: true
 ---
 
-<!-- ![right:10%](./imgs/logo.png) -->
-
-
-<!-- ![bg](./imgs/cover-foss-united-jan-2024.png) -->
-![bg](./imgs/qdrant-space-cube.jpg)
-<!-- ![bg](./imgs/upscaled-2-sharp.jpg) -->
+![bg](./imgs/hero.png)
 
 ---
 

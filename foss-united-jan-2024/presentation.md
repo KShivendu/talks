@@ -52,17 +52,17 @@ inlineSVG: true
 
 ---
 
-## Traditional search
+## Traditional ways to build search
 
 * Approaches:
-  * Keywords, Regex, Boolean operators
-  * NLP, CV, Vocabs
-  * Knowledge graphs
+  * Keyword match, Regex, Boolean operators
+  * Extracting metadata using NLP and CV
+  * Knowledge graphs, Vocabs
 
 * Challenges:
-  * Extra work required.
+  * Extra work required to maintain the knowledge
   * Growing amount of unstructured data everywhere
-  * Multimodal search is hard: Text, Image, Audio, Video
+  * Multimodal search remains hard: Text, Image, Audio, Video
 
 ---
 

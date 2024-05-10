@@ -1,5 +1,7 @@
 # Talks
 
-- Qdrant: Future of search and beyond @ FOSS United Jan 2024 Meetup BLR 
+- Qdrant: Future of search and beyond @ FOSS United Jan 2024 Meetup BLR
   - [Youtube video](https://youtu.be/dGO_Kxo_x6o)
   - [Slides](https://kshivendu.github.io/talks/foss-united-jan-2024/presentation.html)
+- Improving vector search relevance with reranking and fusion @ Tensorflow meetup BLR
+  - [Slides](https://kshivendu.github.io/talks/reranking/presentation.html)

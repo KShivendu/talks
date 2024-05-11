@@ -74,9 +74,10 @@ inlineSVG: true
 * Example: Google Lens
 * Problem: Expensive and not easy to scale
 * Solution: Indexing and approximation
+* Vector DBs
 
 <!-- Image showing vector search -->
----
+<!-- ---
 
 ## What is **Qdrant**
 
@@ -90,7 +91,7 @@ inlineSVG: true
 
 * SDKs for Python, JS, Go, Java, etc
 
-* Twitter, Canva, Meesho, Flipkart
+* Twitter, Canva, Meesho, Flipkart -->
 
 ---
 

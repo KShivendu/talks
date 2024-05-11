@@ -128,7 +128,7 @@ POST /collections/rentals/points/search
 ## Why care about search (relevance)?
   * R.A.G.
   * Results are only as good as the data (context)
-  * Context is limited and costly (latency + $)
+  * Context is limited and costly (latency + $ + quality)
   * Search can be your MOAT
     * Perplexity.ai
     * "Cheating is all you need" by Cody, Sourcegraph
@@ -251,7 +251,7 @@ results = co.rerank(
 
 ![bg right:30% 90%](./imgs/bi-vs-cross-encoders.png)
 
-* BGE FlagEmbedding reranker does well (like their embeddings)
+* BGE FlagEmbedding rerankers do well (like their embeddings)
 * Can be finetuned
 * ```python
   from FlagEmbedding import FlagReranker
@@ -279,27 +279,47 @@ results = co.rerank(
 
 * Embedding for each token
 * MaxSim
-* Surpasses the quality of single-vector representations
+* Surpasses single-vector representations
 * Scales efficiently to large documents
 
 ---
 
-## Fusion: 2nd way to get 2nd opinion
+### Fusion: 2nd way to get 2nd opinion
 
 * Combine with **any** other search results:
   * Vector search with different modalities (image, text, etc)
   * Sparse vector search or BM25
-  * ...
+  * Results from any IR system
 * Popular algos:
   * Reciprocal Ranked Fusion (RRF)
   * Relative Score Fusion (RSF)
-  * Distribution-Based Score Fusion (DBSF)
+* Python lib `ranx`
+---
+
+### RRF: Reciprocal Ranked Fusion
+
+<!-- ![bg right:50% 100%](./imgs/rrf.jpg) -->
+![bg right:50% 100%](./imgs/rrf.webp)
+
+* Ignores relevance scores
+* Dampening based on rank
+
+---
+
+### RSF: Relative score Fusion
+
+![bg right:50% 100%](./imgs/rsf.png)
+
+* Normalize and combine
+* Great when score distributions are similar
 
 ---
 
 # Summary
 
 * Relevance matters because context is important and costly.
+  * Reranking
+  * Fusion
 
 * Slides: [kshivendu.dev/talks](https://kshivendu.dev/talks)
 

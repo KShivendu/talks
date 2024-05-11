@@ -1,5 +1,6 @@
 ---
 theme: gaia
+baseUrl: "/reranking-fusion"
 _class: lead
 style: |
   :root {
@@ -19,7 +20,7 @@ inlineSVG: true
 # paginate: true
 ---
 
-![bg](./imgs/hero.png)
+![bg](imgs/hero.png)
 
 ---
 

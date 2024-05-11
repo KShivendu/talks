@@ -25,7 +25,7 @@ inlineSVG: true
 
 ## $ whoami
 
-![bg right:40% 80%](./imgs/shivendu.jpg)
+![bg right:40% 80%](/static/shivendu.jpg)
 
 * Kumar Shivendu
 
@@ -62,13 +62,13 @@ inlineSVG: true
   * Metric learning
     * CLIP
 
-![bg right:50% 90%](./imgs/clip-model.png)
+![bg right:50% 90%](/static/clip-model.png)
 
 ---
 
 ## Vector search
 
-![bg right:50% 50%](./imgs/lens-reverse-image.png)
+![bg right:50% 50%](/static/lens-reverse-image.png)
 
 * Nearest points
 * Example: Google Lens
@@ -80,7 +80,7 @@ inlineSVG: true
 
 ## What is **Qdrant**
 
-![bg right:40% 50%](./imgs/logo.png)
+![bg right:40% 50%](/static/qdrant.png)
 
 * Vector Search Engine (aka Vector DB)
 
@@ -96,7 +96,7 @@ inlineSVG: true
 
 ## The HNSW Index
 
-![bg right:50% 100%](./imgs/hnsw-layers.png)
+![bg right:50% 100%](/static/hnsw-layers.png)
 
 * Skip Lists + Graphs
 * Approximate and Tunable
@@ -298,8 +298,7 @@ results = co.rerank(
 
 ### RRF: Reciprocal Ranked Fusion
 
-<!-- ![bg right:50% 100%](./imgs/rrf.jpg) -->
-![bg right:50% 100%](./imgs/rrf.webp)
+![bg right:50% 100%](./imgs/rrf.jpg)
 
 * Ignores relevance scores
 * Dampening based on rank
@@ -318,8 +317,8 @@ results = co.rerank(
 # Summary
 
 * Relevance matters because context is important and costly.
-  * Reranking
-  * Fusion
+  * Reranking (Serial)
+  * Fusion (Parallel)
 
 * Slides: [kshivendu.dev/talks](https://kshivendu.dev/talks)
 
@@ -327,9 +326,10 @@ results = co.rerank(
   * kshivendu.dev/bio
   * kshivendu.dev/twitter
 
-![bg right:50% 50%](./imgs/linkedin-qr.png)
+![bg right:50% 50%](/static/linkedin-qr.png)
 
-<!-- * Thank you! -->
 <!--
+Further reading:
+- https://medium.com/llamaindex-blog/boosting-rag-picking-the-best-embedding-reranker-models-42d079022e83
 - https://www.rungalileo.io/blog/mastering-rag-how-to-select-a-reranking-model
-- https://medium.com/llamaindex-blog/boosting-rag-picking-the-best-embedding-reranker-models-42d079022e83 -->
+-->

@@ -1,6 +1,5 @@
 ---
 theme: gaia
-baseUrl: "/reranking-fusion/"
 _class: lead
 style: |
   :root {

@@ -25,7 +25,7 @@ inlineSVG: true
 
 ## $ whoami
 
-![bg right:40% 80%](/static/shivendu.jpg)
+![bg right:40% 80%](../static/shivendu.jpg)
 
 * Kumar Shivendu
 
@@ -62,13 +62,13 @@ inlineSVG: true
   * Metric learning
     * CLIP
 
-![bg right:50% 90%](/static/clip-model.png)
+![bg right:50% 90%](../static/clip-model.png)
 
 ---
 
 ## Vector search
 
-![bg right:50% 50%](/static/lens-reverse-image.png)
+![bg right:50% 50%](../static/lens-reverse-image.png)
 
 * Nearest points
 * Example: Google Lens
@@ -80,7 +80,7 @@ inlineSVG: true
 
 ## What is **Qdrant**
 
-![bg right:40% 50%](/static/qdrant.png)
+![bg right:40% 50%](../static/qdrant.png)
 
 * Vector Search Engine (aka Vector DB)
 
@@ -96,7 +96,7 @@ inlineSVG: true
 
 ## The HNSW Index
 
-![bg right:50% 100%](/static/hnsw-layers.png)
+![bg right:50% 100%](../static/hnsw-layers.png)
 
 * Skip Lists + Graphs
 * Approximate and Tunable
@@ -326,7 +326,7 @@ results = co.rerank(
   * kshivendu.dev/bio
   * kshivendu.dev/twitter
 
-![bg right:50% 50%](/static/linkedin-qr.png)
+![bg right:50% 50%](../static/linkedin-qr.png)
 
 <!--
 Further reading:

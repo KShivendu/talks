@@ -23,7 +23,7 @@ inlineSVG: true
 
 ## $ whoami
 
-![bg right:40% 80%](./imgs/shivendu.jpg)
+![bg right:40% 80%](/static/shivendu.jpg)
 
 * Kumar Shivendu
 
@@ -60,8 +60,8 @@ inlineSVG: true
   * Knowledge graphs, Vocabs
 
 * Challenges:
-  * Extra work required to maintain the knowledge
-  * Growing amount of unstructured data everywhere
+  * Effort to maintain the knowledge
+  * Growth of unstructured data
   * Multimodal search remains hard: Text, Image, Audio, Video
 
 ---
@@ -73,11 +73,11 @@ inlineSVG: true
 * Generated from:
   * ML models
   * Metric learning
-* CLIP
+    * CLIP
 
 <!-- Replace search space image -->
 ![bg vertical right:50% 90%](./imgs/search-space.png)
-![bg right:50% 90%](./imgs/clip-model.png)
+![bg right:50% 90%](/static/clip-model.png)
 
 
 ---
@@ -85,7 +85,7 @@ inlineSVG: true
 ## Vector search
 
 
-![bg right:50% 50%](./imgs/lens-reverse-image.png)
+![bg right:50% 50%](/static/lens-reverse-image.png)
 
 * Nearest points
 * Example: Google Lens
@@ -94,14 +94,11 @@ inlineSVG: true
 
 <!-- Image showing vector search -->
 
-<!-- FIX this image. The arrows are broken -->
-
-
 ---
 
 ## What is **Qdrant**
 
-![bg right:40% 50%](./imgs/logo.png)
+![bg right:40% 50%](/static/qdrant.png)
 
 * Vector Search Engine (aka Vector DB)
 
@@ -117,7 +114,7 @@ inlineSVG: true
 
 ## The HNSW Index
 
-![bg right:50% 100%](./imgs/hnsw-layers.png)
+![bg right:50% 100%](/static/hnsw-layers.png)
 
 * Skip Lists + Graphs
 * Approximate and Tunable
@@ -165,7 +162,7 @@ POST /collections/rentals/points/search
 ---
 ## How to find this thing on the internet?
 
-![bg right:35%](./imgs/anti-pattern-3.jpg)
+![bg right:35%](./imgs/mystical-creature.jpg)
 
 * No reverse image search
 * No known name
@@ -185,8 +182,8 @@ POST /collections/rentals/points/search
 * Search for similar images
   * Similarity bubble
 
-![bg right:60%](./imgs/reverse-image-search-1.png)
-![bg](./imgs/reverse-image-search-2.png)
+![bg right:60%](./imgs/similarity-bubble-1.png)
+![bg](./imgs/similarity-bubble-2.png)
 
 ---
 
@@ -275,7 +272,7 @@ POST /collections/rentals/points/search
   * kshivendu.dev/bio
   * kshivendu.dev/twitter
 
-![bg right:50% 50%](./imgs/linkedin-qr.png)
+![bg right:50% 50%](/static/linkedin-qr.png)
 
 <!-- * Thank you! -->
 

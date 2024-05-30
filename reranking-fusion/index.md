@@ -12,8 +12,6 @@ style: |
   pre {
     white-space: pre-wrap;
   }
-
-
 marp: true
 inlineSVG: true
 # paginate: true
@@ -37,25 +35,23 @@ inlineSVG: true
 
 <!-- * RAG = Retreival Augment Generation -->
 
-<!-- ---
+---
 
 ## Topics to cover
 
-* Evolution of search
-  * Traditional approaches and drawbacks
-  * Vectors search and how it harnesses ML models
+* Vectors, Vector Search, and Vector DBs
+* The HNSW Index
+* Why care about search relevance in the age of GenAI?
+* Are vector search results relevant enough?
+* Reranking
+* Fusion
 
-* Qdrant
-  * Building HNSW index and vector search
-  * Beyond similarity search:
-    * Recommendations
-    * Discovery
-  * Sparse vectors -->
 ---
 
 ## Vectors
 
-* Points in an N-dimensional space
+* Points in an N-dim space
+* Compressed **meaning**
 * Anything -> Vector
 * Popular ways to generate:
   * Language/vision models
@@ -70,10 +66,12 @@ inlineSVG: true
 
 ![bg right:50% 50%](../static/lens-reverse-image.png)
 
-* Nearest points
-* Example: Google Lens
-* Problem: Expensive and not easy to scale
-* Solution: Indexing and approximation
+* Challenges with keywords
+  * Doc miss (low recall)
+  * Can't do img, audio, etc
+* Similarity = Nearest points
+* Faster with indexing and approximation
+* Problem: Hard to scale and manage.
 
 <!-- Image showing vector search -->
 ---
@@ -105,13 +103,35 @@ inlineSVG: true
 
 ---
 
-## Running search:
+## Indexing:
+
+```js
+PUT /collections/rentals/points
+{
+  "batch": {
+    "ids": [1, 2],
+    "vectors": [
+      [0.9, -0.5, ..., 0.0], // generated from rental1.jpg using ML model
+      [0.1, 0.4, ..., 0.3],
+    ],
+    "payload": [
+      {"city": "Bangalore", "sqft": 990, "img_path": "img/rental1.jpg", "tags": ["..."]},
+      {"city": "Hyderabad", "sqft": 1550, "img_path": "img/rental2.jpg", "description": "..."},
+    ]
+  }
+}
+```
+
+
+---
+
+## Search:
 
 ```js
 POST /collections/rentals/points/search
 {
-  "query": [0.2, 0.3, 0.4, 0.5], // vector generated from image/text/video
-  "filter": { "must": [{"key": "locality", "match": {"value": "Indiranagar"}}] },
+  "query": [0.2, 0.3, ..., 0.4], // generated from user query (text) using same model
+  "filter": { "must": [{"key": "city", "match": {"value": "Bangalore"}}] },
   "limit": 10
 }
 ```
@@ -137,7 +157,7 @@ POST /collections/rentals/points/search
 ## Are vector search results relevant enough?
 
 * Depends
-* Vector search is constrained by 2 factors:
+* Vector search **relevance** is constrained by 2 factors:
   * Embedding model
     * Domain
     * Compression
@@ -148,9 +168,9 @@ POST /collections/rentals/points/search
 
 ---
 
-## Reranking:
+## Reranking for RAG:
 
-* Popular in Information Retrieval:
+* Popular in Information Retrieval.
 * Two stages:
   * Reterival:
      * Fast but coarse
@@ -158,7 +178,7 @@ POST /collections/rentals/points/search
      * AKA Candidate generation
   * (Re)ranking:
      * Slow but precise
-     * Rank **hundreds** of candidates
+     * Rank **hundreds** of candidates. Pick top K (10)
 
 ---
 
@@ -166,92 +186,30 @@ POST /collections/rentals/points/search
 
 | Model         | Type    | Performance | Cost      | Example                    |
 | ------------- | ------- | ----------- | --------- | -------------------------- |
-| Rerank API    | Private | Great       | Medium    | Cohere, Mixedbread, Jina   |
-| Cross encoder | OSS     | Great       | Medium    | BGE, sentence transformers |
 | Multi-vector  | OSS     | Good        | Low       | ColBERT                    |
+| Cross encoder | OSS     | Great       | Medium    | BGE, sentence transformers |
+| Rerank API    | Private | Great       | Medium    | Cohere, Mixedbread, Jina   |
 | LLM API       | Private | Best        | Very High | GPT, Claude                |
 
 ---
 
-### Cohere reranker:
+### ColBERT: Contextualized Late Interaction BERT
 
-```python
-import cohere
-co = cohere.Client(API_KEY)
+<!-- FIXME: Should ideally use/create image that exactly shows ColBERT or it can be confusing -->
+![bg right:30% 100%](./imgs/embedding-pooling.png)
 
-query = "What is the capital of the United States?"
-docs = [
-  {"Title":"Facts about Carson City","Content":"..."},
-  {"Title":"The Commonwealth of Northern Mariana Islands","Content":"..."},
-  {"Title":"The Capital of United States Virgin Islands","Content":"..."},
-  {"Title":"Washington D.C.","Content":"..."},
-  {"Title":"Capital Punishment in the US","Content":"..."}
-]
-results = co.rerank(
-  model="rerank-english-v3.0", query=query, documents=docs,
-  rank_fields=['Title','Content'],top_n=5, return_documents=True
-)
-```
+* Embedding for each token
+* MaxSim
+* Surpasses single-vector representations
+* Scales efficiently to large documents
 
----
-
-### Cohere response:
-
-```python
-{
-  "id": "...",
-  "results": [
-    {
-    	"document": { "Content": "...", "Title": "Washington D.C." },
-    	"index": 3,
-    	"relevance_score": 0.9987405
-    },
-    {
-    	"document": { "Content": "...", "Title": "Capital Punishment in the US" },
-    	"index": 4,
-    	"relevance_score": 0.5011778
-    },
-    {
-    	"document": { "Content": "...", "Title": "The Capital of United States Virgin Islands" },
-    	"index": 2,
-    	"relevance_score": 0.10070161
-    },
-  ],
-  "meta": { ... }
-}
-```
-
----
-
-### Cohere reranker finetuning:
-
-* Hard negatives are important
-
-* ```json
-  {
-    "query": "What are your views on the supreme court's decision to make playing national anthem mandatory in cinema halls?",
-    "relevant_passages": ["..."],
-    "hard_negatives": [
-      "Is the decision of SC justified by not allowing national anthem inside courts but making it compulsory at cinema halls?",
-      "Why has the supreme court of India ordered that cinemas play the national anthem before the screening of all movies? Is it justified?",
-      "Is it a good decision by SC to play National Anthem in the theater before screening movie?",
-      "Why is the national anthem being played in theaters?",
-      "What does Balaji Vishwanathan think about the compulsory national anthem rule?"
-    ]
-  }
-  ```
-
-<!-- * [Metrics](https://docs.cohere.com/docs/rerank-understanding-the-results):
-  * nDCG@k
-  * MRR
-  * Accuracy -->
 ---
 
 ### Cross encoder rerankers:
 
 ![bg right:30% 90%](./imgs/bi-vs-cross-encoders.png)
 
-* BGE FlagEmbedding rerankers do well (like their embeddings)
+* BGE flag embedding reranker
 * Can be finetuned
 * ```python
   from FlagEmbedding import FlagReranker
@@ -267,20 +225,86 @@ results = co.rerank(
   scores = reranker.compute_score([query_passage_1, query_passage_2], normalize=True)
   print(scores) # [0.22970796268567764, 0.9996698472749022]
   ```
-* Llama index and other frameworks simplify the interface
-
+* Sort based on score
 
 ---
 
-### ColBERT: Contextualized Late Interaction BERT
+### Cohere reranker:
 
-<!-- FIXME: Should ideally use/create image that exactly shows ColBERT or it can be confusing -->
-![bg right:30% 100%](./imgs/embedding-pooling.png)
+```python
+import cohere
+co = cohere.Client(API_KEY)
 
-* Embedding for each token
-* MaxSim
-* Surpasses single-vector representations
-* Scales efficiently to large documents
+query = "Who is the father of Elon Musk?"
+docs = [
+  {"Title":"Father (Wikipedia)","Content":"A father is the male parent of a child"},
+  {"Title":"Paypal founders","Content":"Elon Musk, Peter Thiel"},
+  {"Title":"Musk family","Content":"Elon is son of Errol and Maye Musk"},  # answer
+  {"Title":"Peter Thiel","Content":"Peter and Elon built Paypal"},
+  {"Title":"Elon musk family","Content":"Elon has 11 children"},
+]
+results = co.rerank(
+  model="rerank-english-v3.0", query=query, documents=docs,
+  rank_fields=['Title','Content'],top_n=3, return_documents=True
+)
+```
+
+---
+
+### Cohere response:
+
+```python
+# question: Who's the father of Elon Musk?
+{
+  "id": "...",
+  "results": [
+    {
+    	"document": {"Title":"Musk family","Content":"Elon is son of Errol and Maye Musk"},
+    	"index": 2,
+    	"relevance_score": 0.9908034 # 99%
+    },
+    {
+    	"document": {"Title":"Elon musk family","Content":"Elon has 11 children"},
+    	"index": 4,
+    	"relevance_score": 0.104294725 # 10%
+    },
+    {
+    	"document": {"Title":"Paypal founders","Content":"Elon Musk, Peter Thiel"},
+    	"index": 2,
+    	"relevance_score": 0.02630528 # 2%
+    },
+  ],
+  "meta": { ... }
+}
+```
+
+---
+
+### Reranker finetuning:
+
+* Similar to embedding finetuning
+* But should be sensitive.
+* So hard negatives are imp.
+* ```python
+  {
+    "query": "How many people live in London?",
+    "pos": "9M people live in London.",
+    "neg": [
+      (
+        "Around 1.5M people live in ",
+        "Cambridge, which is close to London"
+      ),
+      "...",
+    ],
+  }
+  ```
+
+![bg right 50%](./imgs/dog-muffin.webp)
+
+<!-- * [Metrics](https://docs.cohere.com/docs/rerank-understanding-the-results):
+  * nDCG@k
+  * MRR
+  * Accuracy -->
 
 ---
 

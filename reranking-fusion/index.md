@@ -184,7 +184,7 @@ POST /collections/rentals/points/search
 
 ## Popular rerankers for RAG:
 
-| Model         | Type    | Performance | Cost      | Example                    |
+| Model         | Type    | Quality     | Cost      | Example                    |
 | ------------- | ------- | ----------- | --------- | -------------------------- |
 | Multi-vector  | OSS     | Good        | Low       | ColBERT                    |
 | Cross encoder | OSS     | Great       | Medium    | BGE, sentence transformers |

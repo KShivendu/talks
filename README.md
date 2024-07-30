@@ -1,4 +1,4 @@
-# Talks
+# Talks by KShivendu
 
 - Improving vector search relevance with reranking & fusion
   - Event: Tensorflow May 2024 Meetup, Bangalore

@@ -2,7 +2,7 @@
 ## Steps to compile:
 
 ```bash
-npm i -g marp-cli
+npm i -g @marp-team/marp-cli
 marp --server .
 
 # To convert into .html

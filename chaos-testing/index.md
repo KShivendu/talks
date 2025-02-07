@@ -147,7 +147,7 @@ POST /collections/rentals/points/search
 ### Why chaos testing?
 
 * Catch/fix bugs before users.
-* Moving parts:
+* Moving parts of a distributed system:
     * Consensus, segments,  sharding, storage, WAL, HNSW index, etc.
     * When deployed: k8s, operator, disk, backward compatibility, etc.
 * **Anything** can fail. We must prepare for the worse
@@ -171,7 +171,7 @@ POST /collections/rentals/points/search
 * Build and deploy container for every merge to `dev`
 * Operator -> Cluster Manager -> Qdrant cluster
 * Qdrant k8s operator + Cluster manager (CM)
-    * Scale, Replicate, Re-shard, and Balances shards.
+    * Scale, Replicate, Re-shard, and Balance shards.
     * Only CM knows about Qdrant internals
         * consensus, sharding, indexing, etc
 

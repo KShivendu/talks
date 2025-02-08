@@ -137,6 +137,19 @@ POST /collections/rentals/points/search
 
 ![bg 65%](imgs/vector-db-architecture.png)
 
+---
+
+
+### Data persistence
+
+![bg 65%](imgs/segments.png)
+
+----
+
+### Cluster mode
+
+![bg 65%](imgs/sharding-raft.png)
+
 <!-- ---
 ### What kind of tests we run already?
 

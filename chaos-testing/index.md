@@ -27,7 +27,7 @@ inlineSVG: true
 
 * Kumar Shivendu
 
-* Software Engineer @ Qdrant
+* Engineer @ Qdrant
 
 * I ❤️ search, distributed systems, and LLMs.
 
@@ -38,7 +38,8 @@ inlineSVG: true
 
 ## Topics to cover
 
-* Brief intro to vector search and Qdrant
+* Intro to vectors and vector search
+* Overview of Qdrant
 * Why we needed chaos testing?
 * Different components of chaos testing
 * Results
@@ -129,6 +130,12 @@ POST /collections/rentals/points/search
     {"id": 5, "score": 0.23, "payload": {...}},
   ]
   ```
+
+---
+
+### Architecture
+
+![bg 65%](imgs/vector-db-architecture.png)
 
 <!-- ---
 ### What kind of tests we run already?

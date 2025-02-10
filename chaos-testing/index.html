@@ -701,7 +701,7 @@ pre {
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15" data-marpit-fragments="6" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -725,12 +725,15 @@ pre {
 <h3 id="load-generator-%F0%9F%94%A8">Load generator <img class="emoji" draggable="false" alt="🔨" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f528.svg" data-marp-twemoji=""/></h3>
 <ul>
 <li data-marpit-fragment="1">Custom tool: <code>bfb</code></li>
-<li data-marpit-fragment="2">Constantly hammering the cluster</li>
+<li data-marpit-fragment="2"><strong>Constantly</strong> hammering the cluster</li>
 <li data-marpit-fragment="3">Runs in both modes:
 <ul>
 <li data-marpit-fragment="4">Upserts</li>
 <li data-marpit-fragment="5">Search</li>
 </ul>
+</li>
+<li data-marpit-fragment="6">Example:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-c">bfb -n <span class="hljs-number">1000000000</span> --dim <span class="hljs-number">300</span> --search --retry <span class="hljs-number">3</span> --retry-interval <span class="hljs-number">1</span> --delay <span class="hljs-number">1000</span> --timeout <span class="hljs-number">30</span>
+</code></pre>
 </li>
 </ul>
 </section>
@@ -783,7 +786,7 @@ pre {
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-marpit-fragments="4" data-theme="gaia" data-style=":root {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -813,6 +816,7 @@ pre {
 <li data-marpit-fragment="4">Nodes and shards are healthy, readable, and writable</li>
 </ul>
 </li>
+<li data-marpit-fragment="5">Persist results to Postgres and logs to Loki</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-marpit-fragments="2" data-theme="gaia" data-style=":root {
@@ -920,7 +924,7 @@ pre {
 pre {
   white-space: pre-wrap;
 }
-;--marpit-advanced-background-split:25%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;../static/linkedin-qr.png&quot;);background-size:80%;"></figure></div></section></foreignObject><foreignObject width="75%" height="720"><section id="20" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
+;--marpit-advanced-background-split:22%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;../static/linkedin-qr.png&quot;);background-size:80%;"></figure></div></section></foreignObject><foreignObject width="78%" height="720"><section id="20" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -940,7 +944,7 @@ pre {
 pre {
   white-space: pre-wrap;
 }
-;--marpit-advanced-background-split:25%;" data-marpit-advanced-background="content" data-marpit-advanced-background-split="right">
+;--marpit-advanced-background-split:22%;" data-marpit-advanced-background="content" data-marpit-advanced-background-split="right">
 <h3 id="summary">Summary</h3>
 <ul>
 <li data-marpit-fragment="1">
@@ -950,7 +954,7 @@ pre {
 <p>Complex systems can have some critical bugs that are reproduced when multiple conditions meet.</p>
 </li>
 <li data-marpit-fragment="3">
-<p>Chaos is about embracing randomness so that stars align and you hit just the spot.</p>
+<p>Chaos engineering is about proactively simulating possible failures to avoid unexpected issues in production.</p>
 </li>
 <li data-marpit-fragment="4">
 <p>Find me at</p>
@@ -971,7 +975,7 @@ pre {
 pre {
   white-space: pre-wrap;
 }
-" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg></div><div class="bespoke-marp-note" data-index="1" tabindex="0"><p>* RAG = Retreival Augment Generation</p></div><div class="bespoke-marp-note" data-index="4" tabindex="0"><p>Image showing vector search</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>---
+" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg></div><div class="bespoke-marp-note" data-index="1" tabindex="0"><p>* RAG = Retreival Augment Generation</p></div><div class="bespoke-marp-note" data-index="4" tabindex="0"><p>Image showing vector search</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>ToDo: We need a better diagram of raft</p><p>---
 ### What kind of tests we run already?
 
 - Unit tests

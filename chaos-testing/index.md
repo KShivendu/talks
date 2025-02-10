@@ -229,10 +229,11 @@ POST /collections/rentals/points/search
 
 ### Healthcheck crons 🩺
 
-*  Check for degradations:
+* Check for degradations:
     * Points are present
     * Points are consistent
     * Nodes and shards are healthy, readable, and writable
+* Persist results to Postgres and logs to Loki
 
 ---
 

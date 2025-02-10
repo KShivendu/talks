@@ -260,7 +260,7 @@ POST /collections/rentals/points/search
 
 * It's impossible to test every possible scenario by writing tests for each combination.
 * Complex systems can have some critical bugs that are reproduced when multiple conditions meet.
-* Chaos engineering is about proactively simulating possible failures to avoid unexpected issues in production.
+* Chaos engineering is about embracing randomness and proactively simulating failures to avoid issues in prod.
 
 * Find me at
   * [kshivendu.dev/twitter](kshivendu.dev/twitter)

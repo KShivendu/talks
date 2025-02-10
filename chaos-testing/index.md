@@ -150,6 +150,8 @@ POST /collections/rentals/points/search
 
 ![bg 65%](imgs/sharding-raft.png)
 
+<!-- ToDo: We need a better diagram of raft -->
+
 <!-- ---
 ### What kind of tests we run already?
 

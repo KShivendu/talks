@@ -64,10 +64,10 @@ inlineSVG: true
 
 ![bg right:40% 50%](../static/lens-reverse-image.png)
 
+* Things, not strings
 * Keyword search
   * Doc miss (low recall)
   * Can't do img, audio, etc
-* Things, not strings
 * Nearest points
 * Indexing and approximation
 * Problem: Hard to scale and manage.
@@ -166,11 +166,11 @@ POST /collections/rentals/points/search
 
 ### Why chaos testing?
 
-* Catch/fix bugs before users.
 * Moving parts of a distributed system:
     * Consensus, segments,  sharding, storage, WAL, HNSW index, etc.
     * When deployed: k8s, operator, disk, backward compatibility, etc.
 * **Anything** can fail. We must prepare for the worse
+* Catch/fix bugs before users.
 * Impossible to write tests for every possible scenario
 * 💡 Test Qdrant in some of the worst possible scenarios
 
@@ -259,9 +259,3 @@ POST /collections/rentals/points/search
   * [kshivendu.dev/twitter](kshivendu.dev/twitter)
 
 ![bg right:25% 80%](../static/linkedin-qr.png)
-
-<!--
-Further reading:
-- https://medium.com/llamaindex-blog/boosting-rag-picking-the-best-embedding-reranker-models-42d079022e83
-- https://www.rungalileo.io/blog/mastering-rag-how-to-select-a-reranking-model
--->

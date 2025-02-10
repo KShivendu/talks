@@ -202,10 +202,14 @@ POST /collections/rentals/points/search
 ### Load generator 🔨
 
 * Custom tool: `bfb`
-* Constantly hammering the cluster
+* **Constantly** hammering the cluster
 * Runs in both modes:
     * Upserts
     * Search
+* Example:
+  ```c
+  bfb -n 1000000000 --dim 300 --search --retry 3 --retry-interval 1 --delay 1000 --timeout 30
+  ```
 
 ---
 

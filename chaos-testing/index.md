@@ -133,7 +133,7 @@ POST /collections/rentals/points/search
 
 ---
 
-### Architecture
+### Workflow
 
 ![bg 65%](imgs/vector-db-architecture.png)
 

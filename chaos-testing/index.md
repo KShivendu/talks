@@ -231,8 +231,9 @@ POST /collections/rentals/points/search
 
 * Check for degradations:
     * Points are present
-    * Points are consistent
+    * Points are consistent between replicas
     * Nodes and shards are healthy, readable, and writable
+* 2 * 200K points (~1.2GB) checked within 2.4s
 * Persist results to Postgres and logs to Loki
 
 ---
@@ -258,8 +259,8 @@ POST /collections/rentals/points/search
 
 ### Summary
 
-* It's impossible to test every possible scenario by writing tests for each combination.
 * Complex systems can have some critical bugs that are reproduced when multiple conditions meet.
+* It's impossible to test every possible scenario by writing tests for each combination.
 * Chaos engineering is about embracing randomness and proactively simulating failures to avoid issues in prod.
 
 * Find me at

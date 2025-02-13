@@ -786,7 +786,7 @@ pre {
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-marpit-fragments="6" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -812,11 +812,12 @@ pre {
 <li data-marpit-fragment="1">Check for degradations:
 <ul>
 <li data-marpit-fragment="2">Points are present</li>
-<li data-marpit-fragment="3">Points are consistent</li>
+<li data-marpit-fragment="3">Points are consistent between replicas</li>
 <li data-marpit-fragment="4">Nodes and shards are healthy, readable, and writable</li>
 </ul>
 </li>
-<li data-marpit-fragment="5">Persist results to Postgres and logs to Loki</li>
+<li data-marpit-fragment="5">2 * 200K points (~1.2GB) checked within 2.4s</li>
+<li data-marpit-fragment="6">Persist results to Postgres and logs to Loki</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-marpit-fragments="2" data-theme="gaia" data-style=":root {
@@ -948,10 +949,10 @@ pre {
 <h3 id="summary">Summary</h3>
 <ul>
 <li data-marpit-fragment="1">
-<p>It's impossible to test every possible scenario by writing tests for each combination.</p>
+<p>Complex systems can have some critical bugs that are reproduced when multiple conditions meet.</p>
 </li>
 <li data-marpit-fragment="2">
-<p>Complex systems can have some critical bugs that are reproduced when multiple conditions meet.</p>
+<p>It's impossible to test every possible scenario by writing tests for each combination.</p>
 </li>
 <li data-marpit-fragment="3">
 <p>Chaos engineering is about embracing randomness and proactively simulating failures to avoid issues in prod.</p>

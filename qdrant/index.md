@@ -31,7 +31,7 @@ inlineSVG: true
 
 * First talk!
 
-* Qdrant: Future of search and beyond
+* Qdrant: Shaping the future of search and beyond
 
 <!-- ---
 

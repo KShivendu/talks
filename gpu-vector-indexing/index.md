@@ -242,7 +242,7 @@ POST /collections/rentals/points/search
 
 * Can even run on your StreamDeck AMD GPU. Vector search ftw!!
 
-![bg right 90%](gpu-vector-indexing/imgs/qdrant-streamdeck.jpg)
+![bg right 90%](imgs/qdrant-streamdeck.jpg)
 
 
 ---

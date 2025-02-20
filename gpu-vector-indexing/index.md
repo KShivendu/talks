@@ -17,13 +17,13 @@ inlineSVG: true
 # paginate: true
 ---
 
-![bg](gpu-vector-indexing/imgs/hero.png)
+![bg](imgs/hero.png)
 
 ---
 
 ## Speakers
 
-![bg right:40% 80%](gpu-vector-indexing/imgs/ivan.jpeg)
+![bg right:40% 80%](imgs/ivan.jpeg)
 
 ![bg right:40% 80%](../static/shivendu.jpg)
 

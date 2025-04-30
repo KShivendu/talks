@@ -242,9 +242,9 @@ POST /collections/rentals/points/search
 
 * 3 (shards) * 2 (replication) = 6 replicas on 3-5 nodes
 * 2 (Replication) * 200K points (~1.2GB) compared within 2.4s
-<!-- (2.4s is warm on cloud. Local is ~10x faster, 0.7s for cold, 0.2s for warm) -->
 * BFB upload overrides 100 points every second
 * Retry only previously inconsistent points (10 attempts max)
+<!-- (2.4s is warm on cloud. Local is ~10x faster, 0.7s for cold, 0.2s for warm) -->
 
 ---
 

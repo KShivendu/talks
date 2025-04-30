@@ -231,10 +231,18 @@ POST /collections/rentals/points/search
 
 * Check for degradations:
     * Points are present
-    * Points are consistent between replicas
+    * Vectors and payloads are consistent between replicas
     * Nodes and shards are healthy, readable, and writable
-* 2 * 200K points (~1.2GB) checked within 2.4s
+* All this happens in presence of rolling updates, snapshots, resharding, node restarts, and horizontal scaling
 * Persist results to Postgres and logs to Loki
+
+---
+
+### Testing eventual consistency 📒
+
+* 2 (Replication) * 200K points (~1.2GB) compared within 2.4s
+* BFB upload overrides 100 points every second
+* Retry only previously inconsistent points (10 attempts max)
 
 ---
 
@@ -249,7 +257,7 @@ POST /collections/rentals/points/search
 
 ### Results 🚀
 
-* Fixed 20+ hard-to-reproduce / critical bugs since we started (10 Feb 2024)
+* Fixed 30+ hard-to-reproduce / critical bugs since we started (10 Feb 2024)
 * Chaos testing is technically the "production" for the core team.
 * What doesn't kill you, makes you stronger!
 <!-- * If Qdrant thrives here, it's very much ready for the real world! -->

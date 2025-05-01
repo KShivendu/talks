@@ -1,6 +1,6 @@
 # Talks by KShivendu
 
-- Chaos testing: Breaking Qdrant on purpose
+- Chaos testing: Breaking a database on purpose
   - Event: FOSS Talks Feb 2025, PES, Bangalore
   - [Slides](/chaos-testing)
 

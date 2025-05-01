@@ -192,6 +192,7 @@ POST /collections/rentals/points/search
 * Cloud-like env using k8s.
 * Build and deploy container for every merge to `dev`
 * Operator -> Cluster Manager -> Qdrant cluster
+* Qdrant cluster: 3-5 nodes each with 0.5CPU, 2GB RAM
 * Qdrant k8s operator + Cluster manager (CM)
     * Scale, Replicate, Re-shard, and Balance shards.
     * Only CM knows about Qdrant internals
@@ -204,8 +205,8 @@ POST /collections/rentals/points/search
 * Custom tool: `bfb`
 * **Constantly** hammering the cluster
 * Runs in both modes:
-    * Upserts
-    * Search
+    * Upserts: Overrides same 200K points at 100 points / sec
+    * Search: ~11 QPS / sec (1M / day)
 * Example:
   ```c
   bfb -n 1000000000 --dim 300 --search --retry 3 --retry-interval 1 --delay 1000 --timeout 30

@@ -663,7 +663,7 @@ pre {
 <li data-marpit-fragment="4">Already built tools like <code>bfb</code> in-house</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14" data-marpit-fragments="7" data-theme="gaia" data-style=":root {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14" data-marpit-fragments="8" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #bc1439 !important;
@@ -689,12 +689,13 @@ pre {
 <li data-marpit-fragment="1">Cloud-like env using k8s.</li>
 <li data-marpit-fragment="2">Build and deploy container for every merge to <code>dev</code></li>
 <li data-marpit-fragment="3">Operator -&gt; Cluster Manager -&gt; Qdrant cluster</li>
-<li data-marpit-fragment="4">Qdrant k8s operator + Cluster manager (CM)
+<li data-marpit-fragment="4">Qdrant cluster: 3-5 nodes each with 0.5CPU, 2GB RAM</li>
+<li data-marpit-fragment="5">Qdrant k8s operator + Cluster manager (CM)
 <ul>
-<li data-marpit-fragment="5">Scale, Replicate, Re-shard, and Balance shards.</li>
-<li data-marpit-fragment="6">Only CM knows about Qdrant internals
+<li data-marpit-fragment="6">Scale, Replicate, Re-shard, and Balance shards.</li>
+<li data-marpit-fragment="7">Only CM knows about Qdrant internals
 <ul>
-<li data-marpit-fragment="7">consensus, sharding, indexing, etc</li>
+<li data-marpit-fragment="8">consensus, sharding, indexing, etc</li>
 </ul>
 </li>
 </ul>
@@ -728,8 +729,8 @@ pre {
 <li data-marpit-fragment="2"><strong>Constantly</strong> hammering the cluster</li>
 <li data-marpit-fragment="3">Runs in both modes:
 <ul>
-<li data-marpit-fragment="4">Upserts</li>
-<li data-marpit-fragment="5">Search</li>
+<li data-marpit-fragment="4">Upserts: Overrides same 200K points at 100 points / sec</li>
+<li data-marpit-fragment="5">Search: ~11 QPS / sec (1M / day)</li>
 </ul>
 </li>
 <li data-marpit-fragment="6">Example:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-c">bfb -n <span class="hljs-number">1000000000</span> --dim <span class="hljs-number">300</span> --search --retry <span class="hljs-number">3</span> --retry-interval <span class="hljs-number">1</span> --delay <span class="hljs-number">1000</span> --timeout <span class="hljs-number">30</span>

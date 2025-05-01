@@ -31,7 +31,7 @@ inlineSVG: true
 
 * I ❤️ search, distributed systems, and LLMs.
 
-* Chaos testing: Breaking Qdrant on purpose
+* Chaos testing: Breaking a database on purpose
 
 <!-- * RAG = Retreival Augment Generation -->
 ---

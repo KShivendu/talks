@@ -4,7 +4,7 @@
   - Event: FOSS Talks Feb 2025, PES, Bangalore
   - [Slides](/chaos-testing)
 
-- Improving vector search relevance with reranking & fusion
+- Improving search relevance with reranking & fusion
   - Event: Tensorflow May 2024 Meetup, Bangalore
   - [Slides](/reranking-fusion)
 

@@ -192,7 +192,7 @@ POST /collections/rentals/points/search
 * Cloud-like env using k8s.
 * Build and deploy container for every merge to `dev`
 * Operator -> Cluster Manager -> Qdrant cluster
-* Qdrant cluster: 3-5 nodes each with 0.5CPU, 2GB RAM
+* Qdrant cluster: 3-5 k8s pods each with 0.5CPU, 2GB RAM created by Operator
 * Qdrant k8s operator + Cluster manager (CM)
     * Scale, Replicate, Re-shard, and Balance shards.
     * Only CM knows about Qdrant internals
@@ -206,7 +206,7 @@ POST /collections/rentals/points/search
 * **Constantly** hammering the cluster
 * Runs in both modes:
     * Upserts: Overrides same 200K points at 100 points / sec
-    * Search: ~11 QPS / sec (1M / day)
+    * Search: ~11 QPS (1M / day)
 * Example:
   ```c
   bfb -n 1000000000 --dim 300 --search --retry 3 --retry-interval 1 --delay 1000 --timeout 30
@@ -216,7 +216,7 @@ POST /collections/rentals/points/search
 
 ### Chaos crons 🌪️
 
-* Bring chaos:
+* Simple k8s `CronJob`, `kubectl` commands and `bash`:
     * Kill:
         * every 5 mins; triggers shard recovery
     * Scale up/down:
@@ -231,9 +231,9 @@ POST /collections/rentals/points/search
 ### Healthcheck crons 🩺
 
 * Check for degradations:
-    * Points are present
-    * Vectors and payloads are consistent between replicas
     * Nodes and shards are healthy, readable, and writable
+    * Vectors and payloads are consistent between replicas
+    * Points are present
 * All this happens in presence of rolling updates, snapshots, resharding, node restarts, and horizontal scaling
 * Persist results to Postgres and logs to Loki
 
@@ -242,7 +242,8 @@ POST /collections/rentals/points/search
 ### Testing eventual consistency 🔄
 
 * 3 (shards) * 2 (replication) = 6 replicas on 3-5 nodes
-* 2 (Replication) * 200K points (~1.2GB) compared within 2.4s
+* 2 (Replication) * 200K points (~1.2GB) internally compared within 2.4s
+    * high load (indexing is CPU intensive) and degraded state
 * BFB upload overrides 100 points every second
 * Retry only previously inconsistent points (10 attempts max)
 <!-- (2.4s is warm on cloud. Local is ~10x faster, 0.7s for cold, 0.2s for warm) -->
@@ -260,7 +261,7 @@ POST /collections/rentals/points/search
 
 ### Results 🚀
 
-* Fixed 30+ hard-to-reproduce / critical bugs since we started (10 Feb 2024)
+* Fixed 40+ hard-to-reproduce / critical bugs since we started (10 Feb 2024)
 * Chaos testing is technically the "production" for the core team.
 * What doesn't kill you, makes you stronger!
 <!-- * If Qdrant thrives here, it's very much ready for the real world! -->

@@ -1,7 +1,8 @@
 # Talks by KShivendu
 
 - Chaos testing: Breaking a database on purpose
-  - Event: FOSS Talks Feb 2025, PES, Bangalore
+  - Event: PlatformCon (Virtual) and FOSS Talks Feb 2025, PES, Bangalore
+  - [Youtube video](https://youtu.be/qB5lF4jREUI)
   - [Slides](/chaos-testing)
 
 - Improving search relevance with reranking & fusion

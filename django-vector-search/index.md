@@ -35,7 +35,7 @@ inlineSVG: true
 # paginate: true
 ---
 
-![bg](imgs/hero.png)
+![bg](../chaos-testing/imgs/hero.png)
 
 ---
 

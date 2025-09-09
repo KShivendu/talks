@@ -2,7 +2,7 @@
 
 - Beyond filters: Modern search (and more) with vectors in Django
   - Event: DjangoCon US 2025 (Chicago)
-  - [Slides](/django-vectors)
+  - [Slides](/django-vector-search)
 
 
 - Chaos testing: Breaking a database on purpose

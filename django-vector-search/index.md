@@ -85,8 +85,8 @@ products = Product.objects.filter(
 ```
 
 * Cons:
-    * Naive.
     * Slow. It's doing full scan.
+    * Naive. Can miss many relevant items.
 
 ---
 
@@ -188,6 +188,17 @@ products = ProductDocument.search()
 
 ---
 
+## The HNSW Index
+
+![bg right:50% 100%](../static/hnsw-layers.png)
+
+* Skip Lists + Graphs
+* Approximate and Tunable
+* Filter during search
+* Quantization
+
+---
+
 ## Indexing:
 
 ```js
@@ -200,8 +211,8 @@ PUT /collections/rentals/points
       [0.1, 0.4, ..., 0.3],
     ],
     "payload": [
-      {"city": "Bangalore", "sqft": 990, "img_url": "example.com/rental1.jpg", "tags": ["..."]},
-      {"city": "Hyderabad", "sqft": 1550, "img_url": "example.com/rental2.jpg", "description": "..."},
+      {"city": "Chicago", "sqft": 990, "img_url": "example.com/rental1.jpg", "tags": ["..."]},
+      {"city": "San Francisco", "sqft": 1550, "img_url": "example.com/rental2.jpg", "description": "..."},
     ]
   }
 }
@@ -278,9 +289,14 @@ results = ProductDocument.objects.search(title="toy")
 * Lower p99 latency & relevant results at scale.
     * Tradeoff: Higher cost & indexing time.
     * Can be tuned by changing HNSW index config, quantization, & off loading to disk.
-* Can't search for IDs like `TOY_XYZ123` (can be fixed with simple filtering)
+* Can't search for IDs like `TOY_XYZ123` (can be fixed with simple filtering, ongoing research)
 * Need dedicated models in domains with lots of unknown terms (ex: legal & medical) (these days they are in abundance)
 * Although rare, model upgrade needs re-indexing of the whole dataset.
+
+---
+### Hybrid search:
+
+* Combine
 
 ---
 ### Beyond text search:

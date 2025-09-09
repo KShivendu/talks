@@ -35,7 +35,7 @@ inlineSVG: true
 # paginate: true
 ---
 
-![bg](../chaos-testing/imgs/hero.png)
+![bg](imgs/hero.png)
 
 ---
 
@@ -43,11 +43,13 @@ inlineSVG: true
 
 ![bg right:40% 80%](../static/shivendu.jpg)
 
-* Kumar Shivendu
+* Kumar Shivendu (India 🇮🇳)
+
+* 1st international talk!
 
 * Engineer @ Qdrant
 
-* I ❤️ search & distributed systems.
+* I've used Django in most of my roles and I've built search at billion scale.
 
 * Beyond Filters: Modern Search (and more) with Vectors in Django
 
@@ -58,7 +60,7 @@ inlineSVG: true
 
 * Traditional search in Django
 * Intro to vectors and vector search
-* Overview of Qdrant
+* Overview of Vector DBs & HNSW Index
 * Django integration of Vector DBs
 * Tradeoffs & limits of vector search
 * Usecases beyond text search
@@ -73,20 +75,20 @@ inlineSVG: true
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.IntegerField()
 
     class Meta:
         indexes = [models.Index(fields=["price"])]
                                                                                                                   |
-# Query:
+# Query: User wants to search for toys
 products = Product.objects.filter(
-    (Q(name__icontains="toy") | Q(description__icontains="toy")) & Q(price__lte=100)
+    (Q(name__icontains="laptop") | Q(description__icontains="laptop")) & Q(price__lte=2000)
 )
 ```
 
 * Cons:
-    * Slow. It's doing full scan.
-    * Naive. Can miss many relevant items.
+    * Slow. Full scan. No dedicated index
+    * No understanding of language. Misses `notebook`
 
 ---
 
@@ -95,16 +97,19 @@ products = Product.objects.filter(
 
 ```py
 class Product(models.Model):
-    # ...
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.IntegerField()
+
     class Meta:
         # In simple terms, GIN = A map of term/token -> list of document IDs
-        # {"toy": [p1, p2], "soft": [p1]}
+        # {"laptop": [p1, p2], "notebook": [p1]}
         indexes = [models.Index(fields=["price"]), GinIndex(fields=["name"]), GinIndex(fields=["description"])]
 
 # Queries:
 products = Product.annotate(
     search=SearchVector("name", "description"),
-).filter(Q(search="toy") & Q(price__lte=100))
+).filter(Q(search="laptop") & Q(price__lte=2000))
 ```
 
 * Cons:
@@ -148,7 +153,7 @@ products = ProductDocument.search()
 * Points in an N-dim space
 * Compressed **meaning**
 * Anything -> Vector
-* Popular ways to generate:
+* Was only accessible only to big tech:
   * Language/vision models (GPT)
   * Metric learning
     * CLIP
@@ -161,6 +166,7 @@ products = ProductDocument.search()
 
 ![bg right:40% 50%](../static/lens-reverse-image.png)
 
+* Google lens & Spotify recommendations
 * Things, not strings
 * Keyword search
   * Doc miss (low recall)
@@ -199,34 +205,75 @@ products = ProductDocument.search()
 
 ---
 
-## Indexing:
+### Creating a collection:
 
 ```js
-PUT /collections/rentals/points
+// HTTP APIs:
+PUT /collections/product
+{
+  "vectors": {
+    "distance": "Cosine", // Euclid, Dot
+    "size": 384 // dimension of your vector (generated from description of the product).
+  }
+}
+```
+
+* ```js
+  // Creating index on your fields
+  PUT /collections/product/index
+  {
+      "field_name": "price",
+      "field_schema": "integer" // keyword, geo, datetime, text, float, bool
+  }
+  ```
+
+<!--
+```py
+# docker run -p 6333:6333 qdrant/qdrant
+
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+
+client = QdrantClient(url="http://localhost:6333")
+client.create_collection(
+    collection_name="test_collection",
+    vectors_config=VectorParams(size=4, distance=Distance.DOT),
+)
+```
+-->
+
+---
+
+## Upsert:
+
+```js
+PUT /collections/product/points
 {
   "batch": {
     "ids": [1, 2],
     "vectors": [
-      [0.9, -0.5, ..., 0.0], // generated from rental1.jpg using ML model
+      [0.9, -0.5, ..., 0.0], // generated from "description" field using ML model
       [0.1, 0.4, ..., 0.3],
     ],
     "payload": [
-      {"city": "Chicago", "sqft": 990, "img_url": "example.com/rental1.jpg", "tags": ["..."]},
-      {"city": "San Francisco", "sqft": 1550, "img_url": "example.com/rental2.jpg", "description": "..."},
+      {"brand": "Samsung", "price": 990, "img_url": "example.com/samsung.jpg", "description": "..."},
+      {"brand": "Apple", "price": 1550, "img_url": "example.com/apple.jpg", "description": "..."},
     ]
   }
 }
 ```
+<!--
+* Note: Could have generated vectors for image and stored along with `description` vector -->
 
 ---
 
 ## Search:
 
 ```js
-POST /collections/rentals/points/search
+POST /collections/product/points/search
 {
   "query": [0.2, 0.3, ..., 0.4], // generated from user query (text) using same model
-  "filter": { "must": [{"key": "city", "match": {"value": "Bangalore"}}] },
+  "filter": { "must": [{"key": "price", "range": {"lte": 2000}}] },
   "limit": 10
 }
 ```
@@ -268,38 +315,45 @@ POST /collections/rentals/points/search
 
 ```py
 from django_semantic_search import Document, VectorIndex, register_document
-from books.models import Book
+from movies.models import Movie
 
 @register_document
-class ProductDocument(Document):
+class MovieDocument(Document):
     class Meta:
-        model = Book
+        model = Movie
         indexes = [
-            VectorIndex("title"),
-            VectorIndex("description"),
+            VectorIndex("plot")
         ]
 
 # Queries:
-results = ProductDocument.objects.search(title="toy")
+# Note how queries can now be very natural.
+results = MovieDocument.objects.search(plot="Movies where AI becomes sentient")
 ```
 
 ---
-### Tradeoffs and limits of vector search
 
-* Lower p99 latency & relevant results at scale.
-    * Tradeoff: Higher cost & indexing time.
-    * Can be tuned by changing HNSW index config, quantization, & off loading to disk.
-* Can't search for IDs like `TOY_XYZ123` (can be fixed with simple filtering, ongoing research)
-* Need dedicated models in domains with lots of unknown terms (ex: legal & medical) (these days they are in abundance)
-* Although rare, model upgrade needs re-indexing of the whole dataset.
+![bg right:30% 80%](imgs/tradeoff.png)
 
----
-### Hybrid search:
+### Tradeoffs wrt keyword search
 
-* Combine
+* Cost is higher
+    * Indexing is compute heavy. More RAM.
+    * Predictable latency distribution (lower p99) than keyword search
+    * Relevant results: Happier users. Increases revenue if done right
+    * Tuned by changing HNSW index config, quantization, and off-loading vectors to disk.
 
 ---
-### Beyond text search:
+
+### Limits of pure vector search
+
+* Struggles when it sees too many unknown terms
+    * Can't search for IDs like `PRODUCT_XYZ123`
+    * Need dedicated models in domains with lots of unique terms (ex: legal & medical)
+    * Combine with keyword search / filtering to handle such cases easily.
+
+---
+
+### Beyond simple search:
 
 * Multi modal search
 * Recommendations
@@ -313,12 +367,12 @@ results = ProductDocument.objects.search(title="toy")
 
 ### Summary
 
-* Vectors represent the **meaning** of given text/image/video/audio.
+* Vector search is faster at scale and more relevant.
 * Vectors unlock **new paradigms for search**: multi-modal search, recommendations, exploration, anomaly detection, etc.
-* Vector DBs make it easy to manage vectors at scale. They allow tuning between quality, cost, and latency of search.
+* Vector search engines are great if you're running at scale (1M+). They allow tuning between quality, cost, and latency of search.
 
-* Find me at
-  * [kshivendu.dev/twitter](kshivendu.dev/twitter)
+* Find me at [kshivendu.dev/twitter](kshivendu.dev/twitter)
+* Thank you! Questions?
 
 <!-- Need to update QR with new Qdrant colors #DC244C -->
 ![bg right:22% 80%](../static/linkedin-qr.png)

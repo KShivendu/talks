@@ -1998,7 +1998,7 @@ li[data-bespoke-marp-fragment=&quot;active&quot;]:not([data-bespoke-marp-current
 li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
   color: #182b3a;
 }
-" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-marpit-fragments="4" data-theme="gaia" data-style=":root {
+" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-marpit-fragments="5" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -2052,7 +2052,7 @@ li[data-bespoke-marp-fragment=&quot;active&quot;]:not([data-bespoke-marp-current
 li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
   color: #182b3a;
 }
-;--marpit-advanced-background-split:50%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;./imgs/segment.png&quot;);background-size:120%;"></figure></div></section></foreignObject><foreignObject width="50%" height="720"><section id="19" data-marpit-fragments="4" data-theme="gaia" data-style=":root {
+;--marpit-advanced-background-split:50%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;./imgs/segment.png&quot;);background-size:120%;"></figure></div></section></foreignObject><foreignObject width="50%" height="720"><section id="19" data-marpit-fragments="5" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -2114,9 +2114,10 @@ li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
 <li data-marpit-fragment="2">Vector storage (with quantized if required)</li>
 <li data-marpit-fragment="3">Vector index (HNSW)</li>
 <li data-marpit-fragment="4">JSON payload + Payload indices (additional HNSW links)</li>
+<li data-marpit-fragment="5">Started with using Rocksdb (LSM; optimized for writes). Built in-house <code>GridStore</code></li>
 </ul>
 </section>
-</foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-marpit-fragments="4" data-theme="gaia" data-style=":root {
+</foreignObject><foreignObject width="1280" height="720" data-marpit-advanced-background="pseudo"><section data-marpit-fragments="5" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -3144,7 +3145,69 @@ li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-marpit-fragments="7" data-theme="gaia" data-style=":root {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-marpit-fragments="3" data-theme="gaia" data-style=":root {
+  --color-background: #fff !important;
+  --color-foreground: #182b3a !important;
+  --color-highlight: #dc244C !important;
+  --color-dimmed: #888 !important;
+  border-top: 4px solid var(--color-highlight);
+}
+code:not([class^=&quot;language-&quot;]) {
+    background-color: #282c34 !important;
+    color: #abb2bf !important;
+    padding: 2px 4px;
+    border-radius: 3px;
+    /* border-bottom: 2px solid #61afef; */
+}
+pre {
+  white-space: pre-wrap;
+}
+
+/* Previous fragments - make them grey/dimmed */
+li[data-bespoke-marp-fragment=&quot;active&quot;]:not([data-bespoke-marp-current-fragment=&quot;current&quot;]) {
+  color: #182b3a8f;
+}
+
+/* Current fragment - keep normal/darker */
+li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
+  color: #182b3a;
+}
+" lang="en-US" style="--theme:gaia;--style::root {
+  --color-background: #fff !important;
+  --color-foreground: #182b3a !important;
+  --color-highlight: #dc244C !important;
+  --color-dimmed: #888 !important;
+  border-top: 4px solid var(--color-highlight);
+}
+code:not([class^=&quot;language-&quot;]) {
+    background-color: #282c34 !important;
+    color: #abb2bf !important;
+    padding: 2px 4px;
+    border-radius: 3px;
+    /* border-bottom: 2px solid #61afef; */
+}
+pre {
+  white-space: pre-wrap;
+}
+
+/* Previous fragments - make them grey/dimmed */
+li[data-bespoke-marp-fragment=&quot;active&quot;]:not([data-bespoke-marp-current-fragment=&quot;current&quot;]) {
+  color: #182b3a8f;
+}
+
+/* Current fragment - keep normal/darker */
+li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
+  color: #182b3a;
+}
+;">
+<h3 id="trends-in-db-industry">Trends in DB industry</h3>
+<ul>
+<li data-marpit-fragment="1">Vector Search is a very hot paradigm right now.</li>
+<li data-marpit-fragment="2">Serverless: User shouldn't know/care about the number of machines required. Generally paired with multi-tenancy. Neon got acquired.</li>
+<li data-marpit-fragment="3">Decoupling storage and compute: Put stuff in S3, load only whatever is required. Often serverless. Turbopuffer, Tantivy.</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="30" data-marpit-fragments="7" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -3267,7 +3330,7 @@ li[data-bespoke-marp-fragment=&quot;active&quot;]:not([data-bespoke-marp-current
 li[data-bespoke-marp-current-fragment=&quot;current&quot;] {
   color: #182b3a;
 }
-;--marpit-advanced-background-split:22%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;../static/linkedin-qr.png&quot;);background-size:80%;"></figure></div></section></foreignObject><foreignObject width="78%" height="720"><section id="30" data-marpit-fragments="4" data-theme="gaia" data-style=":root {
+;--marpit-advanced-background-split:22%;" data-marpit-advanced-background="background" data-marpit-advanced-background-split="right"><div data-marpit-advanced-background-container="true" data-marpit-advanced-background-direction="horizontal"><figure style="background-image:url(&quot;../static/linkedin-qr.png&quot;);background-size:80%;"></figure></div></section></foreignObject><foreignObject width="78%" height="720"><section id="31" data-marpit-fragments="4" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;

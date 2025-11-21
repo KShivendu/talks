@@ -312,6 +312,7 @@ POST /collections/rentals/points/search
 * Vector storage (with quantized if required)
 * Vector index (HNSW)
 * JSON payload + Payload indices (additional HNSW links)
+* Started with using Rocksdb (LSM; optimized for writes). Built in-house `GridStore`
 
 ---
 
@@ -409,6 +410,13 @@ POST /collections/rentals/points/search
 * You're gonna build software that will power different types of use-cases across the globe.
     * Although, not for everyone - esp. ppl who love building for end-users
 
+---
+
+### Trends in DB industry
+
+* Vector Search is a very hot paradigm right now.
+* Serverless: User shouldn't know/care about the number of machines required. Generally paired with multi-tenancy. Neon got acquired.
+* Decoupling storage and compute: Put stuff in S3, load only whatever is required. Often serverless. Turbopuffer, Tantivy.
 
 ---
 

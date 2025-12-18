@@ -347,7 +347,7 @@ li:has(&gt; img:only-child) {
   list-style: none;
   margin-left: 0;
 }
-" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="3" data-marpit-fragments="9" data-theme="gaia" data-style=":root {
+" lang="en-US" style="" data-marpit-advanced-background="pseudo" data-marpit-advanced-background-split="right"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="3" data-marpit-fragments="7" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -415,14 +415,12 @@ li:has(&gt; img:only-child) {
 <h3 id="topics-to-cover">Topics to cover</h3>
 <ul>
 <li data-marpit-fragment="1">What is multitenancy?</li>
-<li data-marpit-fragment="2">Traditional approaches and limitations</li>
+<li data-marpit-fragment="2">Anti-patterns and existing approach</li>
 <li data-marpit-fragment="3">The problem: Uneven tenant distribution</li>
-<li data-marpit-fragment="4">Tiered multitenancy in Qdrant</li>
-<li data-marpit-fragment="5">Fallback shards vs dedicated shards</li>
-<li data-marpit-fragment="6">Tenant promotion mechanism</li>
-<li data-marpit-fragment="7">Configuration and examples</li>
-<li data-marpit-fragment="8">Benefits and limitations</li>
-<li data-marpit-fragment="9">Q/A</li>
+<li data-marpit-fragment="4">Solution: Tiered multitenancy in Qdrant</li>
+<li data-marpit-fragment="5">Snippets</li>
+<li data-marpit-fragment="6">Demo</li>
+<li data-marpit-fragment="7">Q/A</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section data-marpit-fragments="5" data-theme="gaia" data-style=":root {
@@ -761,7 +759,7 @@ li:has(&gt; img:only-child) {
   list-style: none;
   margin-left: 0;
 }
-" lang="en-US" style="" data-marpit-advanced-background="pseudo"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-marpit-fragments="3" data-theme="gaia" data-style=":root {
+" lang="en-US" style="" data-marpit-advanced-background="pseudo"></section></foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-marpit-fragments="4" data-theme="gaia" data-style=":root {
   --color-background: #fff !important;
   --color-foreground: #182b3a !important;
   --color-highlight: #dc244C !important;
@@ -832,11 +830,14 @@ li:has(&gt; img:only-child) {
     collection_name = <span class="hljs-string">f&quot;tenant_<span class="hljs-subst">{tenant_id}</span>&quot;</span>
     client.create_collection(collection_name, ...)
 </code></pre>
-<p><strong>Problems:</strong></p>
 <ul>
-<li data-marpit-fragment="1">Resource overhead per collection</li>
-<li data-marpit-fragment="2">Qdrant Cloud limit: <strong>1000 collections per cluster</strong></li>
-<li data-marpit-fragment="3">Management complexity</li>
+<li data-marpit-fragment="1">Problems:
+<ul>
+<li data-marpit-fragment="2">Resource overhead per collection</li>
+<li data-marpit-fragment="3">Qdrant Cloud limit: <strong>1000 collections per cluster</strong></li>
+<li data-marpit-fragment="4">Management complexity</li>
+</ul>
+</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7" data-theme="gaia" data-style=":root {

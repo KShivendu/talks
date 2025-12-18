@@ -67,13 +67,11 @@ image: ./imgs/hero.png
 ### Topics to cover
 
 * What is multitenancy?
-* Traditional approaches and limitations
+* Anti-patterns and existing approach
 * The problem: Uneven tenant distribution
-* Tiered multitenancy in Qdrant
-* Fallback shards vs dedicated shards
-* Tenant promotion mechanism
-* Configuration and examples
-* Benefits and limitations
+* Solution: Tiered multitenancy in Qdrant
+* Snippets
+* Demo
 * Q/A
 
 ---
@@ -106,10 +104,10 @@ for tenant_id in tenants:
     client.create_collection(collection_name, ...)
 ```
 
-**Problems:**
-* Resource overhead per collection
-* Qdrant Cloud limit: **1000 collections per cluster**
-* Management complexity
+* Problems:
+  * Resource overhead per collection
+  * Qdrant Cloud limit: **1000 collections per cluster**
+  * Management complexity
 
 ---
 
@@ -191,7 +189,6 @@ client.search(
 * Tenant promotion: Move tenants from default to dedicated shards
   * Search and upsert continue to work during promotion.
 
-
 ---
 
 ### Architecture Overview
@@ -199,7 +196,6 @@ client.search(
 * Common shard: Assume named as `default`
 * Dedicated shard: Assume named by tenant ID
 * Can promote `user_3` from default -> dedicated shard
-
 
 ![bg right:50% 90%](./imgs/tenant-promotion.png)
 

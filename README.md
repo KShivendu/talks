@@ -2,7 +2,7 @@
 
 - Qdrant: Tiered Multi-tenancy
   - Event: Qdrant Office Hours (Virtual, Discord)
-  - [Slides](/qdrant-tiered-multienancy)
+  - [Slides](/tiered-multienancy)
 
 - Beyond filters: Modern search (and more) with vectors in Django
   - Event: DjangoCon US 2025 (Chicago)

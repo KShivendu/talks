@@ -1,5 +1,9 @@
 # Talks by KShivendu
 
+- Qdrant: Tiered Multi-tenancy
+  - Event: Qdrant Office Hours (Virtual, Discord)
+  - [Slides](/qdrant-tiered-multienancy)
+
 - Beyond filters: Modern search (and more) with vectors in Django
   - Event: DjangoCon US 2025 (Chicago)
   - [Slides](/django-vector-search)
@@ -11,7 +15,7 @@
   - [Slides](/chaos-testing)
 
 - Improving search relevance with reranking & fusion
-  - Event: Tensorflow May 2024 Meetup (Bangalore)
+  - Event: Microsoft Reactor (Bangalore) and Tensorflow May 2024 Meetup (Bangalore)
   - [Slides](/reranking-fusion)
 
 - Qdrant: Shaping the future of search and beyond

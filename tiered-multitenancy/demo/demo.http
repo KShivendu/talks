@@ -1,0 +1,63 @@
+GET /cluster
+
+DELETE /collections/demo
+
+PUT /collections/demo
+{
+  "sharding_method": "custom", // IMPORTANT
+  "vectors": {
+    "size": 768,
+    "distance": "Cosine"
+  },
+  "optimizers_config": {
+    // Should ideally index with m=0, payload_m=16
+    // And create payload index on group_id with is_tenant=True
+    // But skipping that to keep machine performant during demo
+    "indexing_threshold": 0
+  }
+}
+
+GET /collections/demo
+
+GET /collections/demo/cluster
+
+PUT /collections/demo/shards
+{
+  "shard_key": "default"
+}
+
+GET /collections/demo/cluster
+
+PUT /collections/demo/shards
+{
+  "shard_key": "user_3",
+  "initial_state": "Partial"
+}
+
+GET /collections/demo/cluster
+
+// Start upserting some points using python script
+
+POST /collections/demo/cluster
+{
+  "replicate_points": {
+    "filter": {
+      // Having index on group_id would be speed up transfer
+      "must": { "key": "group_id", "match": { "value": "user_2" } }
+    },
+    "from_shard_key": "default",
+    "to_shard_key": "user_3"
+  }
+}
+
+GET /collections/demo/cluster
+
+POST /collections/demo/points/delete
+{
+  "filter": {
+      "must": { "key": "group_id", "match": { "value": "user_2" } }
+  },
+  "shard_key": "default"
+}
+
+GET /collections/demo/cluster

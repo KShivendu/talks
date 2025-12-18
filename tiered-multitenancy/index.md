@@ -38,7 +38,7 @@ style: |
 
 marp: true
 title: Qdrant: Tiered Multitenancy
-description: Qdrant Discord Hours talk on Tiered Multi-tenancy
+description: Qdrant Tiered Multi-tenancy (from Discord Office Hours)
 keywords: qdrant, databases, sharing, multi-tenancy, search
 inlineSVG: true
 image: ./imgs/hero.png

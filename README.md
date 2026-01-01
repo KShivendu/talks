@@ -4,6 +4,10 @@
   - Event: Qdrant Office Hours (Virtual, Discord)
   - [Slides](/tiered-multitenancy)
 
+- Qdrant: Internals of a Vector DB
+  - Event: Guest Lecture DBMS Course, IIT Bhilai
+  - [Slides](/qdrant-db-internals)
+
 - Beyond filters: Modern search (and more) with vectors in Django
   - Event: DjangoCon US 2025 (Chicago)
   - [Slides](/django-vector-search)

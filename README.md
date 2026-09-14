@@ -1,5 +1,9 @@
 # Talks by KShivendu
 
+- Token-Native Storage: Read and Write in Your Agent's Language
+  - [Slides](/token-storage)
+  - [Paper (arXiv 2608.02376)](https://arxiv.org/abs/2608.02376) · [Blog post](https://kshivendu.dev/blog/token-storage) · [Benchmarks](https://github.com/KShivendu/token-storage)
+
 - Qdrant: Tiered Multi-tenancy
   - Event: Qdrant Office Hours (Virtual, Discord)
   - [Youtube Video](https://youtu.be/72Ux-Lgx93w)

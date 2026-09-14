@@ -1,6 +1,6 @@
 # Token-Native Storage — talk plan
 
-**Slot:** conference, 30–40 min · **Audience:** mixed developer · **Slides:** 36 (~35 min)
+**Slot:** conference, 30–40 min · **Audience:** mixed developer · **Slides:** 28 (~32 min)
 
 Built from three sources:
 
@@ -28,12 +28,15 @@ compression *and* the translation cost gone.
 ## Act structure
 
 1. **Skeleton** (3) — hero, `$ whoami`, `Topics to cover`
-2. **The problem** (6) — who reads the DB now, the two-representation diagram, the three ladder rungs, "so what does the model want?"
-3. **Free compression** (6) — napkin math, BPE primer, ratio chart + reading, corpora chart + reading (including r50k Hindi at 0.84x)
-4. **The BPE bug** (3) — merge-order IDs, the rank-remap code, the ratio/decode frontier
-5. **The agent flip** (7) — who is reading, agent read chart, agent write chart, the Drake beat, humans at the edge
-6. **Honesty** (3) — gigatoken, limitations, what shipping would cost
-7. **The ask** (5) — interface x2, two asks for the labs, summary, references
+2. **The problem** (5) — the wrong-language slide, the two-representation diagram, two ladder rungs, "so what does the model want?"
+3. **Free compression** (4) — napkin math, BPE primer, two charts (each carries its own conclusion)
+4. **The BPE win** (4) — the two levers, merge-order IDs, the rank-remap code, the ratio/decode frontier
+5. **The agent flip** (5) — agent read chart + reading, agent write chart, the Drake beat, humans at the edge
+6. **Honesty** (3) — gigatoken, which claims survive, limitations
+7. **The ask** (4) — interface, two asks for the labs, summary, references
+
+Pruned from 36. What the six cut slides said now lives in the speaker notes at the
+bottom of `index.md`, to say out loud over the chart that replaced them.
 
 ## Charts
 

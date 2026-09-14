@@ -33,8 +33,11 @@ marp: true
 inlineSVG: true
 # paginate: true
 ---
+
 ![bg](imgs/hero.png)
+
 ---
+
 ## $ whoami
 
 ![bg right:40% 80%](../static/shivendu.jpg)
@@ -46,10 +49,12 @@ inlineSVG: true
 * I ❤️ search, databases, and performance.
 
 * Token-Native Storage
+
 ---
+
 ## Topics to cover
 
-* Why your database speaks the wrong language
+* The payload nobody compresses
 
 * The compression ladder, and why every rung falls short
 
@@ -57,39 +62,24 @@ inlineSVG: true
 
 * An easy win in every BPE tokenizer
 
-* The agent read/write flip
+* The second win: the agent read/write flip
 
 * What breaks, and what the ecosystem needs
+
 ---
-### Your database speaks the wrong language
 
-* One RAG query returns 10 chunks of 512 tokens
+### The payload nobody compresses
 
-* The store hands back UTF-8. The model can only read token IDs
+* A vector DB record is a **vector** plus a text payload
 
-* So it tokenizes: 237us a chunk, 2.4ms per query, **on every query forever**
+* We compress the vector obsessively: product quantization, binary quantization, Matryoshka
 
-* Nothing that read those chunks was human
+* The text payload gets raw UTF-8, or LZ4 if you're lucky. On English, 1.27x
+
+* Text is the heavy field: thousands of characters, one byte each
+
 ---
-### Two representations, paid for twice
 
-```text
-   WRITE (agent)                    READ (agent)
-   +------------+                   +------------+
-   | token IDs  |                   | token IDs  |
-   +------------+                   +------------+
-         | detokenize  50us               ^ tokenize  237us
-         v                                |
-   +------------+                   +------------+
-   | UTF-8 text |                   | UTF-8 text |
-   +------------+                   +------------+
-         | LZ4 compress  2.9us            ^ LZ4 decompress  1.0us
-         v                                |
-   +----------------[ DISK ]-----------------+
-```
-
-* Stored once, kept in **two** representations, translated on every access
----
 ### What our engines actually do
 
 * Qdrant, Elasticsearch, Postgres: the payload gets an LZ-family codec, usually LZ4
@@ -98,8 +88,10 @@ inlineSVG: true
 
 * Cons:
   * Barely compresses. 100 GB of text becomes 79 GB
-  * And every agent read still re-tokenizes
+  * Every copy pays it again: snapshots, backups, WAL, replicas, network egress
+
 ---
+
 ### Compress harder? Train a dictionary?
 
 * gzip `-9` 1.92x  ·  zstd `-19` 1.94x  ·  brotli `q11` 2.57x
@@ -109,16 +101,20 @@ inlineSVG: true
 * Cons:
   * brotli takes 2,777us to encode one 512-token chunk, ~1,000x LZ4's 2.9us
   * The dictionary is yours alone. It ships with your data, nobody else can read it
-  * And every agent read still re-tokenizes
+  * Neither vocabulary is shared or standard
+
 ---
-### So what does the model want?
 
-* Every rung ends the same way: **the model re-tokenizes on every read**
+### What if we stored the model's own format?
 
-* We keep optimizing the container and never question the contents
+* Every rung optimizes the **container** and never questions the contents
 
-* What if we stored what the model actually consumes?
+* Whatever we store, the model turns it into token IDs before it can read a word
+
+* So what if the token IDs were the stored form?
+
 ---
+
 ### The napkin math
 
 ```napkin
@@ -135,7 +131,9 @@ ratio: 4.5 / 2.0 = ~2.25x
 * r50k's vocabulary is 50,257 tokens, which fits in a `uint16`
 
 * This is the whole idea. Everything after this slide is checking it
+
 ---
+
 ## Tokens
 
 * BPE (Byte Pair Encoding) starts from raw bytes and repeatedly merges the most frequent adjacent pair
@@ -145,21 +143,27 @@ ratio: 4.5 / 2.0 = ~2.25x
 * Every word carries its leading space into the token: `" cat"` is 4 bytes of UTF-8, but 1 token
 
 * r50k 50,257 (2 bytes)  ·  cl100k 100,277  ·  o200k 200,019 (3 bytes)
----
-![bg 80%](imgs/ratio-english.png)
----
-![bg 92%](imgs/ratio-corpora.png)
----
-### Two levers on top of the IDs
 
-* The IDs are just integers now, so you can compress them like integers
+---
+
+![bg 80%](imgs/ratio-english.png)
+
+---
+
+![bg 92%](imgs/ratio-corpora.png)
+
+---
+
+### Two levers on top of the IDs
 
 * Asymmetric Numeral Systems (ANS) is an entropy coder: frequent tokens get shorter codes. `"the"` is ~40x more common than `"embeddings"`, so it earns fewer bits
 
 * Or re-rank the IDs by frequency and pack them with `streamvbyte`, a **variable-length** integer codec
 
 * One table, trained once on a corpus, reused for every document. Not per-document, or you would ship ~900 bytes of table with each 512-token chunk
+
 ---
+
 ### An easy win in every BPE tokenizer
 
 * Running the frequency histogram, I found BPE hands out IDs in **merge-discovery order**, not by how often a token is used
@@ -169,7 +173,9 @@ ratio: 4.5 / 2.0 = ~2.25x
 * Variable-length integer codecs pay for big numbers, so this ordering leaves compression on the table for everyone downstream
 
 * Re-ranking by frequency on English: 2.13x → 2.60x. Half of `+freq`'s gain is the remap alone
+
 ---
+
 ### Fixing it:
 
 ```python
@@ -189,27 +195,60 @@ def compress(text):
     n = codec.encodeArray(ranks, len(ranks), out, len(out))       # streamvbyte
     return len(ranks).to_bytes(4, "big") + out[:n].tobytes()
 ```
+
 ---
+
 ![bg 78%](imgs/frontier.png)
+
 ---
+
+### Two representations, paid for twice
+
+```text
+   WRITE (agent)                    READ (agent)
+   +------------+                   +------------+
+   | token IDs  |                   | token IDs  |
+   +------------+                   +------------+
+         | detokenize  50us               ^ tokenize  237us
+         v                                |
+   +------------+                   +------------+
+   | UTF-8 text |                   | UTF-8 text |
+   +------------+                   +------------+
+         | LZ4 compress  2.9us            ^ LZ4 decompress  1.0us
+         v                                |
+   +----------------[ DISK ]-----------------+
+```
+
+* Stored once, kept in **two** forms, translated on every access
+
+---
+
 ![bg 90%](imgs/agent-read.png)
+
 ---
+
 ### Agent read
 
 * LZ4 decompresses in 1.0us, then spends **236.7us** tokenizing text the model will immediately consume as IDs
 
-* Token-native serves the IDs directly: 3.6us (`+freq`) to 28.8us (`+ANS`)
+* Token-native serves the IDs directly: 3.6us with `+freq`, 28.8us with `+ANS`
 
 * That's ~66x on the fastest token-native path
 
 * Read is where it compounds: it happens on every retrieval, forever. Writing happens once
+
 ---
+
 ![bg 90%](imgs/agent-write.png)
+
 ---
+
 ### Detokenize, then tokenize again on every read
 
 ![bg 42%](imgs/drake-no.jpg)
+
 ---
+
 ### But humans still read this data
 
 * True cost: token-native pays ~50us to detokenize before a human sees anything
@@ -219,7 +258,9 @@ def compress(text):
 * The human sees one answer, once, at the end
 
 * So detokenize **once**, at the edge. Maybe in the frontend
+
 ---
+
 ### Works well, but... tokenizers got faster
 
 * My whole read argument assumes tokenizing costs ~237us. I measured that with `tiktoken`
@@ -229,7 +270,9 @@ def compress(text):
 * My blog post said a 30M-request/month workload wastes 42 hours/month re-tokenizing
 
 * With a fast tokenizer that becomes **~1.1 hours/month**. I was off by 38x
+
 ---
+
 ### So which claims actually survive?
 
 | Claim | Verdict | With gigatoken as the baseline |
@@ -241,7 +284,9 @@ def compress(text):
 | Random cold read | Small | 652.9 → **498.4us (1.3x)** |
 
 * The compression and write arguments never depended on a slow tokenizer. Part of the read argument did
+
 ---
+
 ### Limitations
 
 * Pays off end to end only if reader and writer share a tokenizer. Anthropic and Google (except Gemma) haven't published theirs
@@ -251,7 +296,9 @@ def compress(text):
 * My frequency table is corpus-specific. Point it at a corpus it wasn't built on and the ratio drops
 
 * `mxbai-embed-large-v1` compresses better at 3.56x, but **80.4%** of articles decode corrupted. BERT lowercases: `"Qdrant"` becomes `"qdrant"`
+
 ---
+
 ### Interface
 
 ```js
@@ -268,7 +315,9 @@ POST /collections/documents/points/search
 ```
 
 * Ask for `"tokens"` to skip detokenization. Swapping codec is **not a data migration**
+
 ---
+
 ### Two asks for the AI labs
 
 * Sort the vocabulary by corpus frequency before you publish it. It costs **one sort**, and it hands every downstream user free compression
@@ -276,7 +325,9 @@ POST /collections/documents/points/search
 * Publish the tokenizers. We need a UTF-8-like standard for tokens, so a stored payload isn't locked to one vendor's model version
 
 * You don't have to wait for either of these. Remap on your own corpus and you'll beat the vendor's ordering anyway
+
 ---
+
 ### Summary
 
 * A tokenizer that covers your script is **free compression**: 2.25x raw, 3.40x with a coder
@@ -289,7 +340,9 @@ POST /collections/documents/points/search
   * [kshivendu.dev/twitter](https://kshivendu.dev/twitter)
 
 ![bg right:20% 80%](../static/linkedin-qr.png)
+
 ---
+
 ### References
 
 * Paper: [Token-Native Storage](https://arxiv.org/abs/2608.02376) (arXiv 2608.02376)

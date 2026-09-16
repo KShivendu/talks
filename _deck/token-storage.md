@@ -14,9 +14,10 @@ routerMode: hash
 # selects prose instead. We want people to copy from the slides.
 selectable: true
 layout: cover
-background: /imgs/hero.png
 class: 'text-left'
 ---
+<img :src="$asset('imgs/hero.png')" class="absolute inset-0 w-full h-full object-contain" alt="Token-Native Storage" />
+
 <!-- Slide 1: the hero carries the title, nothing else on it. -->
 
 ---
@@ -35,7 +36,7 @@ class: 'text-left'
 - Token-Native Storage
 
 </div>
-<img src="/shivendu.jpg" class="h-64 rounded-lg" />
+<img :src="$asset('shivendu.jpg')" class="h-64 rounded-lg" />
 </div>
 
 ---
@@ -279,18 +280,13 @@ def compress(text):
 
 ---
 
-layout: image
-image: /imgs/frontier.png
-backgroundSize: contain
+<img :src="$asset('imgs/frontier.png')" class="absolute inset-0 w-full h-full object-contain" alt="frontier" />
 
 <!--
 Still a PNG: a scatter needs markers, and the blog's LineChart throws a TDZ on
 any series with markers (onCrosshairLeave used at line 603, declared at 864).
-All o200k here, so raw is 1.59x, not the 2.25x from earlier.
--->
 
-<!--
-All o200k here, so raw is 1.59x, not the 2.25x from earlier. o200k IDs need
+All o200k here, so raw is 1.59x, not the 2.25x from earlier: o200k IDs need
 3 bytes, r50k's fit in 2.
 -->
 
@@ -317,9 +313,7 @@ All o200k here, so raw is 1.59x, not the 2.25x from earlier. o200k IDs need
 
 ---
 
-layout: image
-image: /imgs/agent-read.png
-backgroundSize: contain
+<img :src="$asset('imgs/agent-read.png')" class="absolute inset-0 w-full h-full object-contain" alt="agent-read" />
 
 ---
 
@@ -347,7 +341,7 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 ## Detokenize, then tokenize again on every read
 
 <div class="flex justify-center mt-2">
-  <img src="/imgs/drake-no.jpg" class="h-72 rounded-lg" />
+  <img :src="$asset('imgs/drake-no.jpg')" class="h-72 rounded-lg" />
 </div>
 
 ---
@@ -511,7 +505,7 @@ POST /collections/documents/points/search
 - Paper [arXiv 2608.02376](https://arxiv.org/abs/2608.02376) · [post](https://kshivendu.dev/blog/token-storage) · [benchmarks](https://github.com/KShivendu/token-storage)
 
 </div>
-<img src="/linkedin-qr.png" class="h-48" />
+<img :src="$asset('linkedin-qr.png')" class="h-48" />
 </div>
 
 <!--

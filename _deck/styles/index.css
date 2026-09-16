@@ -1,0 +1,89 @@
+/*
+ * Global deck styles. Slidev auto-imports styles/index.css.
+ *
+ * These lived in a <style> block on slide 1 first, which was wrong: Slidev
+ * injects a slide's styles only while that slide is mounted, so every rule
+ * silently stopped applying from slide 2 onward.
+ *
+ * Ported from the Marp deck's `style:` frontmatter block.
+ */
+/* ── ported from the Marp deck's `style:` block ─────────────────────────── */
+:root {
+  --color-background: #fff;
+  --color-foreground: #182b3a;
+  --color-highlight: #dc244C;   /* Qdrant red */
+  --color-dimmed: #888;
+  /* revealed-but-past fragment, Marp's #182b3a8f */
+  --ts-fragment-dim: #182b3a8f;
+  --ts-code-block: #182b3a;     /* measured off the Marp render */
+  --ts-code-border: transparent;
+}
+
+/* Dark mode: press `d`. The ground matches the hero image (#0b1220) so slide 1
+   stops being the only dark slide. Red highlight is unchanged -- it carries on
+   both grounds. */
+html.dark {
+  --color-background: #0b1220;
+  --color-foreground: #e6edf3;
+  --ts-fragment-dim: #e6edf380;
+  /* the navy code card would nearly vanish on the dark ground, so lift it and
+     give it a hairline edge instead of relying on contrast alone */
+  --ts-code-block: #16263a;
+  --ts-code-border: #ffffff1f;
+}
+
+.slidev-layout {
+  background: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+}
+
+/* inline code: dark chip, One Dark foreground. Not fenced blocks, which Shiki
+   themes itself -- same `:not([class^="language-"])` guard as the Marp deck. */
+.slidev-layout :not(pre) > code {
+  background-color: #282c34 !important;
+  color: #abb2bf !important;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+/* code wraps, never scrolls. A snippet needing a scrollbar is too long. */
+.slidev-layout pre,
+.slidev-layout .shiki {
+  white-space: pre-wrap;
+}
+
+/* Marp's fragment model: revealed-but-past dims, current stays full strength.
+   Slidev's own classes line up with Marp's `active` / `current` exactly. */
+.slidev-vclick-target {
+  transition: color 180ms ease;
+}
+/* Colour the bullet only, never its descendants. A `*` here also repaints the
+   inline-code chip, turning #abb2bf text into translucent dark on a #282c34
+   background -- unreadable. Marp's rule targeted the <li> alone for the same
+   reason, so code keeps its own colours while the prose dims. */
+.slidev-layout .slidev-vclick-prior {
+  color: var(--ts-fragment-dim) !important;
+}
+.slidev-layout .slidev-vclick-current {
+  color: var(--color-foreground) !important;
+}
+
+/* Slidev's "go to slide" box (press `g`) parks off-screen at top:-5rem, which
+   only hides its 42px input. Here its autocomplete list renders too, making the
+   box 666px tall, so ~580px hangs into the right of every slide. `-top-20` is
+   present only while parked, so this stops matching the moment you press `g`. */
+.fixed.right-5.-top-20 { visibility: hidden !important; }
+
+/* Slidev repaints code blocks #f5f5f5, which buries the theme's own light text.
+   Force the navy card the Marp deck actually renders (#182b3a, sampled from a
+   screenshot of qdrant-db-internals slide 9). */
+.slidev-layout pre.shiki,
+.slidev-layout .slidev-code,
+.slidev-layout pre.slidev-code {
+  background-color: var(--ts-code-block) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--ts-code-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+}

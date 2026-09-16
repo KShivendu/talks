@@ -5,7 +5,7 @@
   "scripts": {
     "data": "node scripts/gen-data.mjs",
     "dev": "slidev token-storage.md --open",
-    "build": "rm -rf ../token-storage-next && npm run data && npm run charts && slidev build token-storage.md --base /token-storage-next/ --out ../token-storage-next",
+    "build": "rm -rf ../token-storage && npm run data && npm run charts && slidev build token-storage.md --base /token-storage/ --out ../token-storage",
     "export": "echo 'Run: pnpm dev, then open http://localhost:3030/export (browser exporter, no playwright needed)'",
     "charts": "vite build --config charts/vite.config.mjs"
   },

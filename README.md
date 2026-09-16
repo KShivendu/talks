@@ -1,7 +1,7 @@
 # Talks by KShivendu
 
 - Token-Native Storage: Read and Write in Your Agent's Language
-  - [Slides](/token-storage)
+  - [Slides](/token-storage) (Slidev, live charts) · [older Marp version](/token-storage-old)
   - [Paper (arXiv 2608.02376)](https://arxiv.org/abs/2608.02376) · [Blog post](https://kshivendu.dev/blog/token-storage) · [Benchmarks](https://github.com/KShivendu/token-storage)
 
 - Qdrant: Tiered Multi-tenancy

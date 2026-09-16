@@ -47,7 +47,7 @@ class: 'text-left'
 
 - The payload nobody compresses
 
-- The compression ladder, and why every rung falls short
+- The compression ladder, and why every step on it falls short
 
 - Tokens as the storage format: free compression
 
@@ -79,18 +79,18 @@ class: 'text-left'
 
 ## The compression ladder
 
-| | English | encode cost | why it falls short |
-| --- | ---: | ---: | --- |
-| LZ4 (Qdrant, ES, Postgres) | 1.27x | 2.9us | barely compresses |
-| gzip `-9` | 1.92x | 26us | still a byte codec |
-| zstd `-19` | 1.94x | 209us | slow for what it buys |
-| brotli `q11` | 2.57x | **2,777us** | ~1,000x LZ4 to encode |
-| `zstd --train` | 2.72x | 359us | dictionary ships with your data |
-| LZ4 over 16KB **blocks** | 1.43x | 2.9us | helps, but a read now costs 305us |
+| | English | encode | decode | why it falls short |
+| --- | ---: | ---: | ---: | --- |
+| LZ4 (Qdrant, ES, Postgres) | 1.27x | 2.9us | 1.0us | barely compresses |
+| gzip `-9` | 1.92x | 26us | 8.0us | still a byte codec |
+| zstd `-19` | 1.94x | 209us | 4.5us | slow for what it buys |
+| brotli `q11` | 2.57x | **2,777us** | 9.5us | ~1,000x LZ4 to encode |
+| `zstd --train` | 2.72x | 359us | 3.2us | dictionary ships with your data |
+| LZ4 over 16KB **blocks** | 1.43x | 7.8us | 7.6us | one read decompresses the whole block |
 
 <v-clicks>
 
-- Blocking buys ratio and **costs read latency**: one document decompresses its whole block
+- Decode is cheap, but it returns **bytes**: add **~235us** of tokenizing to every row
 
 - Every copy pays it again: snapshots, WAL, replicas, egress. And no vocabulary here is shared
 
@@ -99,6 +99,19 @@ class: 'text-left'
 <!--
 The 2x2 is in 07_kalcher_baseline/read_latency_2x2_results.json, ES/Lucene-style
 blocks (<=16KB or 128 docs, whole block compressed, one doc read decompresses it).
+
+Decode column = byte_codecs.prose[c].decompress_us from 03_latency/latency_grid_
+results.json. The block row instead comes from 07_kalcher_baseline/block_codecs_
+results.json :: block_meta['512|prose|LZ4'] -- encode 7.8us is the per-doc
+AMORTIZED cost of compressing a whole 16KB block (~7 docs), decode 7.6us is the
+full-block cost one reader pays. Same 512-token prose chunks and seed as the
+other rows, but a separate run (lz4.frame, single-shot) vs the grid's warm
+median-of-30 lz4 point calls -- so treat the encode column as same-order, not
+same-harness. If asked why block encode > point encode: frame headers plus a
+cold single-shot measurement.
+
+None of the decode numbers include tokenizing (~235us for r50k prose), which is
+the point of the next bullet.
 
              byte/doc  byte/block  token/doc  token/block
   prose         287.9       304.8       89.5         39.8
@@ -116,11 +129,11 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 
 <v-clicks>
 
-- Every rung optimizes the **container** and never questions the contents
+- Every option on that ladder packs the **same UTF-8 bytes** tighter. Same contents, smaller box
 
-- Whatever we store, the model turns it into token IDs before it can read a word
+- But nothing downstream reads UTF-8. The model turns it into token IDs first, on **every read**
 
-- So what if the token IDs were the stored form?
+- So what if we **store token IDs directly**?
 
 </v-clicks>
 
@@ -222,10 +235,20 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 <!--
-Order-0 token methods are flat because per-token entropy is additive.
-LZ-family methods climb by finding cross-chunk repeats, and zstd --train only
-catches +freq+vbyte at 4,096 tokens. The advantage is largest at the realistic
-512-token chunk.
+Order-0 token methods are flat because per-token entropy is additive: doubling
+the chunk gives them nothing new. LZ-family methods climb by finding cross-chunk
+repeats, so the gap narrows as chunks grow. The advantage is largest at the
+realistic 512-token chunk, which is the one people actually use.
+
+Against what production actually runs -- LZ4, gzip, zstd-19 -- +ANS wins at
+every chunk size on prose (3.38x vs 1.95x best) and Hindi (5.90x vs 2.45x).
+
+`zstd --train` is the honest comparison, and the Code tab is where it wins:
+3.34x vs +ANS 3.05x at 512, widening to 4.78x vs 2.94x at 4,096. Code is highly
+repetitive, so a dictionary plus an LZ window spanning many chunks beats
+per-token entropy coding. Two answers if pushed: the dictionary has to be
+trained on your corpus and then shipped and versioned alongside it, and its
+output is still bytes you have to tokenize on every read.
 -->
 
 ---

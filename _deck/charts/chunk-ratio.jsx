@@ -6,7 +6,7 @@ import { mount } from './mount.jsx'
 // barely moves them. LZ-family methods climb by finding cross-chunk repeats.
 mount(
   <LineChart
-    title="Ratio holds at every chunk size"
+    title="Token methods stay flat; byte codecs need big chunks"
     xLabel="chunk size (tokens)"
     yLabel="compression ratio"
     xScale="log"

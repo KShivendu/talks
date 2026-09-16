@@ -39,6 +39,13 @@ const ood = JSON.parse(readFileSync(oodPath, 'utf8'))
 // Palette: grey for byte codecs, Qdrant red for token-native. Same meaning as
 // the Marp charts, so the two decks read identically.
 const GREY = '#94a3b8'
+// A ramp for the byte codecs when several share one chart: weakest is lightest,
+// so the family reads as one group but the individual lines stay separable.
+const GREY_L = '#cbd5e1'
+const GREY_M = '#94a3b8'
+const GREY_D = '#64748b'
+const GREY_XD = '#475569'
+const RED_L = '#f4768f'
 const RED = '#dc244C'
 
 const CORPORA = [
@@ -120,31 +127,39 @@ const latency = {
 }
 
 
-// ── chunk-size sweep: ratio (r50k, all domains, 512..4096) ───────────────────
+// ── chunk-size sweep: ratio (native tokenizer per domain, 512..4096) ───────
+// Built from the LATENCY sweep, which carries a `ratio` per cell for every
+// codec. The kalcher chunksize_sweep_ratio table only has token methods, so
+// using it left the byte codecs -- the whole comparison -- off the chart.
 // Order-0 token methods are flat because per-token entropy is additive; the
 // LZ-family climbs by finding cross-chunk redundancy.
 const SIZES = [512, 1024, 2048, 4096]
-const CHUNK_SERIES = [
-  ['raw', RED, 'circle'],
-  ['+freq', RED, 'square'],
-  ['+ANS', RED, 'diamond'],
-  ['Kalcher(zstd)', GREY, 'triangle'],
+const NATIVE_TOK = { prose: 'r50k', code: 'cl100k', hindi: 'o200k' }
+const RATIO_SERIES = [
+  // the real competition: what production stores actually run, plus
+  // `zstd --train` as the strongest byte-side comparison. Darker = stronger.
+  ['LZ4', GREY_L],
+  ['gzip-9', GREY_M],
+  ['zstd-19', GREY_D],
+  ['zstd --train', GREY_XD],
+  ['+freq', RED_L],
+  ['+ANS', RED],
 ]
+const sweepCell = (key, n) => sweep[`${NATIVE_TOK[key]}|${key}|${n}`]
 const chunkRatio = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    series: CHUNK_SERIES.map(([name, color, marker]) => ({
+    series: RATIO_SERIES.map(([name, color]) => ({
       name,
       color,
-      marker,
-      // blog LineChart bug: its marker hit-layer references onCrosshairLeave
-      // (const, declared ~260 lines later) during render, so any series with
-      // markers throws a TDZ. Lines only until that is fixed upstream.
+      // blog LineChart bug: a series with markers references onCrosshairLeave
+      // (const, declared ~260 lines later) during render and throws a TDZ.
       showMarkers: false,
-      points: SIZES.map((n) => [n, chunkRatioRaw[`${key}|${n}|${name}`]?.[0]]).filter(
-        ([, y]) => y != null
-      ),
+      points: SIZES.map((n) => {
+        const v = sweepCell(key, n)?.methods?.[name]?.ratio
+        return v == null ? null : [n, Math.round(v * 100) / 100]
+      }).filter(Boolean),
     })).filter((s) => s.points.length),
   })),
 }
@@ -152,7 +167,6 @@ const chunkRatio = {
 // ── chunk-size sweep: encode cost ────────────────────────────────────────────
 // brotli's quality-11 search does not amortise: 8x the input costs ~18-35x the
 // time, while the token-native coders stay close to linear.
-const NATIVE_TOK = { prose: 'r50k', code: 'cl100k', hindi: 'o200k' }
 const ENC_SERIES = [
   ['brotli-q11', GREY, 'triangle'],
   ['zstd --train', GREY, 'square'],

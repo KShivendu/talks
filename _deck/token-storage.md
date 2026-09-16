@@ -295,18 +295,23 @@ All o200k here, so raw is 1.59x, not the 2.25x from earlier: o200k IDs need
 ## Two representations, paid for twice
 
 ```text
-   WRITE (agent)                    READ (agent)
-   +------------+                   +------------+
-   | token IDs  |                   | token IDs  |
-   +------------+                   +------------+
-         | detokenize  50us               ^ tokenize  237us
-         v                                |
-   +------------+                   +------------+
-   | UTF-8 text |                   | UTF-8 text |
-   +------------+                   +------------+
-         | LZ4 compress  2.9us            ^ LZ4 decompress  1.0us
-         v                                |
-   +----------------[ DISK ]-----------------+
+  WRITE (agent)                   READ (agent)
+
+  ╭────────────╮                  ╭────────────╮
+  │ token IDs  │                  │ token IDs  │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  detokenize  50 µs            │  tokenize  237 µs
+        ▼                               │
+  ╭─────┴──────╮                  ╭─────┴──────╮
+  │ UTF-8 text │                  │ UTF-8 text │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  LZ4 compress  2.9 µs         │  LZ4 decompress  1.0 µs
+        ▼                               │
+  ╭─────┴───────────────────────────────┴──────╮
+  │                    DISK                    │
+  ╰────────────────────────────────────────────╯
 ```
 
 - Stored once, kept in **two** forms, translated on every access

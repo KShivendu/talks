@@ -6,6 +6,10 @@ info: |
   Kumar Shivendu (kshivendu.dev) · arXiv 2608.02376
 # 'all' lets the audience-facing deck start light and toggle with `d`
 colorSchema: all
+# GitHub Pages has no SPA fallback and only honours a site-root 404.html, so
+# history URLs like /token-storage/10 hard-404. Hash routing needs no server
+# support: /token-storage/#/10 works on any static host.
+routerMode: hash
 # Slidev disables text selection by default so click-to-advance never
 # selects prose instead. We want people to copy from the slides.
 selectable: true
@@ -171,7 +175,11 @@ import { useDarkMode } from '@slidev/client'
 // class. Pass the mode in the URL; changing it reloads the frame, and
 // ratio.jsx sets the class before React mounts.
 const { isDark } = useDarkMode()
-const chartSrc = computed(() => `/charts/ratio.html${isDark.value ? '?dark' : ''}`)
+// BASE_URL is '/' in dev and '/token-storage/' in the build. A root-absolute
+// '/charts/...' would resolve to the site root and 404 once deployed.
+const chartSrc = computed(
+  () => `${import.meta.env.BASE_URL}charts/ratio.html${isDark.value ? '?dark' : ''}`
+)
 </script>
 
 <!--

@@ -21,6 +21,9 @@ if (!existsSync(BLOG)) {
   throw new Error(`Blog repo not found at ${BLOG}. The charts import <BarChart> from it.`)
 }
 
+const CHART = process.env.CHART
+if (!CHART) throw new Error('set CHART=<name>; the charts npm script loops over them')
+
 export default {
   root: here,
   base: './',
@@ -42,11 +45,18 @@ export default {
   },
   server: { fs: { allow: [here, r('..'), BLOG] } },
   build: {
+    minify: process.env.NOMIN ? false : 'esbuild',
     // emitted into the Slidev public dir, so slides load them as /charts/*.html
     outDir: r('../public/charts'),
-    emptyOutDir: true,
+    emptyOutDir: false, // the npm script clears the dir once, before the loop
     rollupOptions: {
-      input: { ratio: r('ratio.html') },
+      // One entry per build (see the `charts` npm script). Building all seven
+      // together made Rollup split shared code into chunks with a cycle, and
+      // LineChart evaluated before a binding was ready ("Cannot access 'gt'
+      // before initialization"). Forcing a single chunk instead collapsed the
+      // entries into one bundle, so every page ran every mount(). One entry at
+      // a time keeps each page self-contained and both problems disappear.
+      input: { [CHART]: r(`${CHART}.html`) },
     },
   },
 }

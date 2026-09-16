@@ -334,3 +334,801 @@ export const latency = {
     "read": 28.8
   }
 }
+
+export const chunkRatio = {
+  "xTicks": [
+    [
+      512,
+      "512"
+    ],
+    [
+      1024,
+      "1,024"
+    ],
+    [
+      2048,
+      "2,048"
+    ],
+    [
+      4096,
+      "4,096"
+    ]
+  ],
+  "views": [
+    {
+      "label": "English",
+      "series": [
+        {
+          "name": "raw",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.263671875
+            ],
+            [
+              1024,
+              2.346435546875
+            ],
+            [
+              2048,
+              2.32080078125
+            ],
+            [
+              4096,
+              2.295654296875
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.6495963898486834
+            ],
+            [
+              1024,
+              2.6678170083523156
+            ],
+            [
+              2048,
+              2.6726768613365373
+            ],
+            [
+              4096,
+              2.6674104875152556
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.259539109580617
+            ],
+            [
+              1024,
+              3.3408860398860396
+            ],
+            [
+              2048,
+              3.307950899097725
+            ],
+            [
+              4096,
+              3.311536019515223
+            ]
+          ]
+        },
+        {
+          "name": "Kalcher(zstd)",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.116262607884832
+            ],
+            [
+              1024,
+              3.3679352262817246
+            ],
+            [
+              2048,
+              3.4550598731849758
+            ],
+            [
+              4096,
+              3.4973458847576135
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Code",
+      "series": [
+        {
+          "name": "raw",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1.033203125
+            ],
+            [
+              1024,
+              1.076171875
+            ],
+            [
+              2048,
+              1.071533203125
+            ],
+            [
+              4096,
+              1.08416748046875
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1.393450463149416
+            ],
+            [
+              1024,
+              1.4267432703321878
+            ],
+            [
+              2048,
+              1.3976493572666802
+            ],
+            [
+              4096,
+              1.490502308939512
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.211363068465767
+            ],
+            [
+              1024,
+              2.2271567617226777
+            ],
+            [
+              2048,
+              2.2045683270086
+            ],
+            [
+              4096,
+              2.2387346242844965
+            ]
+          ]
+        },
+        {
+          "name": "Kalcher(zstd)",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.0487378534944565
+            ],
+            [
+              1024,
+              3.3227203502760325
+            ],
+            [
+              2048,
+              4.032713486212081
+            ],
+            [
+              4096,
+              4.060848451086299
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Hindi",
+      "series": [
+        {
+          "name": "raw",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              0.84228515625
+            ],
+            [
+              1024,
+              0.84423828125
+            ],
+            [
+              2048,
+              0.841796875
+            ],
+            [
+              4096,
+              0.842041015625
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1.3369565217391304
+            ],
+            [
+              1024,
+              1.3435580085452774
+            ],
+            [
+              2048,
+              1.3412438288203175
+            ],
+            [
+              4096,
+              1.3417900505779734
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.78888326585695
+            ],
+            [
+              1024,
+              2.8003267973856207
+            ],
+            [
+              2048,
+              2.8009636264929423
+            ],
+            [
+              4096,
+              2.7954399241042185
+            ]
+          ]
+        },
+        {
+          "name": "Kalcher(zstd)",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.8012991608533007
+            ],
+            [
+              1024,
+              3.2174906011735356
+            ],
+            [
+              2048,
+              3.7104172008435956
+            ],
+            [
+              4096,
+              4.18283548195507
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+export const chunkEncode = {
+  "xTicks": [
+    [
+      512,
+      "512"
+    ],
+    [
+      1024,
+      "1,024"
+    ],
+    [
+      2048,
+      "2,048"
+    ],
+    [
+      4096,
+      "4,096"
+    ]
+  ],
+  "views": [
+    {
+      "label": "English",
+      "series": [
+        {
+          "name": "brotli-q11",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2697.7
+            ],
+            [
+              1024,
+              6533.6
+            ],
+            [
+              2048,
+              9561.1
+            ],
+            [
+              4096,
+              20247.7
+            ]
+          ]
+        },
+        {
+          "name": "zstd --train",
+          "color": "#94a3b8",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              410
+            ],
+            [
+              1024,
+              1103.9
+            ],
+            [
+              2048,
+              1602.9
+            ],
+            [
+              4096,
+              3298.3
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              4.8
+            ],
+            [
+              1024,
+              8.9
+            ],
+            [
+              2048,
+              17.4
+            ],
+            [
+              4096,
+              34.2
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.4
+            ],
+            [
+              1024,
+              4.7
+            ],
+            [
+              2048,
+              7.5
+            ],
+            [
+              4096,
+              15.6
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Code",
+      "series": [
+        {
+          "name": "brotli-q11",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1593
+            ],
+            [
+              1024,
+              35008.3
+            ],
+            [
+              2048,
+              4847.7
+            ],
+            [
+              4096,
+              9338.1
+            ]
+          ]
+        },
+        {
+          "name": "zstd --train",
+          "color": "#94a3b8",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              214.7
+            ],
+            [
+              1024,
+              3970.9
+            ],
+            [
+              2048,
+              895.7
+            ],
+            [
+              4096,
+              1698.5
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.9
+            ],
+            [
+              1024,
+              27
+            ],
+            [
+              2048,
+              9.5
+            ],
+            [
+              4096,
+              18.7
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.8
+            ],
+            [
+              1024,
+              23.8
+            ],
+            [
+              2048,
+              5.5
+            ],
+            [
+              4096,
+              8.1
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Hindi",
+      "series": [
+        {
+          "name": "brotli-q11",
+          "color": "#94a3b8",
+          "marker": "triangle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1297.5
+            ],
+            [
+              1024,
+              2003.2
+            ],
+            [
+              2048,
+              3949.2
+            ],
+            [
+              4096,
+              8193.3
+            ]
+          ]
+        },
+        {
+          "name": "zstd --train",
+          "color": "#94a3b8",
+          "marker": "square",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              234.8
+            ],
+            [
+              1024,
+              437.9
+            ],
+            [
+              2048,
+              923.1
+            ],
+            [
+              4096,
+              2043.2
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "marker": "diamond",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1.7
+            ],
+            [
+              1024,
+              2.6
+            ],
+            [
+              2048,
+              4.4
+            ],
+            [
+              4096,
+              7.8
+            ]
+          ]
+        },
+        {
+          "name": "+freq",
+          "color": "#dc244C",
+          "marker": "circle",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.3
+            ],
+            [
+              1024,
+              2.7
+            ],
+            [
+              2048,
+              3.2
+            ],
+            [
+              4096,
+              4.9
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+export const frontier = {
+  "series": [
+    {
+      "name": "LZ4 (bytes)",
+      "color": "#94a3b8",
+      "showLine": false,
+      "marker": "circle",
+      "points": [
+        [
+          1,
+          1.27
+        ]
+      ],
+      "labels": [
+        "LZ4 (bytes)  1.27x / 1us"
+      ]
+    },
+    {
+      "name": "raw IDs",
+      "color": "#dc244C",
+      "showLine": false,
+      "marker": "circle",
+      "points": [
+        [
+          4.6,
+          1.59
+        ]
+      ],
+      "labels": [
+        "raw IDs  1.59x / 4.6us"
+      ]
+    },
+    {
+      "name": "+freq+vbyte",
+      "color": "#dc244C",
+      "showLine": false,
+      "marker": "circle",
+      "points": [
+        [
+          3.6,
+          2.73
+        ]
+      ],
+      "labels": [
+        "+freq+vbyte  2.73x / 3.6us"
+      ]
+    },
+    {
+      "name": "+ANS",
+      "color": "#dc244C",
+      "showLine": false,
+      "marker": "circle",
+      "points": [
+        [
+          28.8,
+          3.4
+        ]
+      ],
+      "labels": [
+        "+ANS  3.40x / 28.8us"
+      ]
+    },
+    {
+      "name": "+freq+leb+zstd",
+      "color": "#94a3b8",
+      "showLine": false,
+      "marker": "circle",
+      "points": [
+        [
+          29.3,
+          3.22
+        ]
+      ],
+      "labels": [
+        "+freq+leb+zstd  3.22x / 29.3us"
+      ]
+    }
+  ]
+}
+
+export const oodAuc = {
+  "categories": [
+    "prose vs code",
+    "prose vs hindi",
+    "code vs prose",
+    "code vs hindi",
+    "hindi vs prose",
+    "hindi vs code"
+  ],
+  "values": [
+    0.974,
+    1,
+    0.966,
+    1,
+    1,
+    1
+  ]
+}
+
+export const oodBpt = {
+  "categories": [
+    "English",
+    "Code",
+    "Hindi"
+  ],
+  "values": [
+    11.1,
+    13,
+    15.1
+  ]
+}
+
+export const ngram = {
+  "categories": [
+    "unigram",
+    "bigram",
+    "trigram"
+  ],
+  "views": [
+    {
+      "label": "English",
+      "values": [
+        3.28,
+        3.97,
+        4.01
+      ]
+    },
+    {
+      "label": "Code",
+      "values": [
+        2.28,
+        3.12,
+        3.34
+      ]
+    },
+    {
+      "label": "Hindi",
+      "values": [
+        2.99,
+        4.5,
+        5.1
+      ]
+    }
+  ]
+}

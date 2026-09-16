@@ -17,8 +17,8 @@ layout: cover
 background: /imgs/hero.png
 class: 'text-left'
 ---
-
 <!-- Slide 1: the hero carries the title, nothing else on it. -->
+
 ---
 
 # $ whoami
@@ -76,34 +76,21 @@ class: 'text-left'
 
 ---
 
-## What our engines actually do
+## The compression ladder
 
-<v-clicks depth="2">
+| | English | encode cost | why it falls short |
+| --- | ---: | ---: | --- |
+| LZ4 (Qdrant, ES, Postgres) | 1.27x | 2.9us | barely compresses |
+| gzip `-9` | 1.92x | 26us | still a byte codec |
+| zstd `-19` | 1.94x | 209us | slow for what it buys |
+| brotli `q11` | 2.57x | **2,777us** | ~1,000x LZ4 to encode |
+| `zstd --train` | 2.72x | 359us | dictionary ships with your data |
 
-- Qdrant, Elasticsearch, Postgres: the payload gets an LZ-family codec, usually LZ4
+<v-clicks>
 
-- On English, 512-token chunks: **1.27x**
+- Every copy pays it again: snapshots, backups, WAL, replicas, network egress
 
-- Cons:
-  - Barely compresses. 100 GB of text becomes 79 GB
-  - Every copy pays it again: snapshots, backups, WAL, replicas, network egress
-
-</v-clicks>
-
----
-
-## Compress harder? Train a dictionary?
-
-<v-clicks depth="2">
-
-- gzip `-9` 1.92x · zstd `-19` 1.94x · brotli `q11` 2.57x
-
-- `zstd --train` learns a 112 KB dictionary from your corpus: **2.72x** on English, 4.52x on Hindi. The fairest competitor in this talk
-
-- Cons:
-  - brotli takes 2,777us to encode one 512-token chunk, ~1,000x LZ4's 2.9us
-  - The dictionary is yours alone. It ships with your data, nobody else can read it
-  - Neither vocabulary is shared or standard
+- None of these vocabularies is shared or standard
 
 </v-clicks>
 
@@ -164,43 +151,87 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 ## Does the napkin math hold?
 
-<iframe :src="chartSrc" class="w-full border-0" style="height: 400px"
-        title="Compression ratio by method" />
+<iframe :src="chart('ratio')" class="w-full border-0" style="height: 400px"
+        title="Does the napkin math hold?" />
 
 <script setup>
-import { computed } from 'vue'
 import { useDarkMode } from '@slidev/client'
-
-// The chart runs in its own document, so it cannot inherit Slidev's `.dark`
-// class. Pass the mode in the URL; changing it reloads the frame, and
-// ratio.jsx sets the class before React mounts.
 const { isDark } = useDarkMode()
-// BASE_URL is '/' in dev and '/token-storage/' in the build. A root-absolute
-// '/charts/...' would resolve to the site root and 404 once deployed.
-const chartSrc = computed(
-  () => `${import.meta.env.BASE_URL}charts/ratio.html${isDark.value ? '?dark' : ''}`
-)
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
 </script>
 
 <!--
-This is the blog's own BarChart, live, not a screenshot. It runs in an iframe on
-purpose: Slidev scales each slide with a CSS transform, and a transformed
-ancestor becomes the containing block for `position: fixed` children, so the
-chart's cursor-following tooltip landed ~1.3x off. An iframe is its own
-browsing context, so clientX and fixed positioning work normally.
-
-Toggle All/Focus and English/Code/Hindi live, hover a bar for its breakdown.
-
+The blog's own BarChart, live. Toggle All/Focus, hover a bar.
 I predicted 2.25x on a napkin and measured 2.25x, with no algorithm running.
-brotli (2.57x) and zstd --train (2.72x) do still beat raw token IDs, but they
-cost 2,777us and 359us to encode. Packing a uint16 costs 5.3us.
+brotli (2.57x) and zstd --train (2.72x) still beat raw token IDs, but cost
+2,777us and 359us to encode. Packing a uint16 costs 5.3us.
 -->
 
 ---
-layout: image
-image: /imgs/ratio-corpora.png
-backgroundSize: contain
+
+## Does it hold beyond English?
+
+<iframe :src="chart('corpora')" class="w-full border-0" style="height: 400px"
+        title="Does it hold beyond English?" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Switch to Hindi mid-sentence: r50k drops to 0.84x, under the break-even line.
+It never learned Devanagari merges, so the Hindi word for India (12 UTF-8 bytes)
+becomes 7 token IDs = 14 bytes. o200k, which has the merges, gets 2.55x raw.
+-->
+
 ---
+
+## Does it hold at every chunk size?
+
+<iframe :src="chart('chunk-ratio')" class="w-full border-0" style="height: 400px"
+        title="Does it hold at every chunk size?" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Order-0 token methods are flat because per-token entropy is additive.
+LZ-family methods climb by finding cross-chunk repeats, and zstd --train only
+catches +freq+vbyte at 4,096 tokens. The advantage is largest at the realistic
+512-token chunk.
+-->
+
+---
+
+## Encode cost grows faster than the input
+
+<iframe :src="chart('chunk-encode')" class="w-full border-0" style="height: 400px"
+        title="Encode cost grows faster than the input" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+brotli's quality-11 search does not amortise: 8x the input costs it ~18-35x
+the time. The token-native coders stay close to linear. So the smaller the
+chunk -- the more realistic the RAG scenario -- the worse brotli looks.
+-->
 
 <!--
 Hindi with o200k is 2.55x raw and 5.90x with ANS. Hindi with r50k is 0.84x,
@@ -210,31 +241,17 @@ word for India (12 UTF-8 bytes) becomes 7 token IDs = 14 bytes.
 
 ---
 
-## Two levers on top of the IDs
-
-<v-clicks>
-
-- Asymmetric Numeral Systems (ANS) is an entropy coder: frequent tokens get shorter codes. `"the"` is ~40x more common than `"embeddings"`, so it earns fewer bits
-
-- Or re-rank the IDs by frequency and pack them with `streamvbyte`, a **variable-length** integer codec
-
-- One table, trained once on a corpus, reused for every document. Not per-document, or you would ship ~900 bytes of table with each 512-token chunk
-
-</v-clicks>
-
----
-
 ## An easy win in every BPE tokenizer
 
 <v-clicks>
+
+- Two ways to squeeze the IDs: an entropy coder (**ANS**, frequent tokens get fewer bits), or re-rank by frequency and pack with `streamvbyte`
 
 - Running the frequency histogram, I found BPE hands out IDs in **merge-discovery order**, not by how often a token is used
 
 - A token you use constantly can sit at ID 40,000. A rare one sits at ID 12
 
-- Variable-length integer codecs pay for big numbers, so this ordering leaves compression on the table for everyone downstream
-
-- Re-ranking by frequency on English: 2.13x → 2.60x. Half of `+freq`'s gain is the remap alone
+- Re-ranking on English: 2.13x → 2.60x. Half of `+freq`'s gain is the remap alone
 
 </v-clicks>
 
@@ -261,10 +278,16 @@ def compress(text):
 ```
 
 ---
+
 layout: image
 image: /imgs/frontier.png
 backgroundSize: contain
----
+
+<!--
+Still a PNG: a scatter needs markers, and the blog's LineChart throws a TDZ on
+any series with markers (onCrosshairLeave used at line 603, declared at 864).
+All o200k here, so raw is 1.59x, not the 2.25x from earlier.
+-->
 
 <!--
 All o200k here, so raw is 1.59x, not the 2.25x from earlier. o200k IDs need
@@ -293,10 +316,10 @@ All o200k here, so raw is 1.59x, not the 2.25x from earlier. o200k IDs need
 - Stored once, kept in **two** forms, translated on every access
 
 ---
+
 layout: image
 image: /imgs/agent-read.png
 backgroundSize: contain
----
 
 ---
 
@@ -314,12 +337,6 @@ backgroundSize: contain
 
 </v-clicks>
 
----
-layout: image
-image: /imgs/agent-write.png
-backgroundSize: contain
----
-
 <!--
 The model already produced the IDs. A byte store throws them away, detokenizes
 (50.3us), then compresses. zstd-19 costs 259.5us a write, 209us the compressor.
@@ -335,17 +352,17 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 
 ---
 
-## But humans still read this data
+## Writes are free, humans read once
 
 <v-clicks>
 
-- True cost: token-native pays ~50us to detokenize before a human sees anything
+- The model **already produced the IDs**. A byte store throws them away, detokenizes (50.3us), then compresses
 
-- But in a RAG or agent loop, a search returns 10 chunks and the agent reads all of them
+- Token-native just stores what it was handed: 2.7-5.3us
 
-- The human sees one answer, once, at the end
+- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
 
-- So detokenize **once**, at the edge. Maybe in the frontend
+- Humans still need characters, but a search returns 10 chunks and the agent reads all of them. Detokenize once, at the edge
 
 </v-clicks>
 
@@ -378,6 +395,53 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 | Random cold read | Small | 652.9 → **498.4us (1.3x)** |
 
 - The compression and write arguments never depended on a slow tokenizer. Part of the read argument did
+
+---
+
+## A free out-of-distribution gate
+
+<iframe :src="chart('ood')" class="w-full border-0" style="height: 360px"
+        title="A free out-of-distribution gate" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+The surprise of this project. The ANS coder already computes -log2 P(token),
+so every chunk gets a bits/token score for nothing. A prose-trained table gives
+11.1 bits/token on prose and 15.1 on Hindi.
+The other free signal, a byte-codec ratio, is directionless on repetitive junk:
+it scores 0.315 AUC on hex dumps where entropy scores 1.000.
+Honest limit: it flags legitimately off-domain text as readily as junk.
+-->
+
+---
+
+## How far can this go?
+
+<iframe :src="chart('ngram')" class="w-full border-0" style="height: 400px"
+        title="How far can this go?" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
+// resolves to the site root and 404s once deployed.
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Conditioning on the previous token helps, a third barely does: prose
+3.28 -> 3.97 -> 4.01x. The trigram table roughly triples in size for +1%.
+The language-model ceiling is ~12x (Deletang 2024), unreachable by stacking
+n-grams -- the tables explode first. Because the stored form is just token IDs,
+upgrading the table is a codec change, not a data migration.
+-->
 
 ---
 
@@ -444,23 +508,11 @@ POST /collections/documents/points/search
 - Find me at
   - [kshivendu.dev/twitter](https://kshivendu.dev/twitter)
 
+- Paper [arXiv 2608.02376](https://arxiv.org/abs/2608.02376) · [post](https://kshivendu.dev/blog/token-storage) · [benchmarks](https://github.com/KShivendu/token-storage)
+
 </div>
 <img src="/linkedin-qr.png" class="h-48" />
 </div>
-
----
-
-## References
-
-- Paper: [Token-Native Storage](https://arxiv.org/abs/2608.02376) (arXiv 2608.02376)
-
-- Post: [kshivendu.dev/blog/token-storage](https://kshivendu.dev/blog/token-storage)
-
-- Benchmarks: [github.com/KShivendu/token-storage](https://github.com/KShivendu/token-storage)
-
-- [tiktoken](https://github.com/openai/tiktoken) · [constriction](https://github.com/bamler-lab/constriction) (ANS) · [streamvbyte](https://github.com/lemire/streamvbyte) · [gigatoken](https://github.com/marcelroed/gigatoken)
-
-- Kalcher, *Compressing token IDs with frequency ordering* (2026) · NVIDIA [Megatron-Core](https://github.com/NVIDIA/Megatron-LM) tokenized `.bin` corpora
 
 <!--
 Q&A backup: six-tokenizer generality (3.30-3.40x band); decorrelation (order-0

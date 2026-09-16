@@ -7,7 +7,7 @@
     "dev": "slidev token-storage.md --open",
     "build": "rm -rf ../token-storage && npm run data && npm run charts && slidev build token-storage.md --base /token-storage/ --out ../token-storage",
     "export": "echo 'Run: pnpm dev, then open http://localhost:3030/export (browser exporter, no playwright needed)'",
-    "charts": "vite build --config charts/vite.config.mjs"
+    "charts": "rm -rf public/charts && for c in ratio corpora chunk-ratio chunk-encode ood ngram; do CHART=$c vite build --config charts/vite.config.mjs || exit 1; done"
   },
   "dependencies": {
     "@slidev/cli": "^51.8.2",

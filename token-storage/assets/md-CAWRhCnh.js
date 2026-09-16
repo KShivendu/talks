@@ -1,0 +1,5 @@
+import{o as i,V as l,a3 as m,b as o,z as u,ax as h,ay as p,G as s}from"./modules/vue-Bhcaf6WO.js";import{I as d}from"./slidev/default-nkPUkb6y.js";import{u as f,f as k}from"./slidev/context-DJFcHBBW.js";import{u as _}from"./slidev/useDarkMode-QlIqOxkw.js";import"./index-D3gYedfX.js";import"./modules/shiki-Dq2beWmg.js";const x=["src"],B={__name:"token-storage.md__slidev_12",setup(g){const{$clicksContext:r,$frontmatter:a}=f();r.setup();const{isDark:n}=_(),c=t=>`/token-storage/charts/${t}.html${n.value?"?dark":""}`;return(t,e)=>(i(),l(d,h(p(s(k)(s(a),11))),{default:m(()=>[e[0]||(e[0]=o("h2",null,"Encode cost grows faster than the input",-1)),o("iframe",{src:c("chunk-encode"),class:"w-full border-0",style:{height:"400px"},title:"Encode cost grows faster than the input"},null,8,x),u(`
+brotli's quality-11 search does not amortise: 8x the input costs it ~18-35x
+the time. The token-native coders stay close to linear. So the smaller the
+chunk -- the more realistic the RAG scenario -- the worse brotli looks.
+`)]),_:1},16))}};export{B as default};

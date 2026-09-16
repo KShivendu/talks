@@ -2,6 +2,8 @@ import BarChart from '@blog/BarChart'
 import { ratioViews } from '@data/token-storage'
 import { mount } from './mount.jsx'
 
+// Same component and data as the English chart, but every dataset at once:
+// switch corpus mid-sentence to show r50k falling under 1.0x on Hindi.
 mount(
   <BarChart
     orientation="horizontal"

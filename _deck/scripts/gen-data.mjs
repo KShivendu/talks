@@ -242,6 +242,32 @@ const chunkEncode = {
   })),
 }
 
+// ── chunk-size sweep: read cost ──────────────────────────────────────────────
+// The companion to the encode sweep, and the one that matters: writes happen
+// once, reads happen on every retrieval forever.
+//
+// The finding is not just the gap, it is the FLATNESS of the grey band. Across
+// every corpus and size the four byte codecs land within 1.0-3.2% of each
+// other, because read_us is decompress plus the mandatory tokenize, and
+// tokenize is ~99% of it. Which byte codec you pick is nearly irrelevant to
+// read latency. Token methods beat the cheapest of them by 6.6-17.0x, and the
+// dearest by up to 119x.
+const chunkRead = {
+  xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
+  views: CORPORA.map(([label, key]) => ({
+    label,
+    series: ENC_SERIES.map(([name, color]) => ({
+      name,
+      color,
+      showMarkers: false,
+      points: SIZES.map((n) => {
+        const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.read_us
+        return v == null ? null : [n, round1(v)]
+      }).filter(Boolean),
+    })).filter((s) => s.points.length),
+  })),
+}
+
 // ── the ratio/decode frontier, as a real scatter ─────────────────────────────
 // LineChart draws markers only when showLine is false, and hit-tests in 2D.
 const FRONTIER = [
@@ -356,6 +382,8 @@ export const chunkRatio = ${JSON.stringify(chunkRatio, null, 2)}
 
 export const chunkEncode = ${JSON.stringify(chunkEncode, null, 2)}
 
+export const chunkRead = ${JSON.stringify(chunkRead, null, 2)}
+
 export const frontier = ${JSON.stringify(frontier, null, 2)}
 
 export const oodAuc = ${JSON.stringify(oodAuc, null, 2)}
@@ -378,6 +406,15 @@ console.log(
 )
 console.log(`  latency: tokenize ${latency.tokenize}us, +freq read ${latency.freq.read}us`)
 console.log(`  chunk sweep: ${SIZES.length} sizes x ${CORPORA.length} corpora`)
+{
+  const m = sweep['r50k|prose|512'].methods
+  const b = ['LZ4', 'gzip-9', 'zstd-19', 'zstd --train'].map((x) => m[x].read_us)
+  console.log(
+    `  chunk read @512 prose: byte ${round1(Math.min(...b))}-${round1(Math.max(...b))}us ` +
+      `(spread ${((Math.max(...b) / Math.min(...b) - 1) * 100).toFixed(1)}%), ` +
+      `+freq ${round1(m['+freq'].read_us)}us`
+  )
+}
 console.log(`  ood: entropy AUC ${Math.min(...oodAuc.values)}-${Math.max(...oodAuc.values)}`)
 console.log(`  ngram prose: ${ngram.views[0].values.join(' -> ')}x`)
 console.log(

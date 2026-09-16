@@ -313,6 +313,39 @@ word for India (12 UTF-8 bytes) becomes 7 token IDs = 14 bytes.
 
 ---
 
+## And to read back, at every chunk size?
+
+<iframe :src="chart('chunk-read')" class="w-full border-0" style="height: 400px"
+        title="Read cost across chunk sizes" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+The one that matters: a write happens once, a read happens on every retrieval
+forever.
+
+Point at the grey band before the gap. All four byte codecs sit within 1.0-3.2%
+of each other at every corpus and every size, because read_us is decompress
+plus the mandatory tokenize and tokenize is ~99% of it. English at 512: LZ4
+307.7us, gzip-9 314.1, zstd-19 310.9, zstd --train 309.7. Choosing a better
+byte codec buys you essentially nothing on the read path -- that is the whole
+argument in one picture.
+
+The gap, stated as the worst case for us: 6.6-17.0x against the CHEAPEST byte
+codec, up to 119x against the dearest. English at 512 is +freq 4.2us against
+307.7us.
+
+Growth is sublinear for the byte codecs (5.1-5.2x for an 8x input), so do not
+claim it explodes. +ANS grows fastest of the token methods at 7.7x, +freq
+slowest at 3.3x.
+-->
+
+---
+
 ## An easy win in every BPE tokenizer
 
 <v-clicks>

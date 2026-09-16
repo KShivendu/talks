@@ -86,14 +86,29 @@ class: 'text-left'
 | zstd `-19` | 1.94x | 209us | slow for what it buys |
 | brotli `q11` | 2.57x | **2,777us** | ~1,000x LZ4 to encode |
 | `zstd --train` | 2.72x | 359us | dictionary ships with your data |
+| LZ4 over 16KB **blocks** | 1.43x | 2.9us | helps, but a read now costs 305us |
 
 <v-clicks>
 
-- Every copy pays it again: snapshots, backups, WAL, replicas, network egress
+- Blocking buys ratio and **costs read latency**: one document decompresses its whole block
 
-- None of these vocabularies is shared or standard
+- Every copy pays it again: snapshots, WAL, replicas, egress. And no vocabulary here is shared
 
 </v-clicks>
+
+<!--
+The 2x2 is in 07_kalcher_baseline/read_latency_2x2_results.json, ES/Lucene-style
+blocks (<=16KB or 128 docs, whole block compressed, one doc read decompresses it).
+
+             byte/doc  byte/block  token/doc  token/block
+  prose         287.9       304.8       89.5         39.8
+  code          217.2       231.6       76.8         79.1
+  hindi         158.7       173.9       85.7         67.9
+
+Blocking slows the byte store (decompress the block, then still tokenize) and
+speeds the token store (decode amortises, nothing to tokenize). Prose is the
+clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
+-->
 
 ---
 

@@ -1399,6 +1399,30 @@ export const chunkRead = {
               238.3
             ]
           ]
+        },
+        {
+          "name": "tokenize alone (unavoidable)",
+          "color": "#0f172a",
+          "dashed": true,
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              306.7
+            ],
+            [
+              1024,
+              535.2
+            ],
+            [
+              2048,
+              897.1
+            ],
+            [
+              4096,
+              1569.2
+            ]
+          ]
         }
       ]
     },
@@ -1542,6 +1566,30 @@ export const chunkRead = {
               136.8
             ]
           ]
+        },
+        {
+          "name": "tokenize alone (unavoidable)",
+          "color": "#0f172a",
+          "dashed": true,
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              227.1
+            ],
+            [
+              1024,
+              2016
+            ],
+            [
+              2048,
+              594.2
+            ],
+            [
+              4096,
+              1099
+            ]
+          ]
         }
       ]
     },
@@ -1683,6 +1731,30 @@ export const chunkRead = {
             [
               4096,
               65.6
+            ]
+          ]
+        },
+        {
+          "name": "tokenize alone (unavoidable)",
+          "color": "#0f172a",
+          "dashed": true,
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              161.3
+            ],
+            [
+              1024,
+              239.8
+            ],
+            [
+              2048,
+              397.4
+            ],
+            [
+              4096,
+              595.3
             ]
           ]
         }

@@ -14,7 +14,7 @@ import { mount } from './mount.jsx'
 // against the cheapest byte codec, up to 119x against the dearest.)
 mount(
   <LineChart
-    title="All four byte codecs overlap within 3% — the tokenizer decides"
+    title="The grey lines ARE the dashed line: read cost is the tokenizer"
     xLabel="chunk size (tokens)"
     yLabel="read µs per chunk"
     xScale="log"

@@ -252,10 +252,28 @@ const chunkEncode = {
 // tokenize is ~99% of it. Which byte codec you pick is nearly irrelevant to
 // read latency. Token methods beat the cheapest of them by 6.6-17.0x, and the
 // dearest by up to 119x.
+// Plot the tokenize term itself. read_us for a byte codec is exactly
+// decompress_us + one shared tokenize cost -- identical to the decimal across
+// all four codecs (English 512: 306.7us for every one of them; 4,096: 1569.2).
+// Drawn as a dashed reference line, the four grey codec lines visibly sit on
+// top of it, which shows the claim instead of asking the room to take it.
+const tokenizeOnly = (key) => ({
+  name: 'tokenize alone (unavoidable)',
+  color: '#0f172a',
+  dashed: true,
+  showMarkers: false,
+  points: SIZES.map((n) => {
+    const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.LZ4
+    return m == null ? null : [n, round1(m.read_us - m.decompress_us)]
+  }).filter(Boolean),
+})
+
 const chunkRead = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
+    // tokenize LAST: series paint in order, and drawn first it vanished under
+    // the four solid codec lines -- the exact overlap it exists to reveal.
     series: ENC_SERIES.map(([name, color]) => ({
       name,
       color,
@@ -264,7 +282,9 @@ const chunkRead = {
         const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.read_us
         return v == null ? null : [n, round1(v)]
       }).filter(Boolean),
-    })).filter((s) => s.points.length),
+    }))
+      .concat([tokenizeOnly(key)])
+      .filter((s) => s.points.length),
   })),
 }
 

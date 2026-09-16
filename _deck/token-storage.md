@@ -266,8 +266,11 @@ realistic 512-token chunk, which is the one people actually use.
 Against what production actually runs -- LZ4, gzip, zstd-19 -- +ANS wins at
 every chunk size on prose (3.38x vs 1.95x best) and Hindi (5.90x vs 2.45x).
 
-`zstd --train` is the honest comparison, and the Code tab is where it wins:
-3.34x vs +ANS 3.05x at 512, widening to 4.78x vs 2.94x at 4,096. Code is highly
+`zstd --train` is the honest comparison, and on the Code tab it beats +ANS:
+3.34x vs 3.05x at 512, widening to 4.78x vs 2.94x at 4,096. But it does not
+beat +dict, which is the point of that seventh line -- 3.39x at 512, ahead of
+zstd --train, and 4.48x at 4,096, just behind it. And +dict reads in 7.2us
+against 228.3us, because its output is still token IDs. Code is highly
 repetitive, so a dictionary plus an LZ window spanning many chunks beats
 per-token entropy coding. Two answers if pushed: the dictionary has to be
 trained on your corpus and then shipped and versioned alongside it, and its
@@ -622,6 +625,8 @@ agentic system it is also the rarer path: the agent does most of the writing.
 - Hosted LLM APIs take text and return text, so you need to own the inference stack
 
 - My frequency table is corpus-specific. Point it at a corpus it wasn't built on and the ratio drops
+
+- On **code**, `+ANS` falls behind: order-0 models no repetition, and code repeats constantly. A dictionary trained on token IDs (`+dict`) gets **3.39x** and still reads in **7us**
 
 - `mxbai-embed-large-v1` compresses better at 3.56x, but **80.4%** of articles decode corrupted. BERT lowercases: `"Qdrant"` becomes `"qdrant"`
 

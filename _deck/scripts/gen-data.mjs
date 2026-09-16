@@ -183,6 +183,11 @@ const RATIO_SERIES = [
   ['zstd --train', GREY_XD],
   ['+freq', RED_L],
   ['+ANS', RED],
+  // +dict answers "you lose on code": order-0 coders model no repetition, and
+  // code repeats constantly. zstd-22 with a 112KB dictionary trained on packed
+  // token-ID bytes -- output is still token IDs, so a read still skips
+  // tokenizing. Same sweep as every other series here, so no mixing.
+  ['+dict', '#7c1d3f'],
 ]
 const sweepCell = (key, n) => sweep[`${NATIVE_TOK[key]}|${key}|${n}`]
 const chunkRatio = {

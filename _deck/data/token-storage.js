@@ -495,6 +495,29 @@ export const chunkRatio = {
               3.39
             ]
           ]
+        },
+        {
+          "name": "+dict",
+          "color": "#7c1d3f",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.12
+            ],
+            [
+              1024,
+              3.17
+            ],
+            [
+              2048,
+              3.29
+            ],
+            [
+              4096,
+              3.35
+            ]
+          ]
         }
       ]
     },
@@ -638,6 +661,29 @@ export const chunkRatio = {
               2.94
             ]
           ]
+        },
+        {
+          "name": "+dict",
+          "color": "#7c1d3f",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              3.39
+            ],
+            [
+              1024,
+              3.79
+            ],
+            [
+              2048,
+              4.16
+            ],
+            [
+              4096,
+              4.48
+            ]
+          ]
         }
       ]
     },
@@ -779,6 +825,29 @@ export const chunkRatio = {
             [
               4096,
               6.1
+            ]
+          ]
+        },
+        {
+          "name": "+dict",
+          "color": "#7c1d3f",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              4.7
+            ],
+            [
+              1024,
+              5.24
+            ],
+            [
+              2048,
+              5.35
+            ],
+            [
+              4096,
+              5.73
             ]
           ]
         }

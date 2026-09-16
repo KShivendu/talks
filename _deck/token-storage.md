@@ -92,13 +92,26 @@ class: 'text-left'
 
 - Decode is cheap, but it returns **bytes**: add **~235us** of tokenizing to every row
 
-- Every copy pays it again: snapshots, WAL, replicas, egress. And no vocabulary here is shared
+- The one that gets close, `zstd --train`, needs a vocabulary **you** train and ship. The tokenizer's is already standard, and your model already loaded it
 
 </v-clicks>
 
 <!--
 The 2x2 is in 07_kalcher_baseline/read_latency_2x2_results.json, ES/Lucene-style
 blocks (<=16KB or 128 docs, whole block compressed, one doc read decompresses it).
+
+Do NOT reinstate the old "every copy pays it again: snapshots, WAL, replicas,
+egress" bullet here. That line is from token-storage-extra.mdx:1360 ("The
+Multiplier Hits Every Copy of the Bytes"), where it is a PAYOFF of token
+storage -- every copy gets 3.35x smaller -- not a criticism of the ladder.
+Better byte compression helps those copies too, and nothing re-tokenizes a
+snapshot or a WAL, so there is no second payment to point at.
+
+The vocabulary bullet is from token-storage.mdx:234: zstd --train does learn a
+vocab from the corpus, and it IS shared across documents in a domain
+(token-storage.mdx:590, one 112KB global dictionary). What it is not is
+STANDARDIZED FOR REUSE -- that is the actual asymmetry against a tokenizer
+vocabulary the serving model has already loaded.
 
 Decode column = byte_codecs.prose[c].decompress_us from 03_latency/latency_grid_
 results.json. The block row instead comes from 07_kalcher_baseline/block_codecs_

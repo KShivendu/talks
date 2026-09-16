@@ -204,26 +204,38 @@ const chunkRatio = {
 }
 
 // ── chunk-size sweep: encode cost ────────────────────────────────────────────
-// brotli's quality-11 search does not amortise: 8x the input costs ~18-35x the
-// time, while the token-native coders stay close to linear.
+// Same competition and the same grey ramp as the ratio sweep above, so the two
+// slides read as one pair: what you get, then what it costs.
+//
+// Growth from 512 to 4,096 tokens, against an input that grows 8x:
+//   zstd-19  12.1x / 11.7x / 11.3x  (prose / code / hindi)  -- superlinear
+//   gzip-9    8.5x /  6.7x /  9.0x   ~linear
+//   zstd--tr  8.0x /  7.9x /  8.7x   ~linear
+//   +ANS      7.1x /  6.6x /  4.5x   sublinear
+//   LZ4       4.3x /  4.0x /  3.4x   sublinear
+//   +freq     4.6x /  2.9x /  2.1x   sublinear
+// So only zstd-19 genuinely outgrows its input. The slide claims the absolute
+// gap instead, stated as the worst case for us: across every corpus and size
+// the CHEAPEST byte codec still costs 8.1-17.7x more than the DEAREST token
+// method. (Extreme vs extreme would be 526x, true but self-serving.)
 const ENC_SERIES = [
-  ['brotli-q11', GREY, 'triangle'],
-  ['zstd --train', GREY, 'square'],
-  ['+ANS', RED, 'diamond'],
-  ['+freq', RED, 'circle'],
+  ['LZ4', GREY_L],
+  ['gzip-9', GREY_M],
+  ['zstd-19', GREY_D],
+  ['zstd --train', GREY_XD],
+  ['+freq', RED_L],
+  ['+ANS', RED],
 ]
 const chunkEncode = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    series: ENC_SERIES.map(([name, color, marker]) => ({
+    series: ENC_SERIES.map(([name, color]) => ({
       name,
       color,
-      marker,
       showMarkers: false,
       points: SIZES.map((n) => {
-        const cell = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]
-        const v = cell?.methods?.[name]?.write_us
+        const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.write_us
         return v == null ? null : [n, round1(v)]
       }).filter(Boolean),
     })).filter((s) => s.points.length),

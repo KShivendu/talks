@@ -811,33 +811,77 @@ export const chunkEncode = {
       "label": "English",
       "series": [
         {
-          "name": "brotli-q11",
-          "color": "#94a3b8",
-          "marker": "triangle",
+          "name": "LZ4",
+          "color": "#cbd5e1",
           "showMarkers": false,
           "points": [
             [
               512,
-              2697.7
+              65.3
             ],
             [
               1024,
-              6533.6
+              93.7
             ],
             [
               2048,
-              9561.1
+              155.4
             ],
             [
               4096,
-              20247.7
+              277.9
+            ]
+          ]
+        },
+        {
+          "name": "gzip-9",
+          "color": "#94a3b8",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              88.7
+            ],
+            [
+              1024,
+              187.4
+            ],
+            [
+              2048,
+              327.3
+            ],
+            [
+              4096,
+              749.5
+            ]
+          ]
+        },
+        {
+          "name": "zstd-19",
+          "color": "#64748b",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              262.6
+            ],
+            [
+              1024,
+              753.1
+            ],
+            [
+              2048,
+              1340.3
+            ],
+            [
+              4096,
+              3174.5
             ]
           ]
         },
         {
           "name": "zstd --train",
-          "color": "#94a3b8",
-          "marker": "square",
+          "color": "#475569",
           "showMarkers": false,
           "points": [
             [
@@ -859,33 +903,8 @@ export const chunkEncode = {
           ]
         },
         {
-          "name": "+ANS",
-          "color": "#dc244C",
-          "marker": "diamond",
-          "showMarkers": false,
-          "points": [
-            [
-              512,
-              4.8
-            ],
-            [
-              1024,
-              8.9
-            ],
-            [
-              2048,
-              17.4
-            ],
-            [
-              4096,
-              34.2
-            ]
-          ]
-        },
-        {
           "name": "+freq",
-          "color": "#dc244C",
-          "marker": "circle",
+          "color": "#f4768f",
           "showMarkers": false,
           "points": [
             [
@@ -905,6 +924,29 @@ export const chunkEncode = {
               15.6
             ]
           ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              4.8
+            ],
+            [
+              1024,
+              8.9
+            ],
+            [
+              2048,
+              17.4
+            ],
+            [
+              4096,
+              34.2
+            ]
+          ]
         }
       ]
     },
@@ -912,33 +954,77 @@ export const chunkEncode = {
       "label": "Code",
       "series": [
         {
-          "name": "brotli-q11",
-          "color": "#94a3b8",
-          "marker": "triangle",
+          "name": "LZ4",
+          "color": "#cbd5e1",
           "showMarkers": false,
           "points": [
             [
               512,
-              1593
+              41.2
             ],
             [
               1024,
-              35008.3
+              295.3
             ],
             [
               2048,
-              4847.7
+              87.1
             ],
             [
               4096,
-              9338.1
+              162.9
+            ]
+          ]
+        },
+        {
+          "name": "gzip-9",
+          "color": "#94a3b8",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              57
+            ],
+            [
+              1024,
+              550.7
+            ],
+            [
+              2048,
+              170.8
+            ],
+            [
+              4096,
+              379.3
+            ]
+          ]
+        },
+        {
+          "name": "zstd-19",
+          "color": "#64748b",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              181.1
+            ],
+            [
+              1024,
+              12536.7
+            ],
+            [
+              2048,
+              925.8
+            ],
+            [
+              4096,
+              2126.6
             ]
           ]
         },
         {
           "name": "zstd --train",
-          "color": "#94a3b8",
-          "marker": "square",
+          "color": "#475569",
           "showMarkers": false,
           "points": [
             [
@@ -960,33 +1046,8 @@ export const chunkEncode = {
           ]
         },
         {
-          "name": "+ANS",
-          "color": "#dc244C",
-          "marker": "diamond",
-          "showMarkers": false,
-          "points": [
-            [
-              512,
-              2.9
-            ],
-            [
-              1024,
-              27
-            ],
-            [
-              2048,
-              9.5
-            ],
-            [
-              4096,
-              18.7
-            ]
-          ]
-        },
-        {
           "name": "+freq",
-          "color": "#dc244C",
-          "marker": "circle",
+          "color": "#f4768f",
           "showMarkers": false,
           "points": [
             [
@@ -1006,6 +1067,29 @@ export const chunkEncode = {
               8.1
             ]
           ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              2.9
+            ],
+            [
+              1024,
+              27
+            ],
+            [
+              2048,
+              9.5
+            ],
+            [
+              4096,
+              18.7
+            ]
+          ]
         }
       ]
     },
@@ -1013,33 +1097,77 @@ export const chunkEncode = {
       "label": "Hindi",
       "series": [
         {
-          "name": "brotli-q11",
-          "color": "#94a3b8",
-          "marker": "triangle",
+          "name": "LZ4",
+          "color": "#cbd5e1",
           "showMarkers": false,
           "points": [
             [
               512,
-              1297.5
+              35
             ],
             [
               1024,
-              2003.2
+              47.8
             ],
             [
               2048,
-              3949.2
+              75.1
             ],
             [
               4096,
-              8193.3
+              119.8
+            ]
+          ]
+        },
+        {
+          "name": "gzip-9",
+          "color": "#94a3b8",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              49.4
+            ],
+            [
+              1024,
+              91.8
+            ],
+            [
+              2048,
+              192.6
+            ],
+            [
+              4096,
+              442.2
+            ]
+          ]
+        },
+        {
+          "name": "zstd-19",
+          "color": "#64748b",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              163.4
+            ],
+            [
+              1024,
+              312.7
+            ],
+            [
+              2048,
+              730.3
+            ],
+            [
+              4096,
+              1840.1
             ]
           ]
         },
         {
           "name": "zstd --train",
-          "color": "#94a3b8",
-          "marker": "square",
+          "color": "#475569",
           "showMarkers": false,
           "points": [
             [
@@ -1061,33 +1189,8 @@ export const chunkEncode = {
           ]
         },
         {
-          "name": "+ANS",
-          "color": "#dc244C",
-          "marker": "diamond",
-          "showMarkers": false,
-          "points": [
-            [
-              512,
-              1.7
-            ],
-            [
-              1024,
-              2.6
-            ],
-            [
-              2048,
-              4.4
-            ],
-            [
-              4096,
-              7.8
-            ]
-          ]
-        },
-        {
           "name": "+freq",
-          "color": "#dc244C",
-          "marker": "circle",
+          "color": "#f4768f",
           "showMarkers": false,
           "points": [
             [
@@ -1105,6 +1208,29 @@ export const chunkEncode = {
             [
               4096,
               4.9
+            ]
+          ]
+        },
+        {
+          "name": "+ANS",
+          "color": "#dc244C",
+          "showMarkers": false,
+          "points": [
+            [
+              512,
+              1.7
+            ],
+            [
+              1024,
+              2.6
+            ],
+            [
+              2048,
+              4.4
+            ],
+            [
+              4096,
+              7.8
             ]
           ]
         }

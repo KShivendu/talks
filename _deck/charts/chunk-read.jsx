@@ -2,25 +2,24 @@ import LineChart from '@blog/LineChart'
 import { chunkRead } from '@data/token-storage'
 import { mount } from './mount.jsx'
 
-// The companion to chunk-encode, and the one that actually matters: a write
-// happens once, a read happens on every retrieval forever.
+// Decode ALONE, on equal terms: decompress_us for the byte codecs, read_us for
+// the token methods (already IDs, so read_us is their pure decode).
 //
-// Title says "overlap" deliberately: the four grey lines are drawn but sit on
-// top of each other, and from the back of a room that reads as missing lines
-// unless the title says otherwise. The flatness is the finding, not the gap. read_us is decompress plus the
-// mandatory tokenize, and tokenize is ~99% of it, so all four byte codecs sit
-// within 1.0-3.2% of each other at every corpus and every size. Picking a
-// better byte codec buys you almost nothing here. (The gap itself is 6.6-17x
-// against the cheapest byte codec, up to 119x against the dearest.)
+// The earlier version plotted a byte codec's full `read_us`, which bundles the
+// mandatory tokenize -- ~99% of the number and identical across all four
+// codecs. That compared a codec against a tokenizer and made the four grey
+// lines overlap. Fairer to concede pure decode, which the byte codecs win
+// (LZ4 0.9us against +freq 4.2us on English at 512), and put the tokenize tax
+// in a line under the chart where it belongs.
 mount(
   <LineChart
-    title="The grey lines ARE the dashed line: read cost is the tokenizer"
+    title="Decode alone: what each codec costs to unpack"
     xLabel="chunk size (tokens)"
-    yLabel="read µs per chunk"
+    yLabel="decode µs per chunk"
     xScale="log"
     yScale="log"
     xTicks={chunkRead.xTicks}
-    height={250}
+    height={230}
     views={chunkRead.views}
   />
 )

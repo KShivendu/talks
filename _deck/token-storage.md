@@ -315,8 +315,14 @@ word for India (12 UTF-8 bytes) becomes 7 token IDs = 14 bytes.
 
 ## And to read back, at every chunk size?
 
-<iframe :src="chart('chunk-read')" class="w-full border-0" style="height: 400px"
-        title="Read cost across chunk sizes" />
+<iframe :src="chart('chunk-read')" class="w-full border-0" style="height: 370px"
+        title="Decode cost across chunk sizes" />
+
+<div class="text-sm opacity-80 -mt-1">
+
+Decode only. A byte codec must then **tokenize**: +307us at 512 tokens, +1,569us at 4,096 (English). Token IDs need none.
+
+</div>
 
 <script setup>
 import { useDarkMode } from '@slidev/client'
@@ -328,30 +334,31 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 The one that matters: a write happens once, a read happens on every retrieval
 forever.
 
-Point at the dashed line first. `read_us` for a byte codec is exactly
-decompress + tokenize, per the sweep's own config:
+Decode ALONE here, on equal terms: decompress_us for the byte codecs, read_us
+for the token methods (already token IDs, so read_us is their pure decode).
 
-  "read": "agent read = to token IDs; byte = decompress + tokenize(serving-cold)"
+Concede the chart out loud -- the byte codecs win it. English at 512: LZ4 0.9us,
+zstd --train 2.9, zstd-19 4.2, gzip-9 7.4, against +freq 4.2 and +ANS 30.8.
++ANS is the slowest thing on the slide and that is fine, say so.
 
-and the tokenize term is one shared constant, identical to the decimal across
-all four codecs. English prose, r50k:
+Then the line under the chart. The byte path is not finished at decode; it has
+to tokenize before a model can read a word, and that is one shared constant,
+identical to the decimal across all four codecs:
 
-  512 tokens            read    decompress    tokenize
-    LZ4                307.7           0.9       306.7
-    zstd --train       309.7           2.9       306.7
-    zstd-19            310.9           4.2       306.7
-    gzip-9             314.1           7.4       306.7
-  4,096 tokens: same story, 1569.2us of tokenize for every one of them.
+  English prose, r50k       512      4,096
+    tokenize tax          306.7     1569.2
+    (LZ4 decode)            0.9        7.0
 
-So the codec contributes 0.9-7.4us out of ~307us. That is why the four lines
-overlap, and why the dashed line sits underneath all of them. Choosing a better
-byte codec buys you essentially nothing on the read path -- the whole argument
-in one picture.
+So 0.9us of work buys you a 306.7us bill. The token path's 4.2us is the whole
+cost. Hindi 161.3us at 512, code 227.1us.
 
-If someone asks whether this "hides" the codec: yes, deliberately, and the
-dashed line is there so it is not hidden. An agent cannot skip the tokenize, so
-it belongs in the read cost. The ladder slide earlier quotes decode WITHOUT it,
-because there the question is how fast the codec is.
+Watch out for the code corpus at 1,024: the tax reads 2016.0us, out of line
+with 227.1 / 594.2 / 1099.0 either side of it. That is a measurement artifact
+in this sweep, not a real cliff. Use English if anyone drills in.
+
+Why this differs from the earlier `read_us` framing: bundling the tokenize into
+the codec's bar compared a codec against a tokenizer, and made all four byte
+codecs overlap. Separating them is fairer and still wins.
 
 The gap, stated as the worst case for us: 6.6-17.0x against the CHEAPEST byte
 codec, up to 119x against the dearest. English at 512 is +freq 4.2us against

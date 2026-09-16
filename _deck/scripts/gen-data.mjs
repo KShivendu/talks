@@ -242,51 +242,49 @@ const chunkEncode = {
   })),
 }
 
-// ── chunk-size sweep: read cost ──────────────────────────────────────────────
-// The companion to the encode sweep, and the one that matters: writes happen
-// once, reads happen on every retrieval forever.
+// ── chunk-size sweep: decode cost ────────────────────────────────────────────
+// Like for like, and it costs us the headline: a byte codec's `read_us`
+// bundles in the mandatory tokenize, which is ~99% of it and identical across
+// all four codecs, so plotting that compared a codec against a tokenizer.
+// Here every series is decode ALONE -- decompress_us for the byte codecs,
+// read_us for the token methods (already token IDs, so read_us IS their pure
+// decode; they have no decompress_us field).
 //
-// The finding is not just the gap, it is the FLATNESS of the grey band. Across
-// every corpus and size the four byte codecs land within 1.0-3.2% of each
-// other, because read_us is decompress plus the mandatory tokenize, and
-// tokenize is ~99% of it. Which byte codec you pick is nearly irrelevant to
-// read latency. Token methods beat the cheapest of them by 6.6-17.0x, and the
-// dearest by up to 119x.
-// Plot the tokenize term itself. read_us for a byte codec is exactly
-// decompress_us + one shared tokenize cost -- identical to the decimal across
-// all four codecs (English 512: 306.7us for every one of them; 4,096: 1569.2).
-// Drawn as a dashed reference line, the four grey codec lines visibly sit on
-// top of it, which shows the claim instead of asking the room to take it.
-const tokenizeOnly = (key) => ({
-  name: 'tokenize alone (unavoidable)',
-  color: '#0f172a',
-  dashed: true,
-  showMarkers: false,
-  points: SIZES.map((n) => {
-    const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.LZ4
-    return m == null ? null : [n, round1(m.read_us - m.decompress_us)]
-  }).filter(Boolean),
-})
-
+// On those terms the byte codecs win: English at 512, LZ4 unpacks in 0.9us
+// against +freq's 4.2us and +ANS's 30.8us. Concede it. The tokenize tax is
+// carried as a line under the chart instead, because that is the honest place
+// for it: a cost the byte path pays next, not a codec being slow.
 const chunkRead = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    // tokenize LAST: series paint in order, and drawn first it vanished under
-    // the four solid codec lines -- the exact overlap it exists to reveal.
     series: ENC_SERIES.map(([name, color]) => ({
       name,
       color,
       showMarkers: false,
       points: SIZES.map((n) => {
-        const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.read_us
+        const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]
+        if (m == null) return null
+        const v = m.kind === 'byte' ? m.decompress_us : m.read_us
         return v == null ? null : [n, round1(v)]
       }).filter(Boolean),
-    }))
-      .concat([tokenizeOnly(key)])
-      .filter((s) => s.points.length),
+    })).filter((s) => s.points.length),
   })),
 }
+
+// What the byte path owes after decoding: read_us - decompress_us, which is
+// one shared constant across the four codecs (identical to the decimal).
+const tokenizeTax = Object.fromEntries(
+  CORPORA.map(([, key]) => [
+    key,
+    Object.fromEntries(
+      SIZES.map((n) => {
+        const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`].methods.LZ4
+        return [n, round1(m.read_us - m.decompress_us)]
+      })
+    ),
+  ])
+)
 
 // ── the ratio/decode frontier, as a real scatter ─────────────────────────────
 // LineChart draws markers only when showLine is false, and hit-tests in 2D.
@@ -404,6 +402,8 @@ export const chunkEncode = ${JSON.stringify(chunkEncode, null, 2)}
 
 export const chunkRead = ${JSON.stringify(chunkRead, null, 2)}
 
+export const tokenizeTax = ${JSON.stringify(tokenizeTax, null, 2)}
+
 export const frontier = ${JSON.stringify(frontier, null, 2)}
 
 export const oodAuc = ${JSON.stringify(oodAuc, null, 2)}
@@ -428,11 +428,10 @@ console.log(`  latency: tokenize ${latency.tokenize}us, +freq read ${latency.fre
 console.log(`  chunk sweep: ${SIZES.length} sizes x ${CORPORA.length} corpora`)
 {
   const m = sweep['r50k|prose|512'].methods
-  const b = ['LZ4', 'gzip-9', 'zstd-19', 'zstd --train'].map((x) => m[x].read_us)
   console.log(
-    `  chunk read @512 prose: byte ${round1(Math.min(...b))}-${round1(Math.max(...b))}us ` +
-      `(spread ${((Math.max(...b) / Math.min(...b) - 1) * 100).toFixed(1)}%), ` +
-      `+freq ${round1(m['+freq'].read_us)}us`
+    `  chunk decode @512 prose: LZ4 ${round1(m.LZ4.decompress_us)}us, ` +
+      `+freq ${round1(m['+freq'].read_us)}us, +ANS ${round1(m['+ANS'].read_us)}us` +
+      ` | tokenize tax ${tokenizeTax.prose[512]}us`
   )
 }
 console.log(`  ood: entropy AUC ${Math.min(...oodAuc.values)}-${Math.max(...oodAuc.values)}`)

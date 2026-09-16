@@ -427,53 +427,6 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 
 ---
 
-## A free out-of-distribution gate
-
-<iframe :src="chart('ood')" class="w-full border-0" style="height: 360px"
-        title="A free out-of-distribution gate" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
-// resolves to the site root and 404s once deployed.
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-The surprise of this project. The ANS coder already computes -log2 P(token),
-so every chunk gets a bits/token score for nothing. A prose-trained table gives
-11.1 bits/token on prose and 15.1 on Hindi.
-The other free signal, a byte-codec ratio, is directionless on repetitive junk:
-it scores 0.315 AUC on hex dumps where entropy scores 1.000.
-Honest limit: it flags legitimately off-domain text as readily as junk.
--->
-
----
-
-## How far can this go?
-
-<iframe :src="chart('ngram')" class="w-full border-0" style="height: 400px"
-        title="How far can this go?" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-// BASE_URL is '/' in dev, '/token-storage/' in the build. A root-absolute path
-// resolves to the site root and 404s once deployed.
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Conditioning on the previous token helps, a third barely does: prose
-3.28 -> 3.97 -> 4.01x. The trigram table roughly triples in size for +1%.
-The language-model ceiling is ~12x (Deletang 2024), unreachable by stacking
-n-grams -- the tables explode first. Because the stored form is just token IDs,
-upgrading the table is a codec change, not a data migration.
--->
-
----
-
 ## Limitations
 
 <v-clicks>

@@ -1,3 +1,5 @@
+// NOT BUILT: the 'ngram' slide was cut from the deck. Re-add 'ngram' to the
+// charts npm script to bring it back; the data is still generated.
 import BarChart from '@blog/BarChart'
 import { ngram } from '@data/token-storage'
 import { mount } from './mount.jsx'

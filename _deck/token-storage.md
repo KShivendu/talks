@@ -318,6 +318,36 @@ All o200k here, so raw is 1.59x, not the 2.25x from earlier: o200k IDs need
 
 ---
 
+## After: one representation
+
+```text
+  WRITE (agent)                   READ (agent)
+
+  ╭────────────╮                  ╭────────────╮
+  │ token IDs  │                  │ token IDs  │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  +freq encode  2.7 µs         │  +freq decode  3.6 µs
+        ▼                               │
+  ╭─────┴───────────────────────────────┴──────╮
+  │                    DISK                    │
+  ╰────────────────────────────────────────────╯
+
+        detokenize once at the edge, only for a human:  50.3 µs
+```
+
+- The UTF-8 boxes are gone from the loop. **Nothing translates** on a read
+
+<!--
+Same layout as the previous slide so the difference is the missing middle row.
+Before: token IDs -> UTF-8 -> disk, and back again on every access.
+After: the IDs are the stored form, so a read hands them straight to the model.
+Numbers are o200k +freq: 2.7us to encode, 3.6us to decode, against 237us to
+re-tokenize. Detokenize survives, but once, at the edge, for a human.
+-->
+
+---
+
 <img :src="$asset('imgs/agent-read.png')" class="absolute inset-0 w-full h-full object-contain" alt="agent-read" />
 
 ---

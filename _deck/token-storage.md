@@ -45,7 +45,7 @@ class: 'text-left'
 
 <v-clicks>
 
-- The payload nobody compresses
+- Why is text compression important?
 
 - The compression ladder, and why every step on it falls short
 
@@ -61,17 +61,17 @@ class: 'text-left'
 
 ---
 
-## The payload nobody compresses
+## Why is text compression important?
 
 <v-clicks>
 
 - A vector DB record is a **vector** plus a text payload
 
-- We compress the vector obsessively: product quantization, binary quantization, Matryoshka
+- We compress the vector obsessively: turboquant, binary quantization, Matryoshka
 
-- The text payload gets raw UTF-8, or LZ4 if you're lucky. On English, 1.27x
+- The text payload gets raw UTF-8, or LZ4. On English: 1.27x
 
-- Text is the heavy field: thousands of characters, one byte each
+- Text dwarfs every other field type: thousands of characters, one byte each. While numeric fields need 2-4 bytes
 
 </v-clicks>
 
@@ -90,9 +90,9 @@ class: 'text-left'
 
 <v-clicks>
 
-- Decode is cheap, but it returns **bytes**: add **~235us** of tokenizing to every row
+- LZ4 is most commonly used due to speed but gives you 1.2-1.4x compression
 
-- The one that gets close, `zstd --train`, needs a vocabulary **you** train and ship. The tokenizer's is already standard, and your model already loaded it
+- Decode is cheaper, but it returns **bytes**: add **~235us** of tokenizing to every row
 
 </v-clicks>
 
@@ -142,9 +142,9 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 
 <v-clicks>
 
-- Every option on that ladder packs the **same UTF-8 bytes** tighter. Same contents, smaller box
+- Decode is very fast but not for the agents. Why?
 
-- But nothing downstream reads UTF-8. The model turns it into token IDs first, on **every read**
+- Because models (LLM Agents, Re-rankers, or Embedders) don't read UTF-8. They must turn it into tokens first, on **every read**
 
 - So what if we **store token IDs directly**?
 
@@ -165,11 +165,13 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 <v-clicks>
 
+- This napkin math was my original motivation for the experiment.
+
 - One BPE token covers about **3/4 of a word**
 
-- r50k's vocabulary is 50,257 tokens, which fits in a `uint16`
+- r50k's vocabulary is 50,257 tokens, which fits in a `uint16` (65k)
 
-- This is the whole idea. Everything after this slide is checking it
+- Lossless compression
 
 </v-clicks>
 
@@ -183,7 +185,7 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 - `"storage"` is **one** token. `"Token-native"` is three: `Token` + `-` + `native`
 
-- Every word carries its leading space into the token: `" cat"` is 4 bytes of UTF-8, but 1 token
+- Words often carry the leading space into the token: `" cat"` is 4 bytes of UTF-8, but 1 token
 
 - r50k 50,257 (2 bytes) · cl100k 100,277 · o200k 200,019 (3 bytes)
 

@@ -1258,3 +1258,619 @@ export const ngram = {
     }
   ]
 }
+
+export const agentRead = [
+  {
+    "label": "Agent",
+    "default": true,
+    "datasets": [
+      {
+        "label": "English",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              449.7,
+              459.1,
+              455.3,
+              453,
+              1.3,
+              13.5,
+              10.7,
+              41.7
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "450us",
+              "459us",
+              "455us",
+              "453us",
+              "1.3us",
+              "13.5us",
+              "10.7us",
+              "41.7us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Code",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              347.8,
+              358.1,
+              350.6,
+              348.9,
+              1.4,
+              12,
+              5.7,
+              25.1
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "348us",
+              "358us",
+              "351us",
+              "349us",
+              "1.4us",
+              "12.0us",
+              "5.7us",
+              "25.1us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Hindi",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              103.6,
+              112.7,
+              107.8,
+              103.2,
+              1.3,
+              11.5,
+              8.4,
+              13.8
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "104us",
+              "113us",
+              "108us",
+              "103us",
+              "1.3us",
+              "11.5us",
+              "8.4us",
+              "13.8us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Human",
+    "datasets": [
+      {
+        "label": "English",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              4.4,
+              34.5,
+              25.9,
+              7.4,
+              25,
+              36.9,
+              34.1,
+              65.1
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "4.4us",
+              "34.5us",
+              "25.9us",
+              "7.4us",
+              "25.0us",
+              "36.9us",
+              "34.1us",
+              "65.1us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Code",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              3,
+              19.7,
+              12.8,
+              3.9,
+              22.3,
+              24.9,
+              18.6,
+              38
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "3.0us",
+              "19.7us",
+              "12.8us",
+              "3.9us",
+              "22.3us",
+              "24.9us",
+              "18.6us",
+              "38.0us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Hindi",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "read latency",
+            "values": [
+              2.6,
+              18.7,
+              18.5,
+              2.5,
+              22.3,
+              17.2,
+              14.1,
+              19.5
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "2.6us",
+              "18.7us",
+              "18.5us",
+              "2.5us",
+              "22.3us",
+              "17.2us",
+              "14.1us",
+              "19.5us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      }
+    ]
+  }
+]
+
+export const agentWrite = [
+  {
+    "label": "Agent",
+    "default": true,
+    "datasets": [
+      {
+        "label": "English",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              35.1,
+              130.8,
+              727.9,
+              960.2,
+              1.9,
+              18.1,
+              8.2,
+              12.5
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "35.1us",
+              "131us",
+              "728us",
+              "960us",
+              "1.9us",
+              "18.1us",
+              "8.2us",
+              "12.5us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Code",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              17.4,
+              67.4,
+              402.7,
+              416.8,
+              1.8,
+              16.3,
+              4.3,
+              7.6
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "17.4us",
+              "67.4us",
+              "403us",
+              "417us",
+              "1.8us",
+              "16.3us",
+              "4.3us",
+              "7.6us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Hindi",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              10.9,
+              66.3,
+              389,
+              512.6,
+              1.9,
+              8.1,
+              5.7,
+              3.3
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "10.9us",
+              "66.3us",
+              "389us",
+              "513us",
+              "1.9us",
+              "8.1us",
+              "5.7us",
+              "3.3us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "Human",
+    "datasets": [
+      {
+        "label": "English",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              11.4,
+              107.1,
+              704.2,
+              936.5,
+              439.8,
+              315.7,
+              298.4,
+              412
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "11.4us",
+              "107us",
+              "704us",
+              "937us",
+              "440us",
+              "316us",
+              "298us",
+              "412us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Code",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              5.8,
+              55.8,
+              391.1,
+              405.2,
+              326,
+              210.4,
+              193.6,
+              271.6
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "5.8us",
+              "55.8us",
+              "391us",
+              "405us",
+              "326us",
+              "210us",
+              "194us",
+              "272us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      },
+      {
+        "label": "Hindi",
+        "categories": [
+          "LZ4",
+          "gzip -9",
+          "zstd -19",
+          "zstd --train",
+          "r50k raw",
+          "o200k raw",
+          "o200k +freq",
+          "o200k +ANS"
+        ],
+        "series": [
+          {
+            "name": "write latency",
+            "values": [
+              5.2,
+              60.6,
+              383.3,
+              506.9,
+              248,
+              115.3,
+              106.4,
+              157.1
+            ],
+            "colors": [
+              "#cbd5e1",
+              "#94a3b8",
+              "#64748b",
+              "#475569",
+              "#dc244C",
+              "#dc244C",
+              "#f4768f",
+              "#dc244C"
+            ],
+            "text": [
+              "5.2us",
+              "60.6us",
+              "383us",
+              "507us",
+              "248us",
+              "115us",
+              "106us",
+              "157us"
+            ],
+            "textPosition": "outside"
+          }
+        ]
+      }
+    ]
+  }
+]

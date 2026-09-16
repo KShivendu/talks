@@ -77,16 +77,16 @@ class: 'text-left'
 
 ---
 
-## The compression ladder
+## Standard compression algorithms
 
-| | English | encode | decode | why it falls short |
+| | English | encode | decode | remarks |
 | --- | ---: | ---: | ---: | --- |
-| LZ4 (Qdrant, ES, Postgres) | 1.27x | 2.9us | 1.0us | barely compresses |
+| **LZ4 (Most engines use this)** | 1.27x | 2.9us | 1.0us | barely compresses |
 | gzip `-9` | 1.92x | 26us | 8.0us | still a byte codec |
 | zstd `-19` | 1.94x | 209us | 4.5us | slow for what it buys |
 | brotli `q11` | 2.57x | **2,777us** | 9.5us | ~1,000x LZ4 to encode |
 | `zstd --train` | 2.72x | 359us | 3.2us | dictionary ships with your data |
-| LZ4 over 16KB **blocks** | 1.43x | 7.8us | 7.6us | one read decompresses the whole block |
+| LZ4 over 16KB **blocks** | 1.43x | 7.8us | 7.6us | **7 docs** share a block, so one read decodes all 7 |
 
 <v-clicks>
 
@@ -100,7 +100,15 @@ class: 'text-left'
 The 2x2 is in 07_kalcher_baseline/read_latency_2x2_results.json, ES/Lucene-style
 blocks (<=16KB or 128 docs, whole block compressed, one doc read decompresses it).
 
-Do NOT reinstate the old "every copy pays it again: snapshots, WAL, replicas,
+Why 7: a block caps at 16 KB or 128 docs, whichever comes first, and a
+512-token English chunk is ~2,344 UTF-8 bytes. 16,384 / 2,344 = 7.0, so byte
+size always binds and the 128-doc cap never does. That is why decode is 7.6us
+against LZ4's 1.0us point decode -- almost exactly 7x, because one reader
+decompresses all 7 documents to get one. Denser corpora pack more per block and
+pay more: code 14 docs/block, Hindi 18 (block_codecs_results.json ::
+block_meta). At 256 tokens it is 13 / 28 / 37.
+
+Do NOT reinstate the old "every copy pays it again": snapshots, WAL, replicas,
 egress" bullet here. That line is from token-storage-extra.mdx:1360 ("The
 Multiplier Hits Every Copy of the Bytes"), where it is a PAYOFF of token
 storage -- every copy gets 3.35x smaller -- not a criticism of the ladder.
@@ -426,6 +434,37 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 
 ---
 
+## Every byte codec pays the same tokenize tax
+
+<iframe :src="chart('agent-read')" class="w-full border-0" style="height: 400px"
+        title="Agent and human read latency" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Toggle Agent/Human on the right, corpus on the left. Numbers are the post's own
+`latValues`, pulled out of token-storage.mdx at build time so the deck cannot
+drift from the blog.
+
+AGENT read, English: LZ4 449.7us, gzip 459.1, zstd-19 455.3, zstd --train 453.0
+-- they differ by 2% because decompression is 1-9us and the other ~445us is the
+mandatory tokenize, identical for all of them. That flat wall of grey IS the
+slide. Token-native: r50k raw 1.3us, o200k raw 13.5, o200k +freq 10.7, o200k
++ANS 41.7. Fastest path is ~350x.
+
+HUMAN read is the honest other side: LZ4 4.4us beats every token method,
+because now somebody has to detokenize (23-25us) and nobody has to tokenize.
+Say it before the room says it: humans are the case byte storage wins. The
+answer is on the next slides -- an agent reads hundreds of chunks per query,
+a human reads one summary at the end, so detokenize once at the edge.
+-->
+
+---
+
 ## Detokenize, then tokenize again on every read
 
 <div class="flex justify-center mt-2">
@@ -447,6 +486,32 @@ The model already produced the IDs. A byte store throws them away, detokenizes
 - Humans still need characters, but a search returns 10 chunks and the agent reads all of them. Detokenize once, at the edge
 
 </v-clicks>
+
+---
+
+## Agent writes: nothing to detokenize
+
+<iframe :src="chart('agent-write')" class="w-full border-0" style="height: 400px"
+        title="Agent and human write latency" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+LOG axis, unlike the read chart: this one spans 1.9us to 960us, and on a linear
+axis every token bar vanishes into the baseline.
+
+AGENT write, English: r50k raw 1.9us against LZ4 35.1us, gzip 130.8, zstd-19
+727.9, zstd --train 960.2. The model emitted the IDs, so a token store just
+packs them; a byte store has to detokenize first and then compress.
+
+HUMAN write: r50k raw 439.8us, LZ4 11.4us -- flipped, because a human hands you
+text and somebody must tokenize it. That is a real cost and worth naming. In an
+agentic system it is also the rarer path: the agent does most of the writing.
+-->
 
 ---
 

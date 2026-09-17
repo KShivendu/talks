@@ -76,32 +76,34 @@ const sweep = JSON.parse(readFileSync(sweepPath, 'utf8')).sweep
 const ood = JSON.parse(readFileSync(oodPath, 'utf8'))
 
 /*
- * Qdrant brand palette. Amaranth #DC244C and Neon Blue #6047FF are the two
- * brand hues, Black #0B0F19 and White #FFFFFF the ground.
+ * Qdrant brand palette, with one rule: the byte codecs are the competition, not
+ * the subject. They stay neutral grey and carry no markers, so they read as one
+ * recessive band. Amaranth is spent only on the token-native methods, which is
+ * what makes it mean something when it appears.
  *
- * Byte codecs take the blue ramp, token-native the amaranth ramp, so the two
- * families separate by hue rather than by "coloured vs grey" -- and neither
- * reads as the loser before a word is said. Within a family, darker = stronger.
- *
- * The blog's own charts are green (lib/viz-palette). The talk overrides the
- * furniture through the `chrome` prop rather than forking the components.
+ * Every colour clears 3:1 (the WCAG bar for graphical objects) against BOTH
+ * white and Qdrant Black #0B0F19, because the deck is colorSchema:'all'. That
+ * is a real constraint: neutrals only satisfy it between #606060 and #949494,
+ * which is exactly where the grey ramp below sits. Verified by
+ * scripts/palette-check.mjs.
  */
 const AMARANTH = '#dc244c'
-const NEON_BLUE = '#6047ff'
 const BLACK = '#0b0f19'
 
-// byte-codec ramp, weakest to strongest
-const BLUE_L = '#c3bbff'
-const BLUE_M = '#9384ff'
-const BLUE_D = NEON_BLUE
-const BLUE_XD = '#3f2ec2'
-// token-native ramp
-const RED_L = '#f4768f'
-const RED = AMARANTH
-const RED_D = '#8f1732'
+// byte codecs: one recessive band, weakest to strongest. Narrow on purpose --
+// they are meant to be read as a group, not told apart at a glance.
+const GREY_L = '#8a9099' //  3.2:1 light  5.9:1 dark
+const GREY_M = '#7b828d' //  3.9:1        4.9:1
+const GREY_D = '#6c7480' //  4.7:1        4.1:1
+const GREY_XD = '#5d6573' //  5.9:1        3.3:1
 
-// kept for the charts that still speak in neutrals
-const GREY = '#94a3b8'
+// token-native: the emphasised family. Markers (ring/star/diamond) carry
+// identity, so these stay close to the brand hue instead of chasing distance.
+const RED_L = '#ef5a7c' //  3.3:1 light  5.9:1 dark
+const RED = AMARANTH //  4.8:1        4.0:1
+const RED_D = '#a83865' //  6.1:1        3.1:1
+
+const GREY = GREY_M
 
 const CORPORA = [
   ['English', 'prose'],
@@ -195,17 +197,17 @@ const RATIO_SERIES = [
   // `zstd --train` as the strongest byte-side comparison. Darker = stronger.
   // Shapes let the lines be told apart where they cross or overlap, and give
   // the token-native trio the eye-catching ones -- star for the headline +ANS.
-  ['LZ4', BLUE_L, 'circle'],
-  ['gzip-9', BLUE_M, 'square'],
-  ['zstd-19', BLUE_D, 'triangle'],
-  ['zstd --train', BLUE_XD, 'diamond'],
+  ['LZ4', GREY_L, null],
+  ['gzip-9', GREY_M, null],
+  ['zstd-19', GREY_D, null],
+  ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
   ['+freq', RED_L, 'ring'],
   ['+ANS', RED, 'star'],
   // +dict answers "you lose on code": order-0 coders model no repetition, and
   // code repeats constantly. zstd-22 with a 112KB dictionary trained on packed
   // token-ID bytes -- output is still token IDs, so a read still skips
   // tokenizing. Same sweep as every other series here, so no mixing.
-  ['+dict', RED_D, 'diamond'],
+  ['+dict', RED_D, 'square'],
 ]
 const sweepCell = (key, n) => sweep[`${NATIVE_TOK[key]}|${key}|${n}`]
 const chunkRatio = {
@@ -216,6 +218,7 @@ const chunkRatio = {
       name,
       color,
       marker,
+      showMarkers: marker != null,
       points: SIZES.map((n) => {
         const v = sweepCell(key, n)?.methods?.[name]?.ratio
         return v == null ? null : [n, Math.round(v * 100) / 100]
@@ -242,10 +245,10 @@ const chunkRatio = {
 // Same colours AND shapes as RATIO_SERIES, so a line means the same thing on
 // all three sweep charts.
 const ENC_SERIES = [
-  ['LZ4', BLUE_L, 'circle'],
-  ['gzip-9', BLUE_M, 'square'],
-  ['zstd-19', BLUE_D, 'triangle'],
-  ['zstd --train', BLUE_XD, 'diamond'],
+  ['LZ4', GREY_L, null],
+  ['gzip-9', GREY_M, null],
+  ['zstd-19', GREY_D, null],
+  ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
   ['+freq', RED_L, 'ring'],
   ['+ANS', RED, 'star'],
 ]
@@ -257,6 +260,7 @@ const chunkEncode = {
       name,
       color,
       marker,
+      showMarkers: marker != null,
       points: SIZES.map((n) => {
         const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.write_us
         return v == null ? null : [n, round1(v)]
@@ -285,6 +289,7 @@ const chunkRead = {
       name,
       color,
       marker,
+      showMarkers: marker != null,
       points: SIZES.map((n) => {
         const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]
         if (m == null) return null
@@ -365,10 +370,10 @@ const LAT_ROWS = [
   // his competition: what production runs, plus the strongest byte comparison.
   // brotli is in the post's table but off the slide -- at 8,251us on agent
   // write it is 9x the next bar and flattens everything else to nothing.
-  ['LZ4', 0, BLUE_L],
-  ['gzip -9', 1, BLUE_M],
-  ['zstd -19', 2, BLUE_D],
-  ['zstd --train', 4, BLUE_XD],
+  ['LZ4', 0, GREY_L],
+  ['gzip -9', 1, GREY_M],
+  ['zstd -19', 2, GREY_D],
+  ['zstd --train', 4, GREY_XD],
   ['r50k raw', 5, RED],
   ['o200k raw', 7, RED],
   ['o200k +freq', 10, RED_L],

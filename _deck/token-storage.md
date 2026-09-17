@@ -383,7 +383,7 @@ slowest at 3.3x.
 
 ---
 
-## An easy win in every BPE tokenizer
+## Achieving even higher compression
 
 <v-clicks>
 

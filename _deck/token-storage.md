@@ -407,6 +407,7 @@ slowest at 3.3x.
 
 ---
 
+<!--
 ## Fixing it:
 
 ```python {all|3-8|10-15|12}
@@ -427,7 +428,7 @@ def compress(text):
     return len(ranks).to_bytes(4, "big") + out[:n].tobytes()
 ```
 
----
+-->
 
 ## Pick your point on the curve
 
@@ -460,7 +461,7 @@ fraction of the decode.
 
 ---
 
-## Two representations, paid for twice
+## Before: Translation on every read/write
 
 ```text
   WRITE (agent)                   READ (agent)
@@ -482,11 +483,11 @@ fraction of the decode.
   ╰────────────────────────────────────────────╯
 ```
 
-- Stored once, kept in **two** forms, translated on every access
+- Models don't understand UTF-8. So you translate on every read/write
 
 ---
 
-## After: one representation
+## After: No translation cost
 
 ```text
   WRITE (agent)                   READ (agent)
@@ -504,7 +505,7 @@ fraction of the decode.
         detokenize once at the edge, only for a human:  50.3 µs
 ```
 
-- The UTF-8 boxes are gone from the loop. **Nothing translates** on a read
+- The UTF-8 boxes are gone. **No translation required** on read/write
 
 <!--
 Same layout as the previous slide so the difference is the missing middle row.
@@ -516,21 +517,24 @@ re-tokenize. Detokenize survives, but once, at the edge, for a human.
 
 ---
 
-<img :src="$asset('imgs/agent-read.png')" class="absolute inset-0 w-full h-full object-contain" alt="agent-read" />
-
----
-
 ## Agent read
 
 <v-clicks>
 
-- LZ4 decompresses in 1.0us, then spends **236.7us** tokenizing text the model will immediately consume as IDs
+- LZ4 decompresses in 1.0us, then spends **263us** tokenizing text for the model
 
 - Token-native serves the IDs directly: 3.6us with `+freq`, 28.8us with `+ANS`
 
-- That's ~66x on the fastest token-native path
+- That's ~66x on every single read
 
 - Read is where it compounds: it happens on every retrieval, forever. Writing happens once
+
+<!--
+- Why bother about `us` optimizations?
+    - Low level optimizations compound very fast due to millions/billions of repetitions
+    - Machines need faster interfaces. Humans don't feel `ms` but not the case with agents.
+    - We don't choose zstd because it takes `209us` but here we are okay with `1+263us`.
+-->
 
 </v-clicks>
 

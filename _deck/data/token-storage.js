@@ -2039,7 +2039,77 @@ export const agentRead = [
               "10.7us",
               "41.7us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "decompress",
+                  "value": 4.1
+                },
+                {
+                  "label": "tokenize",
+                  "value": 445.6
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 13.4
+                },
+                {
+                  "label": "tokenize",
+                  "value": 445.6
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 9.7
+                },
+                {
+                  "label": "tokenize",
+                  "value": 445.6
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 7.4
+                },
+                {
+                  "label": "tokenize",
+                  "value": 445.6
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.3
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 13.5
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 5.6
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 5.1
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 41.7
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2088,7 +2158,77 @@ export const agentRead = [
               "5.7us",
               "25.1us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "decompress",
+                  "value": 2.8
+                },
+                {
+                  "label": "tokenize",
+                  "value": 345
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 13.1
+                },
+                {
+                  "label": "tokenize",
+                  "value": 345
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 5.6
+                },
+                {
+                  "label": "tokenize",
+                  "value": 345
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 3.9
+                },
+                {
+                  "label": "tokenize",
+                  "value": 345
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.4
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 12
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 3.2
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 2.5
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 25.1
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2137,7 +2277,77 @@ export const agentRead = [
               "8.4us",
               "13.8us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "decompress",
+                  "value": 2.9
+                },
+                {
+                  "label": "tokenize",
+                  "value": 100.7
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 12
+                },
+                {
+                  "label": "tokenize",
+                  "value": 100.7
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 7.1
+                },
+                {
+                  "label": "tokenize",
+                  "value": 100.7
+                }
+              ],
+              [
+                {
+                  "label": "decompress",
+                  "value": 2.5
+                },
+                {
+                  "label": "tokenize",
+                  "value": 100.7
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.3
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 11.5
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 5.5
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 2.9
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 13.8
+                }
+              ]
+            ]
           }
         ]
       }
@@ -2191,7 +2401,62 @@ export const agentRead = [
               "34.1us",
               "65.1us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              null,
+              null,
+              null,
+              [
+                {
+                  "label": "decompress",
+                  "value": 7.4
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.3
+                },
+                {
+                  "label": "detokenize",
+                  "value": 23.7
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 13.5
+                },
+                {
+                  "label": "detokenize",
+                  "value": 23.4
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 5.6
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 5.1
+                },
+                {
+                  "label": "detokenize",
+                  "value": 23.4
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 41.7
+                },
+                {
+                  "label": "detokenize",
+                  "value": 23.4
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2240,7 +2505,62 @@ export const agentRead = [
               "18.6us",
               "38.0us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              null,
+              null,
+              null,
+              [
+                {
+                  "label": "decompress",
+                  "value": 3.9
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.4
+                },
+                {
+                  "label": "detokenize",
+                  "value": 20.9
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 12
+                },
+                {
+                  "label": "detokenize",
+                  "value": 12.9
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 3.2
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 2.5
+                },
+                {
+                  "label": "detokenize",
+                  "value": 12.9
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 25.1
+                },
+                {
+                  "label": "detokenize",
+                  "value": 12.9
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2289,7 +2609,62 @@ export const agentRead = [
               "14.1us",
               "19.5us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              null,
+              null,
+              null,
+              [
+                {
+                  "label": "decompress",
+                  "value": 2.5
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 1.3
+                },
+                {
+                  "label": "detokenize",
+                  "value": 21
+                }
+              ],
+              [
+                {
+                  "label": "unpack",
+                  "value": 11.5
+                },
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                }
+              ],
+              [
+                {
+                  "label": "streamvbyte-decode",
+                  "value": 5.5
+                },
+                {
+                  "label": "rank-lookup",
+                  "value": 2.9
+                },
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                }
+              ],
+              [
+                {
+                  "label": "ANS-decode",
+                  "value": 13.8
+                },
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                }
+              ]
+            ]
           }
         ]
       }
@@ -2347,7 +2722,77 @@ export const agentWrite = [
               "8.2us",
               "12.5us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "detokenize",
+                  "value": 23.7
+                },
+                {
+                  "label": "compress",
+                  "value": 11.4
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 23.7
+                },
+                {
+                  "label": "compress",
+                  "value": 107.1
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 23.7
+                },
+                {
+                  "label": "compress",
+                  "value": 704.2
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 23.7
+                },
+                {
+                  "label": "compress",
+                  "value": 936.5
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 1.9
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 18.1
+                }
+              ],
+              [
+                {
+                  "label": "rank-remap",
+                  "value": 2
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 6.2
+                }
+              ],
+              [
+                {
+                  "label": "ANS-encode",
+                  "value": 12.5
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2396,7 +2841,77 @@ export const agentWrite = [
               "4.3us",
               "7.6us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "detokenize",
+                  "value": 11.6
+                },
+                {
+                  "label": "compress",
+                  "value": 5.8
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 11.6
+                },
+                {
+                  "label": "compress",
+                  "value": 55.8
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 11.6
+                },
+                {
+                  "label": "compress",
+                  "value": 391.1
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 11.6
+                },
+                {
+                  "label": "compress",
+                  "value": 405.2
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 1.8
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 16.3
+                }
+              ],
+              [
+                {
+                  "label": "rank-remap",
+                  "value": 1
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 3.3
+                }
+              ],
+              [
+                {
+                  "label": "ANS-encode",
+                  "value": 7.6
+                }
+              ]
+            ]
           }
         ]
       },
@@ -2445,7 +2960,77 @@ export const agentWrite = [
               "5.7us",
               "3.3us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                },
+                {
+                  "label": "compress",
+                  "value": 5.2
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                },
+                {
+                  "label": "compress",
+                  "value": 60.6
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                },
+                {
+                  "label": "compress",
+                  "value": 383.3
+                }
+              ],
+              [
+                {
+                  "label": "detokenize",
+                  "value": 5.7
+                },
+                {
+                  "label": "compress",
+                  "value": 506.9
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 1.9
+                }
+              ],
+              [
+                {
+                  "label": "pack",
+                  "value": 8.1
+                }
+              ],
+              [
+                {
+                  "label": "rank-remap",
+                  "value": 1
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 4.7
+                }
+              ],
+              [
+                {
+                  "label": "ANS-encode",
+                  "value": 3.3
+                }
+              ]
+            ]
           }
         ]
       }
@@ -2499,7 +3084,59 @@ export const agentWrite = [
               "298us",
               "412us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "compress",
+                  "value": 11.4
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 107.1
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 704.2
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 936.5
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 445.6
+                },
+                {
+                  "label": "pack",
+                  "value": 1.9
+                }
+              ],
+              null,
+              [
+                {
+                  "label": "tokenize",
+                  "value": 290.2
+                },
+                {
+                  "label": "rank-remap",
+                  "value": 2
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 6.2
+                }
+              ],
+              null
+            ]
           }
         ]
       },
@@ -2548,7 +3185,50 @@ export const agentWrite = [
               "194us",
               "272us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "compress",
+                  "value": 5.8
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 55.8
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 391.1
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 405.2
+                }
+              ],
+              null,
+              null,
+              [
+                {
+                  "label": "tokenize",
+                  "value": 189.3
+                },
+                {
+                  "label": "rank-remap",
+                  "value": 1
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 3.3
+                }
+              ],
+              null
+            ]
           }
         ]
       },
@@ -2597,7 +3277,50 @@ export const agentWrite = [
               "106us",
               "157us"
             ],
-            "textPosition": "outside"
+            "textPosition": "outside",
+            "breakdown": [
+              [
+                {
+                  "label": "compress",
+                  "value": 5.2
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 60.6
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 383.3
+                }
+              ],
+              [
+                {
+                  "label": "compress",
+                  "value": 506.9
+                }
+              ],
+              null,
+              null,
+              [
+                {
+                  "label": "tokenize",
+                  "value": 100.7
+                },
+                {
+                  "label": "rank-remap",
+                  "value": 1
+                },
+                {
+                  "label": "streamvbyte-encode",
+                  "value": 4.7
+                }
+              ],
+              null
+            ]
           }
         ]
       }

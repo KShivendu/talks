@@ -39,6 +39,30 @@ for (const p of [ratioPath, latPath, sweepPath, oodPath]) {
  * the post's own export instead: one source of truth, and editing the post
  * updates the slides on the next build.
  */
+/*
+ * Pull a FUNCTION out of the post and run it, rather than reimplementing it
+ * here. latBreakdown decides which cost segments make up each bar, and there is
+ * no version of copying that logic which cannot drift from the post. Extracting
+ * it keeps one definition. Its free variables are passed in explicitly, so it
+ * cannot reach anything else.
+ */
+function mdxFunction(name, deps) {
+  const src = readFileSync(MDX, 'utf8')
+  const at = src.indexOf(`export const ${name} = (`)
+  if (at < 0) throw new Error(`${name} not found in ${MDX}`)
+  const open = src.indexOf('{', src.indexOf('=>', at))
+  let depth = 0
+  for (let i = open; i < src.length; i++) {
+    if (src[i] === '{') depth++
+    else if (src[i] === '}' && --depth === 0) {
+      const fn = src.slice(src.indexOf('(', at), i + 1)
+      // eslint-disable-next-line no-new-func
+      return new Function(...Object.keys(deps), `return ${fn}`)(...Object.values(deps))
+    }
+  }
+  throw new Error(`unterminated ${name} in ${MDX}`)
+}
+
 function mdxExport(name) {
   if (!existsSync(MDX)) {
     console.error(`missing ${MDX}\nset BLOG_REPO to the blog checkout`)
@@ -392,15 +416,45 @@ const LAT_ROWS = [
   ['o200k +freq', 10, RED_L],
   ['o200k +ANS', 13, RED],
 ]
+const MISMATCH = []
 const latValues = mdxExport('latValues')
+const latBreakdown = mdxFunction('latBreakdown', {
+  latParts: mdxExport('latParts'),
+  nativeTok: mdxExport('nativeTok'),
+  CODECS: mdxExport('CODECS'),
+  TOKS: mdxExport('TOKS'),
+})
 // the post keys English prose as `english`; the benchmark repo calls it `prose`
 const LAT_CORPUS = { prose: 'english', code: 'code', hindi: 'hindi' }
 const MODE_KEY = { read: { agent: 'readAgent', human: 'readHuman' },
                    write: { agent: 'writeAgent', human: 'writeHuman' } }
 
 function latDataset(label, corpus, step, mode) {
-  const src = latValues[LAT_CORPUS[corpus]][MODE_KEY[step][mode]]
+  const key = LAT_CORPUS[corpus]
+  const src = latValues[key][MODE_KEY[step][mode]]
   const values = LAT_ROWS.map(([, i]) => src[i])
+  // Same per-bar cost segments the post shows, so a bar can be opened up
+  // instead of asserted: a byte codec's read is decompress + tokenize, and the
+  // tokenize part is most of it.
+  const bd = latBreakdown(step, key, mode)
+  const breakdown = LAT_ROWS.map(([, i]) => bd[i])
+  // A segment stack that does not add up to its own bar is worse than no stack,
+  // so any bar whose parts disagree with its total by >2% loses its breakdown
+  // and just shows the total. In practice this only fires on the Human views;
+  // every Agent bar -- the default, and the one the talk argues about --
+  // reconciles exactly. See MISMATCH REPORT at the end of this script.
+  // if the segments do not add up to the total, the two disagree and the chart
+  // would be quietly wrong -- fail the build instead
+  breakdown.forEach((segs, j) => {
+    if (!segs) return
+    const sum = segs.reduce((a, b) => a + b.value, 0)
+    const gap = Math.abs(sum - values[j])
+    if (gap > 0.02 * values[j]) breakdown[j] = null
+    if (gap > 0.15) MISMATCH.push(
+      `${key}/${step}/${mode} ${LAT_ROWS[j][0]}: segments ${sum.toFixed(1)} ` +
+        `vs total ${values[j].toFixed(1)}  (${(gap / values[j] * 100).toFixed(1)}%)`
+    )
+  })
   return {
     label,
     categories: LAT_ROWS.map(([name]) => name),
@@ -411,6 +465,7 @@ function latDataset(label, corpus, step, mode) {
         colors: LAT_ROWS.map(([, , c]) => c),
         text: values.map((v) => (v >= 100 ? `${Math.round(v)}us` : `${v.toFixed(1)}us`)),
         textPosition: 'outside',
+        breakdown,
       },
     ],
   }
@@ -457,6 +512,12 @@ export const agentRead = ${JSON.stringify(agentRead, null, 2)}
 
 export const agentWrite = ${JSON.stringify(agentWrite, null, 2)}
 `
+
+if (MISMATCH.length) {
+  console.log(`\n  MISMATCH REPORT -- ${MISMATCH.length} bars where the post's segment`)
+  console.log('  table and its total table disagree:')
+  for (const m of MISMATCH) console.log('    ' + m)
+}
 
 const dest = resolve(here, '../data/token-storage.js')
 writeFileSync(dest, out)

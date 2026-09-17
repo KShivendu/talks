@@ -460,12 +460,6 @@ UTF-8 is the honest other side: there the byte codecs win outright, LZ4 at
 nobody has to tokenize. Say it before the room does -- and then say that a
 human needs ~90 seconds to read the chunk, so 54us on that path is ~2 million
 times smaller than the reader it serves.
-
-HUMAN read is the honest other side: LZ4 4.4us beats every token method,
-because now somebody has to detokenize (23-25us) and nobody has to tokenize.
-Say it before the room says it: humans are the case byte storage wins. The
-answer is on the next slides -- an agent reads hundreds of chunks per query,
-a human reads one summary at the end, so detokenize once at the edge.
 -->
 
 ---
@@ -513,8 +507,8 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 | you store | a model reads | a screen reads |
 | --- | --- | --- |
-| UTF-8 — today | **tokenize 235us** | free |
-| token IDs | free | **detokenize 45us** |
+| UTF-8 — today | **tokenize 237us** | free |
+| token IDs | free | **detokenize 50us** |
 
 <v-clicks>
 
@@ -535,10 +529,18 @@ This slide concedes the counter-case, so lead with the table and let the room
 see both directions before you argue. Symmetric on purpose: nobody can say the
 cost was hidden.
 
-Numbers are English/r50k serving-cold from 03_latency/latency_grid_results.json:
-tokenize 235.3us, detokenize 45.5us. The ratio holds across corpora -- prose
-5.2x, code 5.1x (175.2 / 34.2), Hindi 4.2x (118.4 / 27.9) -- and widens warm,
-to 10-16x, because detokenize benefits more from a hot table.
+Numbers are English/o200k serving-cold from 03_latency/latency_grid_
+results.json: tokenize 236.7us, detokenize 50.3us, a 4.7x gap. o200k to match
+the diagrams and the rest of the deck; r50k would be 235.3 / 45.5, a 5.2x gap,
+same story. Confirmed independently by 09_cold_tokenize, which measures 267.0 /
+50.8 for o200k on the same chunks.
+
+The gap holds across corpora with their native tokenizers -- prose 5.2x, code
+5.3x (267.6 / 50.2), Hindi 4.7x -- and widens warm to 10-16x, because
+detokenize benefits more from a hot table than tokenize does.
+
+Detokenize did NOT get faster at any point; 45 and 50 are r50k and o200k, not
+an old and a new number. Only tokenize moved, from the post's stale 445.6.
 
 Why it is structural, which also pre-answers the next slide: detokenize is one
 lookup per token and a concat. Tokenize has to FIND the tokens first -- regex

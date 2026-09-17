@@ -343,7 +343,7 @@ fraction of the decode.
 
 ---
 
-## Before: Translation on every read/write
+## Before: Translate on every read/write
 
 ```text
   WRITE (agent)                   READ (agent)
@@ -369,7 +369,7 @@ fraction of the decode.
 
 ---
 
-## After: No translation cost
+## After: Zero translation cost
 
 ```text
   WRITE (agent)                   READ (agent)
@@ -459,26 +459,7 @@ a human reads one summary at the end, so detokenize once at the edge.
 
 ---
 
-## Detokenize, then tokenize again on every read
-
-<div class="flex justify-center mt-2">
-  <img :src="$asset('imgs/drake-no.jpg')" class="h-72 rounded-lg" />
-</div>
-
----
-
-## Writes are free, humans read once
-
-<v-clicks>
-
-
-
-
-</v-clicks>
-
----
-
-## Agent writes: nothing to detokenize
+## Agent writes
 
 <iframe :src="chart('agent-write')" class="w-full border-0" style="height: 400px"
         title="Agent and human write latency" />
@@ -490,10 +471,8 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 
-- The model **already produced the IDs**. A byte store throws them away, detokenizes (50.3us), then compresses
-- Token-native just stores what it was handed: 2.7-5.3us
-- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
-- Human interfaces (browsers/apps) still need characters, so detokenize once for old devices that don't agree on the tokenizer
+- The model **already produced the IDs**. 
+- A byte store throws them away, detokenizes (50.3us), then compresses
 
 <!--
 LOG axis, unlike the read chart: this one spans 1.9us to 960us, and on a linear
@@ -510,11 +489,32 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ---
 
+## Humans vs agents
+
+<v-clicks>
+
+- Token native storage is primarily about compression. Even without agents, you get the compression gains.
+
+- If you optmize for agents:
+    - Human reads: 4.4us -> 34us
+    - Human writes: 11us -> 298us
+
+- In agentic workloads, agents are the primary reads and writers of text.
+- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
+- Bold idea: Human interfaces (browsers/apps) still need characters, so detokenize once for old devices that don't agree on the tokenizer
+
+</v-clicks>
+
+
+---
+
 ## What if tokenizers get faster?
 
 <v-clicks depth="2">
 
 - My original argument assumes tokenizing costs ~237us. I measured that with `tiktoken`
+
+- If tokenization gets faster (they will), 
 
 - However tokenization cost can never be 0.
 
@@ -525,13 +525,13 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ---
 
-## Limitations
+## What the ecosystem needs and limitations
 
 <v-clicks>
 
 - Pays off end to end only if reader and writer share a tokenizer. Anthropic and Google (except Gemma) haven't published theirs
 
-- Private LLM APIs take text and return text, so you need to own the inference stack
+- vLLM accepts token IDs. But private LLM APIs (OpenAI, Anthropic) don't
 
 - My frequency table is corpus-specific. Point it at a corpus it wasn't built on and the ratio drops
 
@@ -545,34 +545,23 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ## Interface
 
-```js {all|1-3|4-7|8-11}
+```js {all|1-3|4-8|9-12}
 // One-time: register the tokenizer for a field.
 PUT /collections/documents/index
 { "schema": { "text": { "type": "token", "tokenizer": "o200k" } } }
+
 // Write: hand over the IDs the model just produced. A plain string also works.
 PUT /collections/documents/points
 { "points": [{ "id": 123, "vector": [0.12, -0.34],
     "payload": { "text": [1858, 6427, 20272, 318, 257] } }] }
+
 // Read: ask per field. Default stays "text", existing clients see no change.
 POST /collections/documents/points/search
 { "vector": [0.1], "limit": 10, "with_payload": { "text": "tokens" } }
 ```
 
-- Ask for `"tokens"` to skip detokenization. Swapping codec is **not a data migration**
-
----
-
-## Two asks for the AI labs
-
-<v-clicks>
-
-- Sort the vocabulary by corpus frequency before you publish it. It costs **one sort**, and it hands every downstream user free compression
-
-- Publish the tokenizers. We need a UTF-8-like standard for tokens, so a stored payload isn't locked to one vendor's model version
-
-- You don't have to wait for either of these. Remap on your own corpus and you'll beat the vendor's ordering anyway
-
-</v-clicks>
+- Ask for `"tokens"` to skip detokenization. 
+- NOT available in Qdrant for now. 
 
 ---
 

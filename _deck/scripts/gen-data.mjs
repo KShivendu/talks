@@ -471,11 +471,17 @@ function latDataset(label, corpus, step, mode) {
   }
 }
 
-// Agent first: it is the case the talk argues about, and the room should not
-// have to click to see it.
+// Labelled by the OUTPUT FORMAT, not by who is reading. "Human latency" was a
+// category error: a human needs ~90s to read a 512-token chunk, so the 50us
+// detokenize charged to that path is ~2 million times smaller than the reader
+// and can never be the bottleneck. What the two columns actually differ in is
+// where they stop -- at token IDs, or at characters.
+//
+// Token IDs first: it is the case the talk argues about, and the room should
+// not have to click to see it.
 const latViews = (step) => [
-  { label: 'Agent', default: true, datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'agent')) },
-  { label: 'Human', datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'human')) },
+  { label: 'Token IDs', default: true, datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'agent')) },
+  { label: 'UTF-8', datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'human')) },
 ]
 const agentRead = latViews('read')
 const agentWrite = latViews('write')

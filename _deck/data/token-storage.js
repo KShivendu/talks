@@ -1991,7 +1991,7 @@ export const ngram = {
 
 export const agentRead = [
   {
-    "label": "Agent",
+    "label": "Token IDs",
     "default": true,
     "datasets": [
       {
@@ -2354,7 +2354,7 @@ export const agentRead = [
     ]
   },
   {
-    "label": "Human",
+    "label": "UTF-8",
     "datasets": [
       {
         "label": "English",
@@ -2674,7 +2674,7 @@ export const agentRead = [
 
 export const agentWrite = [
   {
-    "label": "Agent",
+    "label": "Token IDs",
     "default": true,
     "datasets": [
       {
@@ -3037,7 +3037,7 @@ export const agentWrite = [
     ]
   },
   {
-    "label": "Human",
+    "label": "UTF-8",
     "datasets": [
       {
         "label": "English",

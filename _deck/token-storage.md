@@ -114,7 +114,7 @@ preset (English / code / Hindi) if the room wants to see the Hindi case early.
 
 - LZ4 is most common in DBs due to speed but gives you only 1.3x compression
 
-- We don't use zstd despite 1.94x compression because it takes `200us`+ to encode/write
+- DBs avoid zstd despite 1.94x compression because it takes `200us`+ to encode/write
 
 </v-clicks>
 
@@ -554,7 +554,7 @@ bullet. The compression is 2.3-3.4x regardless of who reads.
 
 ---
 
-## Translate at the client
+## Bold idea: Translate at the client
 
 | | today | at the client |
 | --- | --- | --- |
@@ -564,7 +564,7 @@ bullet. The compression is 2.3-3.4x regardless of who reads.
 
 <v-clicks>
 
-- Your browser already decodes UTF-8 on every character. `भ` is **3 bytes** and no glyph in ASCII. Token `455` to `cat` is one more layer of the same shape
+- Your browser already decodes UTF-8 on every character for rendering. Hindi character `भ` is **3 bytes** with no glyph in ASCII. Token `455` to `cat` is the same idea.
 
 - Detokenize **7.9us** against UTF-8's **0.8us**. Ten times a step nobody has ever called a cost
 
@@ -651,7 +651,7 @@ POST /collections/documents/points/search
 <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
 <div>
 
-- A tokenizer that covers your script is **free compression**: 2.25x raw, 3.40x with a coder
+- A tokenizer that covers your script is **free compression**: 2.2x-2.7x
 
 - The gain is the tokenizer, not the coder. And BPE's merge-order IDs leave more on the table
 

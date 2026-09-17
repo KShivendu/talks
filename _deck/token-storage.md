@@ -368,7 +368,11 @@ fraction of the decode.
   ╰────────────────────────────────────────────╯
 ```
 
+<v-clicks>
+
 - Models don't understand UTF-8. So you translate on every read/write
+
+</v-clicks>
 
 ---
 
@@ -390,7 +394,11 @@ fraction of the decode.
         detokenize once at the edge, only for a human:  50.3 µs
 ```
 
+<v-clicks>
+
 - The UTF-8 boxes are gone. **No translation required** on read/write
+
+</v-clicks>
 
 <!--
 Same layout as the previous slide so the difference is the missing middle row.
@@ -479,8 +487,12 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 
+<v-clicks>
+
 - The model **already produced the IDs**. 
 - A byte store throws them away, detokenizes (50.3us), then compresses
+
+</v-clicks>
 
 <!--
 LOG axis, unlike the read chart: this spans 0.5us to 405us, and on a linear

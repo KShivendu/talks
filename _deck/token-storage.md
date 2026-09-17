@@ -71,9 +71,9 @@ preset (English / code / Hindi) if the room wants to see the Hindi case early.
 
 - Tokens as the storage format: free compression
 
-- An easy win in every BPE tokenizer
+- Token ID compression techniques
 
-- The second win: the agent read/write flip
+- Agent read/write
 
 - Limitations and what the ecosystem needs
 
@@ -657,7 +657,7 @@ POST /collections/documents/points/search
     - LLMs are also very verbose while replying. They also produce lots of thinking tokens
 
 - Agents produce massive amounts of data. Compression saves you a lot on RAM, Disk, Network Egress, etc. 
-    - Storing 1 TB data costs you 6k$ / year at 0.50$ / GB for Disk
+    - Storing 1 TB data costs you 6k$ / year at 0.50$ / GB / month for Disk
     - Compression of 1.27x (LZ4) gets you to 4.7k$ / year
     - If it's 2.73x (o200k+freq) instead, gets you to 2.2k$ / year
 

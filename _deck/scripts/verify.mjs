@@ -53,15 +53,18 @@ page.on('requestfailed', (r) => {
   if (!/favicon\.ico$/.test(r.url())) errors.push(`REQ ${r.url().slice(-60)}`)
 })
 
-// the leading `---\n...\n---` headmatter is not a slide separator, so counting
-// every `---` in the file overcounts and renders a phantom clamped last slide
+// Counting `---` in the source overcounts: the headmatter is not a separator,
+// per-slide frontmatter adds two more lines each, and `hide: true` slides do
+// not render at all. So take an upper bound and stop when Slidev starts
+// clamping -- asking for a slide past the end just re-renders the last one.
 const src = await readFile(new URL('../token-storage.md', import.meta.url), 'utf8')
-const body = src.startsWith('---') ? src.split('---').slice(2).join('---') : src
-const total = (body.match(/^---$/gm) || []).length + 1
+const total = (src.match(/^---$/gm) || []).length + 1
 const targets = process.argv.slice(2).length
   ? process.argv.slice(2)
   : Array.from({ length: total }, (_, i) => String(i + 1))
 
+let lastHead = null
+let lastChars = null
 for (const t of targets) {
   const chart = t.startsWith('chart:')
   const url = chart
@@ -88,6 +91,14 @@ for (const t of targets) {
       leaked: /^(layout|image|backgroundSize):/m.test(txt),
     }
   })
+  if (!chart && lastHead !== null && r.head === lastHead && r.chars === lastChars) {
+    console.log(`\n(stopped at ${Number(t) - 1}: slide ${t} clamps to the same content)`)
+    break
+  }
+  if (!chart) {
+    lastHead = r.head
+    lastChars = r.chars
+  }
   const kind = chart ? 'CHART' : r.iframe ? 'chart' : r.img ? 'img  ' : 'text '
   const flags = [
     r.leaked && 'FRONTMATTER-LEAK',

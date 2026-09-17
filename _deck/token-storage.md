@@ -17,7 +17,7 @@ class: 'text-left'
 ---
 <h1 class="!text-3xl !mb-1 !leading-tight">Token-Native Storage</h1>
 
-<div class="text-sm opacity-70 !-mt-1 mb-2">Store what the model actually reads</div>
+<div class="text-sm opacity-70 !-mt-1 mb-2">Read and Write in your Agent's Language</div>
 
 <iframe :src="chart('hero')" class="w-full border-0" style="height: 430px"
         title="The same text down two pipelines: LZ4 over bytes, and token IDs" />
@@ -502,28 +502,6 @@ text and somebody must tokenize it. That is a real cost and worth naming. In an
 agentic system it is also the rarer path: the agent does most of the writing.
 -->
 
----
-
-## Someone always converts
-
-| you store | a model reads | a screen reads |
-| --- | --- | --- |
-| UTF-8 — today | **tokenize 237us** | free |
-| token IDs | free | **detokenize 50us** |
-
-<v-clicks>
-
-- You don't get to skip the conversion. You choose **which direction** to pay it
-
-- Detokenize is a **table lookup**; tokenize is a **search**: regex split, then merge against a 50-200k vocabulary. **5x cheaper**, and structural rather than an implementation detail
-
-- It is also the rarer direction: an agent reads hundreds of chunks per query, a person reads one summary at the end
-
-- Generated text never converts at all. The model already emitted the IDs
-
-- And if you never serve an agent, the **compression still holds**
-
-</v-clicks>
 
 <!--
 This slide concedes the counter-case, so lead with the table and let the room
@@ -550,9 +528,29 @@ implementation moves both, not the gap between them.
 
 If asked "what about a text-heavy workload with no models at all": the last
 bullet. The compression is 2.3-3.4x regardless of who reads.
+
+## Someone always converts
+
+| you store | a model reads | a screen reads |
+| --- | --- | --- |
+| UTF-8 — today | **tokenize 237us** | free |
+| token IDs | free | **detokenize 50us** |
+
+- You don't get to skip the conversion. You choose **which direction** to pay it
+
+- Detokenize is a **table lookup**; tokenize is a **search**: regex split, then merge against a 50-200k vocabulary. **5x cheaper**, and structural rather than an implementation detail
+
+- It is also the rarer direction: an agent reads hundreds of chunks per query, a person reads one summary at the end
+
+- Generated text never converts at all. The model already emitted the IDs
+
+- And if you never serve an agent, the **compression still holds**
+
 -->
 
 
+---
+hide: true
 ---
 
 ## Bold idea: Translate at the client
@@ -589,6 +587,8 @@ Measured on a 512-token English chunk (~2,288 bytes): UTF-8 decode 0.8us warm /
 -->
 
 ---
+hide: true
+---
 
 ## What if tokenizers get faster?
 
@@ -615,12 +615,12 @@ Measured on a 512-token English chunk (~2,288 bytes): UTF-8 decode 0.8us warm /
 
 - vLLM accepts token IDs. But private LLM APIs (OpenAI, Anthropic) don't
 
-- The frequency tables should be corpus/language specific. English, Hindi, Python behave differently
-
-- On **code**, `+ANS` falls behind: order-0 models no repetition, and code repeats constantly. A dictionary trained on token IDs (`+dict`) gets **3.39x** and still reads in **7us**
+- The frequency tables should be corpus/language specific or compression will suffer
 
 </v-clicks>
 
+---
+hide: true
 ---
 
 ## Interface
@@ -650,16 +650,22 @@ POST /collections/documents/points/search
 <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
 <div>
 
-- A tokenizer that covers your script is **free compression**: 2.2x-2.7x
+<v-clicks depth="2">
 
-- The gain is the tokenizer, not the coder. And BPE's merge-order IDs leave more on the table
+- Tokenizers that know your language can achieve higher compression than popular algorithms (LZ4, gzip, zstd) on UTF-8 bytes
 
-- A byte store re-tokenizes on every read. Store what the model speaks
+- BPE token IDs can be sorted by frequency in your corpus so you get more compression
 
-- Find me at
-  - [kshivendu.dev/twitter](https://kshivendu.dev/twitter)
+- Agentic products can benefit from database that supports reading and writing Token IDs instead of UTF-8 text bytes
+
+- Links
+  - [kshivendu.dev/x](https://kshivendu.dev/x)
+  - [kshivendu.dev/linkedin](https://kshivendu.dev/linkedin)
+  - [talks.kshivendu.dev](https://talks.kshivendu.dev)
 
 - Paper [arXiv 2608.02376](https://arxiv.org/abs/2608.02376) · [post](https://kshivendu.dev/blog/token-storage) · [benchmarks](https://github.com/KShivendu/token-storage)
+
+</v-clicks>
 
 </div>
 <img :src="$asset('linkedin-qr.png')" class="h-48" />

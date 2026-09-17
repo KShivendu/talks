@@ -43,10 +43,10 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -100,10 +100,10 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -157,10 +157,10 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -208,9 +208,9 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -249,9 +249,9 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -290,9 +290,9 @@ export const ratioViews = [
               "#94a3b8",
               "#94a3b8",
               "#94a3b8",
-              "#dc244C",
-              "#dc244C",
-              "#dc244C"
+              "#dc244c",
+              "#dc244c",
+              "#dc244c"
             ],
             "text": [
               "1.00×",
@@ -360,8 +360,8 @@ export const chunkRatio = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -383,8 +383,8 @@ export const chunkRatio = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -406,8 +406,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -429,8 +429,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -453,7 +453,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -475,8 +475,8 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -498,8 +498,8 @@ export const chunkRatio = {
         },
         {
           "name": "+dict",
-          "color": "#7c1d3f",
-          "showMarkers": false,
+          "color": "#8f1732",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -526,8 +526,8 @@ export const chunkRatio = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -549,8 +549,8 @@ export const chunkRatio = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -572,8 +572,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -595,8 +595,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -619,7 +619,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -641,8 +641,8 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -664,8 +664,8 @@ export const chunkRatio = {
         },
         {
           "name": "+dict",
-          "color": "#7c1d3f",
-          "showMarkers": false,
+          "color": "#8f1732",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -692,8 +692,8 @@ export const chunkRatio = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -715,8 +715,8 @@ export const chunkRatio = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -738,8 +738,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -761,8 +761,8 @@ export const chunkRatio = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -785,7 +785,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -807,8 +807,8 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -830,8 +830,8 @@ export const chunkRatio = {
         },
         {
           "name": "+dict",
-          "color": "#7c1d3f",
-          "showMarkers": false,
+          "color": "#8f1732",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -881,8 +881,8 @@ export const chunkEncode = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -904,8 +904,8 @@ export const chunkEncode = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -927,8 +927,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -950,8 +950,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -974,7 +974,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -996,8 +996,8 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1024,8 +1024,8 @@ export const chunkEncode = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -1047,8 +1047,8 @@ export const chunkEncode = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -1070,8 +1070,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -1093,8 +1093,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -1117,7 +1117,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -1139,8 +1139,8 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1167,8 +1167,8 @@ export const chunkEncode = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -1190,8 +1190,8 @@ export const chunkEncode = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -1213,8 +1213,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -1236,8 +1236,8 @@ export const chunkEncode = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -1260,7 +1260,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -1282,8 +1282,8 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1333,8 +1333,8 @@ export const chunkRead = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -1356,8 +1356,8 @@ export const chunkRead = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -1379,8 +1379,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -1402,8 +1402,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -1426,7 +1426,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -1448,8 +1448,8 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1476,8 +1476,8 @@ export const chunkRead = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -1499,8 +1499,8 @@ export const chunkRead = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -1522,8 +1522,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -1545,8 +1545,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -1569,7 +1569,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -1591,8 +1591,8 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1619,8 +1619,8 @@ export const chunkRead = {
       "series": [
         {
           "name": "LZ4",
-          "color": "#cbd5e1",
-          "showMarkers": false,
+          "color": "#c3bbff",
+          "marker": "circle",
           "points": [
             [
               512,
@@ -1642,8 +1642,8 @@ export const chunkRead = {
         },
         {
           "name": "gzip-9",
-          "color": "#94a3b8",
-          "showMarkers": false,
+          "color": "#9384ff",
+          "marker": "square",
           "points": [
             [
               512,
@@ -1665,8 +1665,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd-19",
-          "color": "#64748b",
-          "showMarkers": false,
+          "color": "#6047ff",
+          "marker": "triangle",
           "points": [
             [
               512,
@@ -1688,8 +1688,8 @@ export const chunkRead = {
         },
         {
           "name": "zstd --train",
-          "color": "#475569",
-          "showMarkers": false,
+          "color": "#3f2ec2",
+          "marker": "diamond",
           "points": [
             [
               512,
@@ -1712,7 +1712,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#f4768f",
-          "showMarkers": false,
+          "marker": "ring",
           "points": [
             [
               512,
@@ -1734,8 +1734,8 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244C",
-          "showMarkers": false,
+          "color": "#dc244c",
+          "marker": "star",
           "points": [
             [
               512,
@@ -1800,7 +1800,7 @@ export const frontier = {
     },
     {
       "name": "raw IDs",
-      "color": "#dc244C",
+      "color": "#dc244c",
       "showLine": false,
       "marker": "circle",
       "points": [
@@ -1815,7 +1815,7 @@ export const frontier = {
     },
     {
       "name": "+freq+vbyte",
-      "color": "#dc244C",
+      "color": "#dc244c",
       "showLine": false,
       "marker": "circle",
       "points": [
@@ -1830,7 +1830,7 @@ export const frontier = {
     },
     {
       "name": "+ANS",
-      "color": "#dc244C",
+      "color": "#dc244c",
       "showLine": false,
       "marker": "circle",
       "points": [
@@ -1958,14 +1958,14 @@ export const agentRead = [
               41.7
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "450us",
@@ -2007,14 +2007,14 @@ export const agentRead = [
               25.1
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "348us",
@@ -2056,14 +2056,14 @@ export const agentRead = [
               13.8
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "104us",
@@ -2110,14 +2110,14 @@ export const agentRead = [
               65.1
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "4.4us",
@@ -2159,14 +2159,14 @@ export const agentRead = [
               38
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "3.0us",
@@ -2208,14 +2208,14 @@ export const agentRead = [
               19.5
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "2.6us",
@@ -2266,14 +2266,14 @@ export const agentWrite = [
               12.5
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "35.1us",
@@ -2315,14 +2315,14 @@ export const agentWrite = [
               7.6
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "17.4us",
@@ -2364,14 +2364,14 @@ export const agentWrite = [
               3.3
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "10.9us",
@@ -2418,14 +2418,14 @@ export const agentWrite = [
               412
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "11.4us",
@@ -2467,14 +2467,14 @@ export const agentWrite = [
               271.6
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "5.8us",
@@ -2516,14 +2516,14 @@ export const agentWrite = [
               157.1
             ],
             "colors": [
-              "#cbd5e1",
-              "#94a3b8",
-              "#64748b",
-              "#475569",
-              "#dc244C",
-              "#dc244C",
+              "#c3bbff",
+              "#9384ff",
+              "#6047ff",
+              "#3f2ec2",
+              "#dc244c",
+              "#dc244c",
               "#f4768f",
-              "#dc244C"
+              "#dc244c"
             ],
             "text": [
               "5.2us",

@@ -1,6 +1,7 @@
 import BarChart from '@blog/BarChart'
 import { agentRead } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // Linear on purpose. The story is the cliff: every byte codec piles up at
 // ~450us on English because they all pay the same mandatory tokenize, however
@@ -14,6 +15,7 @@ mount(
     valueMax={500}
     valueTicks={[0, 100, 200, 300, 400, 500]}
     height={255}
+    chrome={qdrantChrome}
     views={agentRead}
   />
 )

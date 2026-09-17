@@ -3,6 +3,7 @@
 import BarChart from '@blog/BarChart'
 import { ngram } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // The wall: a bigram table is a real gain, a trigram is not worth ~3x the
 // table size. And the language-model ceiling is ~12x, unreachable by stacking.
@@ -14,6 +15,7 @@ mount(
     valueMax={5.6}
     valueTicks={[0, 1, 2, 3, 4, 5]}
     height={250}
+    chrome={qdrantChrome}
     views={ngram.views.map((v) => ({
       label: v.label,
       categories: ngram.categories,

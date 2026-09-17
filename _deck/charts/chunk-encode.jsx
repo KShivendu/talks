@@ -1,6 +1,7 @@
 import LineChart from '@blog/LineChart'
 import { chunkEncode } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // Log/log, because the series span 3.4us to 3,300us and the interesting thing
 // is the ratio between them, not the difference.
@@ -23,6 +24,7 @@ mount(
     yScale="log"
     xTicks={chunkEncode.xTicks}
     height={250}
+    chrome={qdrantChrome}
     views={chunkEncode.views}
   />
 )

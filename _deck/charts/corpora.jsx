@@ -1,6 +1,7 @@
 import BarChart from '@blog/BarChart'
 import { ratioViews } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // The slide asks "does it hold beyond English?", so open on Hindi rather than
 // making the room wait for a click. Hindi is also the sharpest case: r50k sits
@@ -19,6 +20,7 @@ mount(
     valueMax={6.4}
     valueTicks={[0, 1, 2, 3, 4, 5, 6]}
     height={255}
+    chrome={qdrantChrome}
     views={hindiFirst}
   />
 )

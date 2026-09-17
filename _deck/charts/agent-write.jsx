@@ -1,6 +1,7 @@
 import BarChart from '@blog/BarChart'
 import { agentWrite } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // Log, unlike the read chart. Write spans 1.9us (an agent handing over token
 // IDs it already has) to 960us (zstd --train), so a linear axis renders every
@@ -20,6 +21,7 @@ mount(
     valueMax={1000}
     valueTicks={[1, 10, 100, 1000]}
     height={255}
+    chrome={qdrantChrome}
     views={agentWrite}
   />
 )

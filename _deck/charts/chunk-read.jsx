@@ -1,6 +1,7 @@
 import LineChart from '@blog/LineChart'
 import { chunkRead } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // Decode ALONE, on equal terms: decompress_us for the byte codecs, read_us for
 // the token methods (already IDs, so read_us is their pure decode).
@@ -20,6 +21,7 @@ mount(
     yScale="log"
     xTicks={chunkRead.xTicks}
     height={230}
+    chrome={qdrantChrome}
     views={chunkRead.views}
   />
 )

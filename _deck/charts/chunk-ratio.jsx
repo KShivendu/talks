@@ -1,6 +1,7 @@
 import LineChart from '@blog/LineChart'
 import { chunkRatio } from '@data/token-storage'
 import { mount } from './mount.jsx'
+import { qdrantChrome } from './qdrant-chrome.js'
 
 // Order-0 token methods are flat: per-token entropy is additive, so chunk size
 // barely moves them. LZ-family methods climb by finding cross-chunk repeats.
@@ -12,6 +13,7 @@ mount(
     xScale="log"
     xTicks={chunkRatio.xTicks}
     height={250}
+    chrome={qdrantChrome}
     views={chunkRatio.views}
   />
 )

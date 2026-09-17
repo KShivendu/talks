@@ -75,17 +75,33 @@ const lat = JSON.parse(readFileSync(latPath, 'utf8'))
 const sweep = JSON.parse(readFileSync(sweepPath, 'utf8')).sweep
 const ood = JSON.parse(readFileSync(oodPath, 'utf8'))
 
-// Palette: grey for byte codecs, Qdrant red for token-native. Same meaning as
-// the Marp charts, so the two decks read identically.
-const GREY = '#94a3b8'
-// A ramp for the byte codecs when several share one chart: weakest is lightest,
-// so the family reads as one group but the individual lines stay separable.
-const GREY_L = '#cbd5e1'
-const GREY_M = '#94a3b8'
-const GREY_D = '#64748b'
-const GREY_XD = '#475569'
+/*
+ * Qdrant brand palette. Amaranth #DC244C and Neon Blue #6047FF are the two
+ * brand hues, Black #0B0F19 and White #FFFFFF the ground.
+ *
+ * Byte codecs take the blue ramp, token-native the amaranth ramp, so the two
+ * families separate by hue rather than by "coloured vs grey" -- and neither
+ * reads as the loser before a word is said. Within a family, darker = stronger.
+ *
+ * The blog's own charts are green (lib/viz-palette). The talk overrides the
+ * furniture through the `chrome` prop rather than forking the components.
+ */
+const AMARANTH = '#dc244c'
+const NEON_BLUE = '#6047ff'
+const BLACK = '#0b0f19'
+
+// byte-codec ramp, weakest to strongest
+const BLUE_L = '#c3bbff'
+const BLUE_M = '#9384ff'
+const BLUE_D = NEON_BLUE
+const BLUE_XD = '#3f2ec2'
+// token-native ramp
 const RED_L = '#f4768f'
-const RED = '#dc244C'
+const RED = AMARANTH
+const RED_D = '#8f1732'
+
+// kept for the charts that still speak in neutrals
+const GREY = '#94a3b8'
 
 const CORPORA = [
   ['English', 'prose'],
@@ -177,29 +193,29 @@ const NATIVE_TOK = { prose: 'r50k', code: 'cl100k', hindi: 'o200k' }
 const RATIO_SERIES = [
   // the real competition: what production stores actually run, plus
   // `zstd --train` as the strongest byte-side comparison. Darker = stronger.
-  ['LZ4', GREY_L],
-  ['gzip-9', GREY_M],
-  ['zstd-19', GREY_D],
-  ['zstd --train', GREY_XD],
-  ['+freq', RED_L],
-  ['+ANS', RED],
+  // Shapes let the lines be told apart where they cross or overlap, and give
+  // the token-native trio the eye-catching ones -- star for the headline +ANS.
+  ['LZ4', BLUE_L, 'circle'],
+  ['gzip-9', BLUE_M, 'square'],
+  ['zstd-19', BLUE_D, 'triangle'],
+  ['zstd --train', BLUE_XD, 'diamond'],
+  ['+freq', RED_L, 'ring'],
+  ['+ANS', RED, 'star'],
   // +dict answers "you lose on code": order-0 coders model no repetition, and
   // code repeats constantly. zstd-22 with a 112KB dictionary trained on packed
   // token-ID bytes -- output is still token IDs, so a read still skips
   // tokenizing. Same sweep as every other series here, so no mixing.
-  ['+dict', '#7c1d3f'],
+  ['+dict', RED_D, 'diamond'],
 ]
 const sweepCell = (key, n) => sweep[`${NATIVE_TOK[key]}|${key}|${n}`]
 const chunkRatio = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    series: RATIO_SERIES.map(([name, color]) => ({
+    series: RATIO_SERIES.map(([name, color, marker]) => ({
       name,
       color,
-      // blog LineChart bug: a series with markers references onCrosshairLeave
-      // (const, declared ~260 lines later) during render and throws a TDZ.
-      showMarkers: false,
+      marker,
       points: SIZES.map((n) => {
         const v = sweepCell(key, n)?.methods?.[name]?.ratio
         return v == null ? null : [n, Math.round(v * 100) / 100]
@@ -223,22 +239,24 @@ const chunkRatio = {
 // gap instead, stated as the worst case for us: across every corpus and size
 // the CHEAPEST byte codec still costs 8.1-17.7x more than the DEAREST token
 // method. (Extreme vs extreme would be 526x, true but self-serving.)
+// Same colours AND shapes as RATIO_SERIES, so a line means the same thing on
+// all three sweep charts.
 const ENC_SERIES = [
-  ['LZ4', GREY_L],
-  ['gzip-9', GREY_M],
-  ['zstd-19', GREY_D],
-  ['zstd --train', GREY_XD],
-  ['+freq', RED_L],
-  ['+ANS', RED],
+  ['LZ4', BLUE_L, 'circle'],
+  ['gzip-9', BLUE_M, 'square'],
+  ['zstd-19', BLUE_D, 'triangle'],
+  ['zstd --train', BLUE_XD, 'diamond'],
+  ['+freq', RED_L, 'ring'],
+  ['+ANS', RED, 'star'],
 ]
 const chunkEncode = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    series: ENC_SERIES.map(([name, color]) => ({
+    series: ENC_SERIES.map(([name, color, marker]) => ({
       name,
       color,
-      showMarkers: false,
+      marker,
       points: SIZES.map((n) => {
         const v = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]?.write_us
         return v == null ? null : [n, round1(v)]
@@ -263,10 +281,10 @@ const chunkRead = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
   views: CORPORA.map(([label, key]) => ({
     label,
-    series: ENC_SERIES.map(([name, color]) => ({
+    series: ENC_SERIES.map(([name, color, marker]) => ({
       name,
       color,
-      showMarkers: false,
+      marker,
       points: SIZES.map((n) => {
         const m = sweep[`${NATIVE_TOK[key]}|${key}|${n}`]?.methods?.[name]
         if (m == null) return null
@@ -347,10 +365,10 @@ const LAT_ROWS = [
   // his competition: what production runs, plus the strongest byte comparison.
   // brotli is in the post's table but off the slide -- at 8,251us on agent
   // write it is 9x the next bar and flattens everything else to nothing.
-  ['LZ4', 0, GREY_L],
-  ['gzip -9', 1, GREY_M],
-  ['zstd -19', 2, GREY_D],
-  ['zstd --train', 4, GREY_XD],
+  ['LZ4', 0, BLUE_L],
+  ['gzip -9', 1, BLUE_M],
+  ['zstd -19', 2, BLUE_D],
+  ['zstd --train', 4, BLUE_XD],
   ['r50k raw', 5, RED],
   ['o200k raw', 7, RED],
   ['o200k +freq', 10, RED_L],

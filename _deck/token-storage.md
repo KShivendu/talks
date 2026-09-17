@@ -75,7 +75,9 @@ preset (English / code / Hindi) if the room wants to see the Hindi case early.
 
 - The second win: the agent read/write flip
 
-- What breaks, and what the ecosystem needs
+- Limitations and what the ecosystem needs
+
+- Future and cost savings impact
 
 </v-clicks>
 
@@ -615,7 +617,7 @@ hide: true
 
 - vLLM accepts token IDs. But private LLM APIs (OpenAI, Anthropic) don't
 
-- The frequency tables should be corpus/language specific or compression will suffer
+- Frequency tables should be corpus/language specific or compression could be hurt (same for existing compressors)
 
 </v-clicks>
 
@@ -642,6 +644,29 @@ POST /collections/documents/points/search
 
 - Ask for `"tokens"` to skip detokenization. 
 - NOT available in Qdrant for now. 
+
+
+---
+
+## Future and impact
+
+<v-clicks depth="2">
+
+- In agentic products, agents read and write more than humans (ChatGPT, Claude Code, Perplexity)
+    - A question can trigger a search that reads hundreds of chunks before answering your question
+    - LLMs are also very verbose while replying. They also produce lots of thinking tokens
+
+- Agents produce massive amounts of data. Compression saves you a lot on RAM, Disk, Network Egress, etc. 
+    - Storing 1 TB data costs you 6k$ / year at 0.50$ / GB for Disk
+    - Compression of 1.27x (LZ4) gets you to 4.7k$ / year
+    - If it's 2.73x (o200k+freq) instead, gets you to 2.2k$ / year
+
+- Tokenization should be made faster (gigatoken) and it makes it easier to achieve the compression we want
+
+- I believe LLM, Embedding Model, and Reranker tokenizers should converge to common standards like we agreed for UTF-8
+    - Already happening with new embedding models that inherit LLM base (Qwen -> Jina)
+
+</v-clicks>
 
 ---
 

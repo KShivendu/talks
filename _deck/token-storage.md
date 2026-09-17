@@ -47,7 +47,7 @@ class: 'text-left'
 
 - Why is text compression important?
 
-- The compression ladder, and why every step on it falls short
+- Different compression algorithms
 
 - Tokens as the storage format: free compression
 
@@ -67,11 +67,11 @@ class: 'text-left'
 
 - A vector DB record is a **vector** plus a text payload
 
-- We compress the vector obsessively: turboquant, binary quantization, Matryoshka
+- We compress the vector obsessively: Turboquant, binary quantization, Matryoshka
 
 - The text payload gets raw UTF-8, or LZ4. On English: 1.27x
 
-- Text dwarfs every other field type: thousands of characters, one byte each. While numeric fields need 2-4 bytes
+- Text: thousands of characters, 1 byte each. Numeric fields: 2-4 bytes
 
 </v-clicks>
 
@@ -86,13 +86,13 @@ class: 'text-left'
 | zstd `-19` | 1.94x | 209us | 4.5us | slow for what it buys |
 | brotli `q11` | 2.57x | **2,777us** | 9.5us | ~1,000x LZ4 to encode |
 | `zstd --train` | 2.72x | 359us | 3.2us | dictionary ships with your data |
-| LZ4 over 16KB **blocks** | 1.43x | 7.8us | 7.6us | **7 docs** share a block, so one read decodes all 7 |
+<!-- | LZ4 over 16KB **blocks** | 1.43x | 7.8us | 7.6us | **7 docs** share a block, so one read decodes all 7 | -->
 
 <v-clicks>
 
-- LZ4 is most commonly used due to speed but gives you 1.2-1.4x compression
+- 512 token chunk
 
-- Decode is cheaper, but it returns **bytes**: add **~235us** of tokenizing to every row
+- LZ4 is most common in DBs due to speed but gives you only 1.3x compression
 
 </v-clicks>
 
@@ -146,14 +146,21 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 
 ---
 
-## What if we stored the model's own format?
+## Can we do better?
 
-<v-clicks>
+<!-- depth="2" so the nested points reveal one at a time too; without it
+     v-clicks only animates the top-level items and the sub-list appears
+     all at once with its parent. -->
+<v-clicks depth="2">
 
-- Decode is very fast but not for the agents. Why?
+- Decode (Read) is much slower for the models. Why?
 
-- Because models (LLM Agents, Re-rankers, or Embedders) don't read UTF-8. They must turn it into tokens first, on **every read**
-
+- Because models (LLM Agents, Re-rankers, or Embedders) don't read UTF-8.
+    - They must turn it into tokens first, on **every read**
+    - Add ~235us on every agent read. (decode+tokenize). With LZ4 decode: 1us -> 236us
+    - Add ~50us on every agent write (detokenize+encode). With LZ4 encode: 2.9us -> 52.9us
+    - Tokenization cost can **never be 0** no matter the optimizations in future
+ 
 - So what if we **store token IDs directly**?
 
 </v-clicks>
@@ -179,7 +186,8 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 - r50k's vocabulary is 50,257 tokens, which fits in a `uint16` (65k)
 
-- Lossless compression
+- Lossless compression. 
+    - Unknown terms are split into existing vocab: `tokenization -> token | #ization`
 
 </v-clicks>
 

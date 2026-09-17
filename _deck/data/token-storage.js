@@ -456,7 +456,7 @@ export const chunkRatio = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -480,7 +480,7 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -629,7 +629,7 @@ export const chunkRatio = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -653,7 +653,7 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -802,7 +802,7 @@ export const chunkRatio = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -826,7 +826,7 @@ export const chunkRatio = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -998,7 +998,7 @@ export const chunkEncode = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1022,7 +1022,7 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1147,7 +1147,7 @@ export const chunkEncode = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1171,7 +1171,7 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1296,7 +1296,7 @@ export const chunkEncode = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1320,7 +1320,7 @@ export const chunkEncode = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1468,7 +1468,7 @@ export const chunkRead = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1492,7 +1492,7 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1617,7 +1617,7 @@ export const chunkRead = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1641,7 +1641,7 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1766,7 +1766,7 @@ export const chunkRead = {
         },
         {
           "name": "+freq",
-          "color": "#ef5a7c",
+          "color": "#dc244c",
           "marker": "star",
           "showMarkers": true,
           "points": [
@@ -1790,7 +1790,7 @@ export const chunkRead = {
         },
         {
           "name": "+ANS",
-          "color": "#dc244c",
+          "color": "#ef5a7c",
           "marker": "ring",
           "showMarkers": true,
           "points": [
@@ -1890,7 +1890,7 @@ export const frontier = {
     },
     {
       "name": "+freq+vbyte",
-      "color": "#ef5a7c",
+      "color": "#dc244c",
       "marker": "star",
       "showLine": false,
       "points": [
@@ -1906,7 +1906,7 @@ export const frontier = {
     },
     {
       "name": "+ANS",
-      "color": "#dc244c",
+      "color": "#ef5a7c",
       "marker": "ring",
       "showLine": false,
       "points": [
@@ -2026,8 +2026,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "236us",
@@ -2121,8 +2121,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "176us",
@@ -2216,8 +2216,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "119us",
@@ -2316,8 +2316,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "1.0us",
@@ -2411,8 +2411,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "0.7us",
@@ -2506,8 +2506,8 @@ export const agentRead = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "0.9us",
@@ -2610,8 +2610,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "48.4us",
@@ -2705,8 +2705,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "35.5us",
@@ -2800,8 +2800,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "29.7us",
@@ -2900,8 +2900,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "2.9us",
@@ -2995,8 +2995,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "1.3us",
@@ -3090,8 +3090,8 @@ export const agentWrite = [
               "#5d6573",
               "#a83865",
               "#a83865",
-              "#ef5a7c",
-              "#dc244c"
+              "#dc244c",
+              "#ef5a7c"
             ],
             "text": [
               "1.8us",

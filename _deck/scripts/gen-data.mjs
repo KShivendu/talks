@@ -58,8 +58,11 @@ const GREY_M = '#7b828d' //  3.9:1        4.9:1
 const GREY_D = '#6c7480' //  4.7:1        4.1:1
 const GREY_XD = '#5d6573' //  5.9:1        3.3:1
 
-// token-native: the emphasised family. Markers (ring/star/diamond) carry
-// identity, so these stay close to the brand hue instead of chasing distance.
+// token-native: the emphasised family. Full-strength Amaranth goes to +freq,
+// the method being recommended -- same reason it carries the star. +ANS wins on
+// ratio alone but costs 8x the decode, so it should not be the brightest thing
+// on the chart. Markers carry identity, so these stay close to the brand hue
+// instead of chasing perceptual distance.
 const RED_L = '#ef5a7c' //  3.3:1 light  5.9:1 dark
 const RED = AMARANTH //  4.8:1        4.0:1
 const RED_D = '#a83865' //  6.1:1        3.1:1
@@ -163,8 +166,8 @@ const RATIO_SERIES = [
   ['gzip-9', GREY_M, null],
   ['zstd-19', GREY_D, null],
   ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
-  ['+freq', RED_L, 'star'],
-  ['+ANS', RED, 'ring'],
+  ['+freq', RED, 'star'],
+  ['+ANS', RED_L, 'ring'],
   // +dict answers "you lose on code": order-0 coders model no repetition, and
   // code repeats constantly. zstd-22 with a 112KB dictionary trained on packed
   // token-ID bytes -- output is still token IDs, so a read still skips
@@ -211,8 +214,8 @@ const ENC_SERIES = [
   ['gzip-9', GREY_M, null],
   ['zstd-19', GREY_D, null],
   ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
-  ['+freq', RED_L, 'star'],
-  ['+ANS', RED, 'ring'],
+  ['+freq', RED, 'star'],
+  ['+ANS', RED_L, 'ring'],
 ]
 const chunkEncode = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
@@ -291,8 +294,8 @@ const FRONTIER = [
   ['LZ4 (bytes)', GREY_D, 'circle', byteDecode('LZ4'), ratios.LZ4.prose, 'top right'],
   ['+freq+leb+zstd', GREY_M, 'diamond', mRead('Kalcher(zstd)'), ratios['o200k Kalcher(zstd)'].prose, 'bottom left'],
   ['raw IDs', RED_D, 'triangle', mRead('raw'), ratios['o200k raw'].prose, 'bottom right'],
-  ['+freq+vbyte', RED_L, 'star', mRead('+freq'), ratios['o200k +freq'].prose, 'top left'],
-  ['+ANS', RED, 'ring', mRead('+ANS'), ratios['o200k +ANS'].prose, 'top left'],
+  ['+freq+vbyte', RED, 'star', mRead('+freq'), ratios['o200k +freq'].prose, 'top left'],
+  ['+ANS', RED_L, 'ring', mRead('+ANS'), ratios['o200k +ANS'].prose, 'top left'],
 ]
 const frontier = {
   series: FRONTIER.map(([name, color, marker, x, y, textPosition]) => ({
@@ -358,8 +361,8 @@ const LAT_ROWS = [
   ['zstd --train', 'byte', 'zstd --train', GREY_XD],
   ['r50k raw', 'token', ['r50k', 'raw'], RED_D],
   ['o200k raw', 'token', ['o200k', 'raw'], RED_D],
-  ['o200k +freq', 'token', ['o200k', '+freq'], RED_L],
-  ['o200k +ANS', 'token', ['o200k', '+ANS'], RED],
+  ['o200k +freq', 'token', ['o200k', '+freq'], RED],
+  ['o200k +ANS', 'token', ['o200k', '+ANS'], RED_L],
 ]
 
 const NATIVE = { prose: 'r50k', code: 'cl100k', hindi: 'o200k' }

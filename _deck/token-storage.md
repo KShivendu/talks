@@ -205,7 +205,8 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 - This napkin math was my original motivation for the experiment.
 
-- One BPE token covers about **3/4 of a word**
+- Looks like we can get higher compression than zstd (1.94x)!
+    - and much higher than standard LZ4 1.27x
 
 - OpenAI `r50k` tokenizer has 50,257 token vocab, which fits in a `uint16` (65k)
 
@@ -293,7 +294,7 @@ becomes 7 token IDs = 14 bytes. o200k, which has the merges, gets 2.55x raw.
 
 <v-clicks depth="2">
 
-- +ANS achieves high compression (o200k: 1.6x -> 3.4x) but is slow (30us) to read
+- +ANS achieves high compression (o200k: 1.6x -> 3.4x) but is slow (30us) to read.
 
 - I discovered that BPE assigns IDs in **merge-discovery order**, not by how often a token is used
 - Sorting token IDs by frequency o200k on English (+freq): 1.6x → 2.7x
@@ -312,7 +313,7 @@ becomes 7 token IDs = 14 bytes. o200k, which has the merges, gets 2.55x raw.
 
 ---
 
-## Pick your player (compression)
+## Pick your compression
 
 <iframe :src="chart('frontier')" class="w-full border-0" style="height: 400px"
         title="Compression ratio against decode cost" />
@@ -617,8 +618,6 @@ Measured on a 512-token English chunk (~2,288 bytes): UTF-8 decode 0.8us warm /
 - The frequency tables should be corpus/language specific. English, Hindi, Python behave differently
 
 - On **code**, `+ANS` falls behind: order-0 models no repetition, and code repeats constantly. A dictionary trained on token IDs (`+dict`) gets **3.39x** and still reads in **7us**
-
-- `mxbai-embed-large-v1` compresses better at 3.56x, but **80.4%** of articles decode corrupted. BERT lowercases: `"Qdrant"` becomes `"qdrant"`
 
 </v-clicks>
 

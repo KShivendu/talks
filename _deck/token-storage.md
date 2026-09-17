@@ -16,9 +16,30 @@ selectable: true
 layout: cover
 class: 'text-left'
 ---
-<img :src="$asset('imgs/hero.png')" class="absolute inset-0 w-full h-full object-contain" alt="Token-Native Storage" />
+<h1 class="!text-3xl !mb-0 !leading-tight">Token-Native Storage</h1>
 
-<!-- Slide 1: the hero carries the title, nothing else on it. -->
+<div class="text-sm opacity-70 mb-1">Store what the model actually reads</div>
+
+<iframe :src="chart('hero')" class="w-full border-0" style="height: 430px"
+        title="The same text down two pipelines: LZ4 over bytes, and token IDs" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+The blog's animated hero, live rather than a screenshot of itself. It runs the
+same input down two pipelines at once -- LZ4 over bytes on top, the token path
+below -- so the argument is on screen before the first word.
+
+Retinted to the deck's language: token path Amaranth, byte path recessive grey.
+The site's version is green and amber, which would say something else.
+
+It loops on its own, so let it run while you introduce yourself. Toggle the
+preset (English / code / Hindi) if the room wants to see the Hindi case early.
+-->
 
 ---
 
@@ -77,7 +98,7 @@ class: 'text-left'
 
 ---
 
-## Standard compression algorithms
+## Text compression for humans
 
 | | English | encode | decode | remarks |
 | --- | ---: | ---: | ---: | --- |
@@ -90,9 +111,11 @@ class: 'text-left'
 
 <v-clicks>
 
-- 512 token chunk
+- 512 token chunk (~2.25KB of English)
 
 - LZ4 is most common in DBs due to speed but gives you only 1.3x compression
+
+- We don't use zstd despite 1.94x compression because it takes `200us`+ to encode/write
 
 </v-clicks>
 
@@ -146,12 +169,13 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 
 ---
 
-## Can we do better?
+## But what about agents?
 
 <!-- depth="2" reveals the nested points one at a time as well. It has to be
      per-tag: overriding the builtin's default in setup/main.ts re-registers the
      component and breaks click accounting -- the slide opens with 4 of 7 items
      already shown. -->
+
 <v-clicks depth="2">
 
 - Decode (Read) is much slower for the models. Why?
@@ -159,9 +183,8 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 - Because models (LLM Agents, Re-rankers, or Embedders) don't read UTF-8.
     - They must turn it into tokens first, on **every read**
     - Add ~235us on every agent read. (decode+tokenize). With LZ4 decode: 1us -> 236us
-    - Add ~50us on every agent write (detokenize+encode). With LZ4 encode: 2.9us -> 52.9us
-    - The tokenize/detokenize cost can **never be 0** no matter the optimizations
- 
+    - Add ~50us on every agent write (detokenize+encode). With LZ4 encode: 3us -> 53us
+
 - So what if we **store token IDs directly**?
 
 </v-clicks>
@@ -185,7 +208,7 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 - One BPE token covers about **3/4 of a word**
 
-- r50k's vocabulary is 50,257 tokens, which fits in a `uint16` (65k)
+- OpenAI `r50k` tokenizer has 50,257 token vocab, which fits in a `uint16` (65k)
 
 - Lossless compression. 
     - Unknown terms are split into existing vocab: `tokenization -> token | #ization`
@@ -230,6 +253,14 @@ brotli (2.57x) and zstd --train (2.72x) still beat raw token IDs, but cost
 2,777us and 359us to encode. Packing a uint16 costs 5.3us.
 -->
 
+
+<v-clicks>
+
+- We got exactly 2.25x. Napkin math was right!
+- With some compression algorithms on top (+freq, +ANS) you reach 2.7-3.4x!
+
+</v-clicks>
+
 ---
 
 ## Does it hold beyond English?
@@ -249,6 +280,231 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 Switch to Hindi mid-sentence: r50k drops to 0.84x, under the break-even line.
 It never learned Devanagari merges, so the Hindi word for India (12 UTF-8 bytes)
 becomes 7 token IDs = 14 bytes. o200k, which has the merges, gets 2.55x raw.
+-->
+
+<v-clicks>
+
+- raw token IDs work out of the box when the tokenizer knows your language. 
+- r50k doesn't know Hindi, but o200k does. raw: 2.5x, +freq: 4.5x, +ANS: 5.9x
+
+</v-clicks>
+---
+
+## Token ID Compression Mechanisms
+
+<v-clicks depth="2">
+
+- +ANS achieves high compression (o200k: 1.6x -> 3.4x) but is slow (30us) to read
+
+- I discovered that BPE assigns IDs in **merge-discovery order**, not by how often a token is used
+- Sorting token IDs by frequency o200k on English (+freq): 1.6x → 2.7x
+- Why this works? 
+    - The most frequent token can vary. For example with o200k:
+    - English: ` the`: 290 -> 0 (most common. 2 -> 1 byte)
+    - English: `{`: 90 -> 200_018 (last slot because never used)
+    - Code: `␣␣␣` (3 spaces):  262 -> 2
+    - Hindi: `भारत`:  29_292 -> 73
+
+- We covered two methods:
+    - +ANS: an entropy coder (**ANS**, frequent tokens get fewer bits)
+    - +freq: re-rank by frequency and pack with `streamvbyte` (recommended)
+
+</v-clicks>
+
+---
+
+## Pick your player (compression)
+
+<iframe :src="chart('frontier')" class="w-full border-0" style="height: 400px"
+        title="Compression ratio against decode cost" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Live scatter now, not a PNG. It was a PNG because a scatter is nothing but
+markers and the blog's LineChart threw a TDZ on any series with markers; that
+is fixed, so every point is hoverable and the room can ask about any one of
+them.
+
+Up and to the LEFT is better: more compression, less time to decode.
+
+All o200k here, so raw IDs are 1.59x rather than the 2.25x quoted earlier --
+o200k needs 3 bytes per ID where r50k fits in 2. Say that before someone spots
+the mismatch with the napkin-math slide.
+
+The shape of the argument: LZ4 is bottom-left (cheap, barely compresses),
++ANS is top (best ratio) but the dearest token method to decode, and
++freq+vbyte sits in the corner most people want -- nearly the ratio, a
+fraction of the decode.
+-->
+
+---
+
+## Before: Translation on every read/write
+
+```text
+  WRITE (agent)                   READ (agent)
+
+  ╭────────────╮                  ╭────────────╮
+  │ token IDs  │                  │ token IDs  │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  detokenize  50 µs            │  tokenize  237 µs
+        ▼                               │
+  ╭─────┴──────╮                  ╭─────┴──────╮
+  │ UTF-8 text │                  │ UTF-8 text │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  LZ4 compress  2.9 µs         │  LZ4 decompress  1.0 µs
+        ▼                               │
+  ╭─────┴───────────────────────────────┴──────╮
+  │                    DISK                    │
+  ╰────────────────────────────────────────────╯
+```
+
+- Models don't understand UTF-8. So you translate on every read/write
+
+---
+
+## After: No translation cost
+
+```text
+  WRITE (agent)                   READ (agent)
+
+  ╭────────────╮                  ╭────────────╮
+  │ token IDs  │                  │ token IDs  │
+  ╰─────┬──────╯                  ╰─────┬──────╯
+        │                               ▲
+        │  +freq encode  2.7 µs         │  +freq decode  3.6 µs
+        ▼                               │
+  ╭─────┴───────────────────────────────┴──────╮
+  │                    DISK                    │
+  ╰────────────────────────────────────────────╯
+
+        detokenize once at the edge, only for a human:  50.3 µs
+```
+
+- The UTF-8 boxes are gone. **No translation required** on read/write
+
+<!--
+Same layout as the previous slide so the difference is the missing middle row.
+Before: token IDs -> UTF-8 -> disk, and back again on every access.
+After: the IDs are the stored form, so a read hands them straight to the model.
+Numbers are o200k +freq: 2.7us to encode, 3.6us to decode, against 237us to
+re-tokenize. Detokenize survives, but once, at the edge, for a human.
+-->
+
+---
+
+## Agent read
+
+<v-clicks>
+
+- LZ4 decompresses in 1.0us, then spends **263us** tokenizing text for the model
+
+- Token-native serves the IDs directly: 3.6us with `+freq`, 28.8us with `+ANS`
+
+- That's ~66x on every single read
+
+- Read is where it compounds: it happens on every retrieval, forever. Writing happens once
+
+<!--
+- Why bother about `us` optimizations?
+    - Low level optimizations compound very fast due to millions/billions of repetitions
+    - Machines need faster interfaces. Humans don't feel `ms` but not the case with agents.
+    - We don't choose zstd because it takes `209us` but here we are okay with `1+263us`.
+-->
+
+</v-clicks>
+
+<!--
+The model already produced the IDs. A byte store throws them away, detokenizes
+(50.3us), then compresses. zstd-19 costs 259.5us a write, 209us the compressor.
+-->
+
+---
+
+## Agent reads pay tokenization cost
+
+<iframe :src="chart('agent-read')" class="w-full border-0" style="height: 400px"
+        title="Agent and human read latency" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Toggle Agent/Human on the right, corpus on the left. Numbers are the post's own
+`latValues`, pulled out of token-storage.mdx at build time so the deck cannot
+drift from the blog.
+
+AGENT read, English: LZ4 449.7us, gzip 459.1, zstd-19 455.3, zstd --train 453.0
+-- they differ by 2% because decompression is 1-9us and the other ~445us is the
+mandatory tokenize, identical for all of them. That flat wall of grey IS the
+slide. Token-native: r50k raw 1.3us, o200k raw 13.5, o200k +freq 10.7, o200k
++ANS 41.7. Fastest path is ~350x.
+
+HUMAN read is the honest other side: LZ4 4.4us beats every token method,
+because now somebody has to detokenize (23-25us) and nobody has to tokenize.
+Say it before the room says it: humans are the case byte storage wins. The
+answer is on the next slides -- an agent reads hundreds of chunks per query,
+a human reads one summary at the end, so detokenize once at the edge.
+-->
+
+---
+
+## Detokenize, then tokenize again on every read
+
+<div class="flex justify-center mt-2">
+  <img :src="$asset('imgs/drake-no.jpg')" class="h-72 rounded-lg" />
+</div>
+
+---
+
+## Writes are free, humans read once
+
+<v-clicks>
+
+- The model **already produced the IDs**. A byte store throws them away, detokenizes (50.3us), then compresses
+
+- Token-native just stores what it was handed: 2.7-5.3us
+
+- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
+
+- Humans still need characters, but a search returns 10 chunks and the agent reads all of them. Detokenize once, at the edge
+
+</v-clicks>
+
+---
+
+## Agent writes: nothing to detokenize
+
+<iframe :src="chart('agent-write')" class="w-full border-0" style="height: 400px"
+        title="Agent and human write latency" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+LOG axis, unlike the read chart: this one spans 1.9us to 960us, and on a linear
+axis every token bar vanishes into the baseline.
+
+AGENT write, English: r50k raw 1.9us against LZ4 35.1us, gzip 130.8, zstd-19
+727.9, zstd --train 960.2. The model emitted the IDs, so a token store just
+packs them; a byte store has to detokenize first and then compress.
+
+HUMAN write: r50k raw 439.8us, LZ4 11.4us -- flipped, because a human hands you
+text and somebody must tokenize it. That is a real cost and worth naming. In an
+agentic system it is also the rarer path: the agent does most of the writing.
 -->
 
 ---
@@ -383,30 +639,6 @@ slowest at 3.3x.
 
 ---
 
-## Achieving even higher compression
-
-<v-clicks depth="2">
-
-- +ANS achieves high compression (o200k: 1.6x -> 3.4x) but is slow (30us) to read
-
-- I discovered that BPE assigns IDs in **merge-discovery order**, not by how often a token is used
-
-- Two methods:
-    - +ANS: an entropy coder (**ANS**, frequent tokens get fewer bits)
-    - +freq: re-rank by frequency and pack with `streamvbyte` (recommended)
-
-- Sorting token IDs by frequency o200k on English (+freq): 1.6x → 2.7x
-
-- The most frequent token can vary. For example, with o200k:
-    - English: ` the`: 290 -> 0 (most common. 2 -> 1 byte)
-    - English: `{`: 90 -> 200_018 (last slot because never used)
-    - Code: `␣␣␣` (3 spaces):  262 -> 2
-    - Hindi: `भारत`:  29_292 -> 73
-
-</v-clicks>
-
----
-
 <!--
 ## Fixing it:
 
@@ -430,199 +662,6 @@ def compress(text):
 
 -->
 
-## Pick your point on the curve
-
-<iframe :src="chart('frontier')" class="w-full border-0" style="height: 400px"
-        title="Compression ratio against decode cost" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Live scatter now, not a PNG. It was a PNG because a scatter is nothing but
-markers and the blog's LineChart threw a TDZ on any series with markers; that
-is fixed, so every point is hoverable and the room can ask about any one of
-them.
-
-Up and to the LEFT is better: more compression, less time to decode.
-
-All o200k here, so raw IDs are 1.59x rather than the 2.25x quoted earlier --
-o200k needs 3 bytes per ID where r50k fits in 2. Say that before someone spots
-the mismatch with the napkin-math slide.
-
-The shape of the argument: LZ4 is bottom-left (cheap, barely compresses),
-+ANS is top (best ratio) but the dearest token method to decode, and
-+freq+vbyte sits in the corner most people want -- nearly the ratio, a
-fraction of the decode.
--->
-
----
-
-## Before: Translation on every read/write
-
-```text
-  WRITE (agent)                   READ (agent)
-
-  ╭────────────╮                  ╭────────────╮
-  │ token IDs  │                  │ token IDs  │
-  ╰─────┬──────╯                  ╰─────┬──────╯
-        │                               ▲
-        │  detokenize  50 µs            │  tokenize  237 µs
-        ▼                               │
-  ╭─────┴──────╮                  ╭─────┴──────╮
-  │ UTF-8 text │                  │ UTF-8 text │
-  ╰─────┬──────╯                  ╰─────┬──────╯
-        │                               ▲
-        │  LZ4 compress  2.9 µs         │  LZ4 decompress  1.0 µs
-        ▼                               │
-  ╭─────┴───────────────────────────────┴──────╮
-  │                    DISK                    │
-  ╰────────────────────────────────────────────╯
-```
-
-- Models don't understand UTF-8. So you translate on every read/write
-
----
-
-## After: No translation cost
-
-```text
-  WRITE (agent)                   READ (agent)
-
-  ╭────────────╮                  ╭────────────╮
-  │ token IDs  │                  │ token IDs  │
-  ╰─────┬──────╯                  ╰─────┬──────╯
-        │                               ▲
-        │  +freq encode  2.7 µs         │  +freq decode  3.6 µs
-        ▼                               │
-  ╭─────┴───────────────────────────────┴──────╮
-  │                    DISK                    │
-  ╰────────────────────────────────────────────╯
-
-        detokenize once at the edge, only for a human:  50.3 µs
-```
-
-- The UTF-8 boxes are gone. **No translation required** on read/write
-
-<!--
-Same layout as the previous slide so the difference is the missing middle row.
-Before: token IDs -> UTF-8 -> disk, and back again on every access.
-After: the IDs are the stored form, so a read hands them straight to the model.
-Numbers are o200k +freq: 2.7us to encode, 3.6us to decode, against 237us to
-re-tokenize. Detokenize survives, but once, at the edge, for a human.
--->
-
----
-
-## Agent read
-
-<v-clicks>
-
-- LZ4 decompresses in 1.0us, then spends **263us** tokenizing text for the model
-
-- Token-native serves the IDs directly: 3.6us with `+freq`, 28.8us with `+ANS`
-
-- That's ~66x on every single read
-
-- Read is where it compounds: it happens on every retrieval, forever. Writing happens once
-
-<!--
-- Why bother about `us` optimizations?
-    - Low level optimizations compound very fast due to millions/billions of repetitions
-    - Machines need faster interfaces. Humans don't feel `ms` but not the case with agents.
-    - We don't choose zstd because it takes `209us` but here we are okay with `1+263us`.
--->
-
-</v-clicks>
-
-<!--
-The model already produced the IDs. A byte store throws them away, detokenizes
-(50.3us), then compresses. zstd-19 costs 259.5us a write, 209us the compressor.
--->
-
----
-
-## Every byte codec pays the same tokenize tax
-
-<iframe :src="chart('agent-read')" class="w-full border-0" style="height: 400px"
-        title="Agent and human read latency" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Toggle Agent/Human on the right, corpus on the left. Numbers are the post's own
-`latValues`, pulled out of token-storage.mdx at build time so the deck cannot
-drift from the blog.
-
-AGENT read, English: LZ4 449.7us, gzip 459.1, zstd-19 455.3, zstd --train 453.0
--- they differ by 2% because decompression is 1-9us and the other ~445us is the
-mandatory tokenize, identical for all of them. That flat wall of grey IS the
-slide. Token-native: r50k raw 1.3us, o200k raw 13.5, o200k +freq 10.7, o200k
-+ANS 41.7. Fastest path is ~350x.
-
-HUMAN read is the honest other side: LZ4 4.4us beats every token method,
-because now somebody has to detokenize (23-25us) and nobody has to tokenize.
-Say it before the room says it: humans are the case byte storage wins. The
-answer is on the next slides -- an agent reads hundreds of chunks per query,
-a human reads one summary at the end, so detokenize once at the edge.
--->
-
----
-
-## Detokenize, then tokenize again on every read
-
-<div class="flex justify-center mt-2">
-  <img :src="$asset('imgs/drake-no.jpg')" class="h-72 rounded-lg" />
-</div>
-
----
-
-## Writes are free, humans read once
-
-<v-clicks>
-
-- The model **already produced the IDs**. A byte store throws them away, detokenizes (50.3us), then compresses
-
-- Token-native just stores what it was handed: 2.7-5.3us
-
-- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
-
-- Humans still need characters, but a search returns 10 chunks and the agent reads all of them. Detokenize once, at the edge
-
-</v-clicks>
-
----
-
-## Agent writes: nothing to detokenize
-
-<iframe :src="chart('agent-write')" class="w-full border-0" style="height: 400px"
-        title="Agent and human write latency" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-LOG axis, unlike the read chart: this one spans 1.9us to 960us, and on a linear
-axis every token bar vanishes into the baseline.
-
-AGENT write, English: r50k raw 1.9us against LZ4 35.1us, gzip 130.8, zstd-19
-727.9, zstd --train 960.2. The model emitted the IDs, so a token store just
-packs them; a byte store has to detokenize first and then compress.
-
-HUMAN write: r50k raw 439.8us, LZ4 11.4us -- flipped, because a human hands you
-text and somebody must tokenize it. That is a real cost and worth naming. In an
-agentic system it is also the rarer path: the agent does most of the writing.
--->
 
 ---
 

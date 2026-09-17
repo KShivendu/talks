@@ -30,7 +30,18 @@ export default {
   // No @vitejs/plugin-react: nothing else here claims .jsx, so esbuild's own
   // JSX transform is enough, and it avoids a plugin/Vite version mismatch
   // (plugin-react 6 wants Vite 7; Slidev pins Vite 6).
-  esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
+  // `loader: 'jsx'` because the blog ships some components as .js containing
+  // JSX (TokenCompressionAnimated). Next.js parses those happily; Vite refuses
+  // unless told, and the error only names the first <tag> it trips over.
+  // `include` has to list .js explicitly -- adding a loader does not widen the
+  // default set of files esbuild will transform.
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react',
+    loader: 'jsx',
+    include: [/\.jsx?$/],
+    exclude: [/node_modules/],
+  },
   optimizeDeps: { esbuildOptions: { jsx: 'automatic', jsxImportSource: 'react' } },
   resolve: {
     dedupe: ['react', 'react-dom'],

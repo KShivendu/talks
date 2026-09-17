@@ -34,3 +34,35 @@ export const qdrantChrome = isDark
       accent: ACCENT,
       accentInk: '#ffffff',
     }
+
+/*
+ * Same idea for the animated hero, whose colour roles are its own rather than
+ * chartChrome's. Deck language: the token path is Amaranth, the byte/LZ4 path
+ * is the recessive grey, so the hero says the same thing as every chart after
+ * it. The site's green and amber would say something else entirely.
+ */
+export const qdrantHero = isDark
+  ? {
+      accent: ACCENT,
+      accentInk: '#ffffff',
+      bg: '#0b0f19',
+      divider: '#232a3c',
+      textMain: '#e8eaf0',
+      textMuted: '#8b90a0',
+      byteStroke: '#5d6573',
+      byteText: '#8b90a0',
+      tokFill: 'rgba(220,36,76,0.16)',
+      tokText: '#ef5a7c',
+      lz4Accent: '#8a9099',
+      lz4Fill: 'rgba(138,144,153,0.14)',
+    }
+  : {
+      accent: ACCENT,
+      accentInk: '#ffffff',
+      divider: '#e1e3e8',
+      byteStroke: '#c9ccd4',
+      tokFill: 'rgba(220,36,76,0.10)',
+      tokText: '#a83865',
+      lz4Accent: '#6c7480',
+      lz4Fill: 'rgba(108,116,128,0.12)',
+    }

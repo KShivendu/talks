@@ -509,15 +509,15 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ---
 
-## Humans vs agents
+## Token IDs vs UTF-8
 
 <v-clicks>
 
 - Token native storage is primarily about compression. Even without agents, you get the compression gains.
 
-- If you optmize for agents:
-    - Human reads: 4.4us -> 34us
-    - Human writes: 11us -> 298us
+- If you optimize for agents:
+    - Text-out reads: 1us -> 54us
+    - Text-in writes: 3us -> 239us
 
 - In agentic workloads, agents are the primary reads and writers of text.
 - Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
@@ -525,6 +525,41 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 </v-clicks>
 
+
+---
+
+## Move the boundary to the client
+
+| | today | at the client |
+| --- | --- | --- |
+| upload | UTF-8 on the wire | token IDs, **2.3x less** |
+| server write | tokenize every doc | nothing to do |
+| agent read | tokenize every read | hand over the IDs |
+
+<v-clicks>
+
+- Your browser already decodes UTF-8 on every character. `भ` is **3 bytes** and no glyph in ASCII. Token `455` to `cat` is one more layer of the same shape
+
+- Detokenize **7.9us** against UTF-8's **0.8us**. Ten times a step nobody has ever called a cost
+
+</v-clicks>
+
+<!--
+2.3x is raw packed IDs -- what a client can do with only the tokenizer, no
+frequency table. The server re-encodes at rest for more: +freq 2.7x, +ANS 3.4x.
+Do not quote 3.4x as the wire number; a browser will not be running ANS.
+
+The multiplier lands on egress at $0.09/GB, replication traffic, cross-region
+sync and page-cache density, not just the disk bill.
+
+Say the limit before the room does: UTF-8 is frozen and universal, tokenizers
+are neither. Client-side tokenizing means shipping a ~2MB vocabulary and
+pinning both ends to one version. Same "no shared vocabulary" problem as the
+Limitations slide, and the honest ceiling on the browser analogy.
+
+Measured on a 512-token English chunk (~2,288 bytes): UTF-8 decode 0.8us warm /
+3.9us serving-cold, detokenize 7.9us / 37.1us. 3 GB/s against 290 MB/s.
+-->
 
 ---
 

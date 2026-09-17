@@ -148,9 +148,10 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
 
 ## Can we do better?
 
-<!-- depth="2" so the nested points reveal one at a time too; without it
-     v-clicks only animates the top-level items and the sub-list appears
-     all at once with its parent. -->
+<!-- depth="2" reveals the nested points one at a time as well. It has to be
+     per-tag: overriding the builtin's default in setup/main.ts re-registers the
+     component and breaks click accounting -- the slide opens with 4 of 7 items
+     already shown. -->
 <v-clicks depth="2">
 
 - Decode (Read) is much slower for the models. Why?
@@ -159,7 +160,7 @@ clean 2.2x win; code is a wash, Hindi improves modestly. Say that if pushed.
     - They must turn it into tokens first, on **every read**
     - Add ~235us on every agent read. (decode+tokenize). With LZ4 decode: 1us -> 236us
     - Add ~50us on every agent write (detokenize+encode). With LZ4 encode: 2.9us -> 52.9us
-    - Tokenization cost can **never be 0** no matter the optimizations in future
+    - The tokenize/detokenize cost can **never be 0** no matter the optimizations
  
 - So what if we **store token IDs directly**?
 
@@ -178,7 +179,7 @@ Tokens: 1 r50k token ID as uint16     = 2.0 bytes/token
 ratio: 4.5 / 2.0 = ~2.25x
 ```
 
-<v-clicks>
+<v-clicks depth="2">
 
 - This napkin math was my original motivation for the experiment.
 

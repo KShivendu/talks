@@ -434,7 +434,7 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 
 <v-clicks>
 
-- LZ4+tokenize: 450us -> 3.6us is 125x faster!
+- LZ4+tokenize: 236us -> 3.6us is **66x faster**
 - Agents read hundreds of chunks for a single query
 
 </v-clicks>
@@ -444,11 +444,22 @@ Toggle Agent/Human on the right, corpus on the left. Numbers are the post's own
 `latValues`, pulled out of token-storage.mdx at build time so the deck cannot
 drift from the blog.
 
-AGENT read, English: LZ4 449.7us, gzip 459.1, zstd-19 455.3, zstd --train 453.0
--- they differ by 2% because decompression is 1-9us and the other ~445us is the
-mandatory tokenize, identical for all of them. That flat wall of grey IS the
-slide. Token-native: r50k raw 1.3us, o200k raw 13.5, o200k +freq 10.7, o200k
-+ANS 41.7. Fastest path is ~350x.
+Numbers come from 03_latency/latency_grid_results.json, the same file the
+ladder slide quotes. They used to come from the post's published table, which
+is stale against the repo -- it has tokenize at 445.6us where the grid measures
+235.3 -- so this chart used to say 450us while the ladder said 235us.
+
+TOKEN IDs, English: LZ4 236.3us, gzip-9 243.3, zstd-19 239.8, zstd --train
+238.5. They differ by 3% because decompress is 1.0-8.0us and the other 235.3 is
+the tokenize, identical for all of them. That flat wall IS the slide. Token
+side: r50k raw 0.3us, o200k raw 4.6, o200k +freq 3.6, o200k +ANS 28.8. The
+fastest path is ~790x, the +freq one 66x.
+
+UTF-8 is the honest other side: there the byte codecs win outright, LZ4 at
+1.0us against +freq's 53.9, because now somebody has to detokenize (45.5us) and
+nobody has to tokenize. Say it before the room does -- and then say that a
+human needs ~90 seconds to read the chunk, so 54us on that path is ~2 million
+times smaller than the reader it serves.
 
 HUMAN read is the honest other side: LZ4 4.4us beats every token method,
 because now somebody has to detokenize (23-25us) and nobody has to tokenize.
@@ -475,8 +486,17 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 - A byte store throws them away, detokenizes (50.3us), then compresses
 
 <!--
-LOG axis, unlike the read chart: this one spans 1.9us to 960us, and on a linear
+LOG axis, unlike the read chart: this spans 0.5us to 405us, and on a linear
 axis every token bar vanishes into the baseline.
+
+TOKEN IDs, English: r50k raw 0.5us against LZ4's 48.4us, gzip-9 71.6, zstd-19
+254.8, zstd --train 405.0. The model already emitted the IDs, so a token store
+just packs them; a byte store has to detokenize first (45.5us) and then
+compress.
+
+UTF-8 flips it: LZ4 2.9us against r50k raw's 235.8, because a text writer hands
+you characters and somebody has to tokenize them. Real cost, rarer path -- in
+an agentic system the agent does most of the writing.
 
 AGENT write, English: r50k raw 1.9us against LZ4 35.1us, gzip 130.8, zstd-19
 727.9, zstd --train 960.2. The model emitted the IDs, so a token store just
@@ -525,7 +545,7 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ---
 
-## What the ecosystem needs and limitations
+## Current limitations
 
 <v-clicks>
 
@@ -533,7 +553,7 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 - vLLM accepts token IDs. But private LLM APIs (OpenAI, Anthropic) don't
 
-- My frequency table is corpus-specific. Point it at a corpus it wasn't built on and the ratio drops
+- The frequency tables should be corpus/language specific. English, Hindi, Python behave differently
 
 - On **code**, `+ANS` falls behind: order-0 models no repetition, and code repeats constantly. A dictionary trained on token IDs (`+dict`) gets **3.39x** and still reads in **7us**
 

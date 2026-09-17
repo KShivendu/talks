@@ -17,8 +17,6 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const REPO = process.env.TOKEN_STORAGE_REPO || resolve(homedir(), 'projects/token-storage')
-const BLOG = process.env.BLOG_REPO || resolve(homedir(), 'projects/blog')
-const MDX = resolve(BLOG, 'data/blog/token-storage.mdx')
 
 const ratioPath = resolve(REPO, '07_kalcher_baseline/results.json')
 const latPath = resolve(REPO, '03_latency/latency_grid_results.json')
@@ -29,67 +27,6 @@ for (const p of [ratioPath, latPath, sweepPath, oodPath]) {
     console.error(`missing ${p}\nset TOKEN_STORAGE_REPO to the token-storage checkout`)
     process.exit(1)
   }
-}
-
-/*
- * The agent/human read+write latencies are composed numbers (a codec step plus
- * a tokenize or detokenize step), and the post already publishes the composed
- * table as `latValues`. Re-deriving it here would mean reimplementing that
- * composition and risking a deck that quietly disagrees with the blog, so read
- * the post's own export instead: one source of truth, and editing the post
- * updates the slides on the next build.
- */
-/*
- * Pull a FUNCTION out of the post and run it, rather than reimplementing it
- * here. latBreakdown decides which cost segments make up each bar, and there is
- * no version of copying that logic which cannot drift from the post. Extracting
- * it keeps one definition. Its free variables are passed in explicitly, so it
- * cannot reach anything else.
- */
-function mdxFunction(name, deps) {
-  const src = readFileSync(MDX, 'utf8')
-  const at = src.indexOf(`export const ${name} = (`)
-  if (at < 0) throw new Error(`${name} not found in ${MDX}`)
-  const open = src.indexOf('{', src.indexOf('=>', at))
-  let depth = 0
-  for (let i = open; i < src.length; i++) {
-    if (src[i] === '{') depth++
-    else if (src[i] === '}' && --depth === 0) {
-      const fn = src.slice(src.indexOf('(', at), i + 1)
-      // eslint-disable-next-line no-new-func
-      return new Function(...Object.keys(deps), `return ${fn}`)(...Object.values(deps))
-    }
-  }
-  throw new Error(`unterminated ${name} in ${MDX}`)
-}
-
-function mdxExport(name) {
-  if (!existsSync(MDX)) {
-    console.error(`missing ${MDX}\nset BLOG_REPO to the blog checkout`)
-    process.exit(1)
-  }
-  const src = readFileSync(MDX, 'utf8')
-  const start = src.indexOf(`export const ${name} =`)
-  if (start < 0) throw new Error(`${name} not found in ${MDX}`)
-  const open = src.indexOf('=', start) + 1
-  const first = src.slice(open).search(/[[{]/)
-  const from = open + first
-  const pairs = { '[': ']', '{': '}' }
-  const close = pairs[src[from]]
-  let depth = 0
-  for (let i = from; i < src.length; i++) {
-    if (src[i] === src[from]) depth++
-    else if (src[i] === close && --depth === 0) {
-      return JSON.parse(
-        src
-          .slice(from, i + 1)
-          .replace(/'/g, '"')
-          .replace(/,(\s*[\]}])/g, '$1')
-          .replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g, '$1"$2":')
-      )
-    }
-  }
-  throw new Error(`unterminated ${name} in ${MDX}`)
 }
 
 const kalcher = JSON.parse(readFileSync(ratioPath, 'utf8'))
@@ -396,65 +333,72 @@ const ngram = {
 }
 
 
-// ── agent vs human, read and write ───────────────────────────────────────────
-// The point of the whole talk in two charts. An agent reading a byte store must
-// tokenize on every read, so every byte codec lands at ~450us on English no
-// matter how fast it decompresses; a token store hands the model what it
-// already wanted, at 1-42us. Writes invert the asymmetry: an LLM emits token
-// IDs, so a token store just packs them (1.9us) while a byte store must
-// detokenize first, then compress.
+// ── agent vs text-consumer, read and write ───────────────────────────────────
+// Built from 03_latency/latency_grid_results.json, the same file the ladder
+// slide quotes. It used to compose the post's published `latValues`, but that
+// table is stale against the repo by a wide margin -- its tokenize is 445.6us
+// where the grid measures 235.3, and its LZ4 compress is 11.4us against 2.9 --
+// so the deck was contradicting itself: 235us of tokenize on the ladder, 445us
+// on this chart. The grid is the source of truth now, and because each bar is
+// summed from its own parts, totals and breakdowns cannot disagree.
+//
+// Composition follows the post's definitions:
+//   to token IDs   byte  = decompress + tokenize      (an agent needs IDs)
+//                  token = the method's read, nothing else
+//   to UTF-8       byte  = decompress, nothing else   (bytes are already text)
+//                  token = the method's read + detokenize
+// and the mirror image for writes.
 const LAT_ROWS = [
   // his competition: what production runs, plus the strongest byte comparison.
-  // brotli is in the post's table but off the slide -- at 8,251us on agent
-  // write it is 9x the next bar and flattens everything else to nothing.
-  ['LZ4', 0, GREY_L],
-  ['gzip -9', 1, GREY_M],
-  ['zstd -19', 2, GREY_D],
-  ['zstd --train', 4, GREY_XD],
-  ['r50k raw', 5, RED],
-  ['o200k raw', 7, RED],
-  ['o200k +freq', 10, RED_L],
-  ['o200k +ANS', 13, RED],
+  // brotli is measured but off the slide -- its encode is 2,777us, 9x the next
+  // bar, and it flattens everything else to nothing.
+  ['LZ4', 'byte', 'LZ4', GREY_L],
+  ['gzip -9', 'byte', 'gzip-9', GREY_M],
+  ['zstd -19', 'byte', 'zstd-19', GREY_D],
+  ['zstd --train', 'byte', 'zstd --train', GREY_XD],
+  ['r50k raw', 'token', ['r50k', 'raw'], RED_D],
+  ['o200k raw', 'token', ['o200k', 'raw'], RED_D],
+  ['o200k +freq', 'token', ['o200k', '+freq'], RED_L],
+  ['o200k +ANS', 'token', ['o200k', '+ANS'], RED],
 ]
-const MISMATCH = []
-const latValues = mdxExport('latValues')
-const latBreakdown = mdxFunction('latBreakdown', {
-  latParts: mdxExport('latParts'),
-  nativeTok: mdxExport('nativeTok'),
-  CODECS: mdxExport('CODECS'),
-  TOKS: mdxExport('TOKS'),
-})
-// the post keys English prose as `english`; the benchmark repo calls it `prose`
-const LAT_CORPUS = { prose: 'english', code: 'code', hindi: 'hindi' }
-const MODE_KEY = { read: { agent: 'readAgent', human: 'readHuman' },
-                   write: { agent: 'writeAgent', human: 'writeHuman' } }
+
+const NATIVE = { prose: 'r50k', code: 'cl100k', hindi: 'o200k' }
+const cell = (corpus, tok) => lat.grid[corpus][tok]
+const tokenizeUs = (corpus, tok) => round1(cell(corpus, tok).tokenize_serving_cold_us[0])
+const detokenizeUs = (corpus, tok) => round1(cell(corpus, tok).detokenize_serving_cold_us[0])
+
+// segments for one bar; the total is their sum, by construction
+function latParts(corpus, row, step, mode) {
+  const [, kind, key] = row
+  const nat = NATIVE[corpus]
+  if (kind === 'byte') {
+    const b = lat.byte_codecs[corpus][key]
+    if (step === 'read') {
+      const seg = [{ label: 'decompress', value: round1(b.decompress_us[0]) }]
+      if (mode === 'tokens') seg.push({ label: 'tokenize', value: tokenizeUs(corpus, nat) })
+      return seg
+    }
+    const seg = []
+    if (mode === 'tokens') seg.push({ label: 'detokenize', value: detokenizeUs(corpus, nat) })
+    seg.push({ label: 'compress', value: round1(b.compress_us[0]) })
+    return seg
+  }
+  const [tok, method] = key
+  const m = cell(corpus, tok).methods[method]
+  if (step === 'read') {
+    const seg = [{ label: 'decode', value: round1(m.read_us[0]) }]
+    if (mode === 'text') seg.push({ label: 'detokenize', value: detokenizeUs(corpus, tok) })
+    return seg
+  }
+  const seg = []
+  if (mode === 'text') seg.push({ label: 'tokenize', value: tokenizeUs(corpus, tok) })
+  seg.push({ label: 'encode', value: round1(m.write_us[0]) })
+  return seg
+}
 
 function latDataset(label, corpus, step, mode) {
-  const key = LAT_CORPUS[corpus]
-  const src = latValues[key][MODE_KEY[step][mode]]
-  const values = LAT_ROWS.map(([, i]) => src[i])
-  // Same per-bar cost segments the post shows, so a bar can be opened up
-  // instead of asserted: a byte codec's read is decompress + tokenize, and the
-  // tokenize part is most of it.
-  const bd = latBreakdown(step, key, mode)
-  const breakdown = LAT_ROWS.map(([, i]) => bd[i])
-  // A segment stack that does not add up to its own bar is worse than no stack,
-  // so any bar whose parts disagree with its total by >2% loses its breakdown
-  // and just shows the total. In practice this only fires on the Human views;
-  // every Agent bar -- the default, and the one the talk argues about --
-  // reconciles exactly. See MISMATCH REPORT at the end of this script.
-  // if the segments do not add up to the total, the two disagree and the chart
-  // would be quietly wrong -- fail the build instead
-  breakdown.forEach((segs, j) => {
-    if (!segs) return
-    const sum = segs.reduce((a, b) => a + b.value, 0)
-    const gap = Math.abs(sum - values[j])
-    if (gap > 0.02 * values[j]) breakdown[j] = null
-    if (gap > 0.15) MISMATCH.push(
-      `${key}/${step}/${mode} ${LAT_ROWS[j][0]}: segments ${sum.toFixed(1)} ` +
-        `vs total ${values[j].toFixed(1)}  (${(gap / values[j] * 100).toFixed(1)}%)`
-    )
-  })
+  const breakdown = LAT_ROWS.map((r) => latParts(corpus, r, step, mode))
+  const values = breakdown.map((segs) => round1(segs.reduce((a, b) => a + b.value, 0)))
   return {
     label,
     categories: LAT_ROWS.map(([name]) => name),
@@ -462,26 +406,23 @@ function latDataset(label, corpus, step, mode) {
       {
         name: `${step} latency`,
         values,
-        colors: LAT_ROWS.map(([, , c]) => c),
+        colors: LAT_ROWS.map(([, , , c]) => c),
         text: values.map((v) => (v >= 100 ? `${Math.round(v)}us` : `${v.toFixed(1)}us`)),
         textPosition: 'outside',
-        breakdown,
+        // single-segment bars get no stack: there is nothing to break down
+        breakdown: breakdown.map((segs) => (segs.length > 1 ? segs : null)),
       },
     ],
   }
 }
 
-// Labelled by the OUTPUT FORMAT, not by who is reading. "Human latency" was a
-// category error: a human needs ~90s to read a 512-token chunk, so the 50us
-// detokenize charged to that path is ~2 million times smaller than the reader
-// and can never be the bottleneck. What the two columns actually differ in is
-// where they stop -- at token IDs, or at characters.
-//
-// Token IDs first: it is the case the talk argues about, and the room should
-// not have to click to see it.
+// Labelled by the OUTPUT FORMAT, not by who is reading. "Human" was a category
+// error: a human needs ~90s to read a 512-token chunk, so the detokenize
+// charged to that path is ~2 million times smaller than the reader and can
+// never be the bottleneck. What the columns differ in is where decoding stops.
 const latViews = (step) => [
-  { label: 'Token IDs', default: true, datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'agent')) },
-  { label: 'UTF-8', datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'human')) },
+  { label: 'Token IDs', default: true, datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'tokens')) },
+  { label: 'UTF-8', datasets: CORPORA.map(([l, c]) => latDataset(l, c, step, 'text')) },
 ]
 const agentRead = latViews('read')
 const agentWrite = latViews('write')
@@ -519,12 +460,6 @@ export const agentRead = ${JSON.stringify(agentRead, null, 2)}
 export const agentWrite = ${JSON.stringify(agentWrite, null, 2)}
 `
 
-if (MISMATCH.length) {
-  console.log(`\n  MISMATCH REPORT -- ${MISMATCH.length} bars where the post's segment`)
-  console.log('  table and its total table disagree:')
-  for (const m of MISMATCH) console.log('    ' + m)
-}
-
 const dest = resolve(here, '../data/token-storage.js')
 writeFileSync(dest, out)
 console.log(`wrote ${dest}`)
@@ -545,10 +480,10 @@ console.log(`  chunk sweep: ${SIZES.length} sizes x ${CORPORA.length} corpora`)
 console.log(`  ood: entropy AUC ${Math.min(...oodAuc.values)}-${Math.max(...oodAuc.values)}`)
 console.log(`  ngram prose: ${ngram.views[0].values.join(' -> ')}x`)
 console.log(
-  `  agent read: LZ4 ${latValues.english.readAgent[0]}us vs r50k raw ` +
-    `${latValues.english.readAgent[5]}us (max ${latMax(agentRead).toFixed(0)}us)`
+  `  read to token IDs (English): LZ4 ${agentRead[0].datasets[0].series[0].values[0]}us ` +
+    `vs r50k raw ${agentRead[0].datasets[0].series[0].values[4]}us`
 )
 console.log(
-  `  agent write: LZ4 ${latValues.english.writeAgent[0]}us vs r50k raw ` +
-    `${latValues.english.writeAgent[5]}us (max ${latMax(agentWrite).toFixed(0)}us)`
+  `  write from token IDs (English): LZ4 ${agentWrite[0].datasets[0].series[0].values[0]}us ` +
+    `vs r50k raw ${agentWrite[0].datasets[0].series[0].values[4]}us`
 )

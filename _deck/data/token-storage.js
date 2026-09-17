@@ -2010,105 +2010,81 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              449.7,
-              459.1,
-              455.3,
-              453,
-              1.3,
-              13.5,
-              10.7,
-              41.7
+              236.3,
+              243.3,
+              239.8,
+              238.5,
+              0.3,
+              4.6,
+              3.6,
+              28.8
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "450us",
-              "459us",
-              "455us",
-              "453us",
-              "1.3us",
-              "13.5us",
-              "10.7us",
-              "41.7us"
+              "236us",
+              "243us",
+              "240us",
+              "239us",
+              "0.3us",
+              "4.6us",
+              "3.6us",
+              "28.8us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "decompress",
-                  "value": 4.1
+                  "value": 1
                 },
                 {
                   "label": "tokenize",
-                  "value": 445.6
+                  "value": 235.3
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 13.4
+                  "value": 8
                 },
                 {
                   "label": "tokenize",
-                  "value": 445.6
+                  "value": 235.3
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 9.7
+                  "value": 4.5
                 },
                 {
                   "label": "tokenize",
-                  "value": 445.6
+                  "value": 235.3
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 7.4
+                  "value": 3.2
                 },
                 {
                   "label": "tokenize",
-                  "value": 445.6
+                  "value": 235.3
                 }
               ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 1.3
-                }
-              ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 13.5
-                }
-              ],
-              [
-                {
-                  "label": "streamvbyte-decode",
-                  "value": 5.6
-                },
-                {
-                  "label": "rank-lookup",
-                  "value": 5.1
-                }
-              ],
-              [
-                {
-                  "label": "ANS-decode",
-                  "value": 41.7
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -2129,105 +2105,81 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              347.8,
-              358.1,
-              350.6,
-              348.9,
-              1.4,
-              12,
-              5.7,
-              25.1
+              175.9,
+              180.1,
+              177.6,
+              176.5,
+              0.4,
+              4.3,
+              3.2,
+              17.1
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "348us",
-              "358us",
-              "351us",
-              "349us",
-              "1.4us",
-              "12.0us",
-              "5.7us",
-              "25.1us"
+              "176us",
+              "180us",
+              "178us",
+              "177us",
+              "0.4us",
+              "4.3us",
+              "3.2us",
+              "17.1us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "decompress",
-                  "value": 2.8
+                  "value": 0.7
                 },
                 {
                   "label": "tokenize",
-                  "value": 345
+                  "value": 175.2
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 13.1
+                  "value": 4.9
                 },
                 {
                   "label": "tokenize",
-                  "value": 345
+                  "value": 175.2
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 5.6
+                  "value": 2.4
                 },
                 {
                   "label": "tokenize",
-                  "value": 345
+                  "value": 175.2
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 3.9
+                  "value": 1.3
                 },
                 {
                   "label": "tokenize",
-                  "value": 345
+                  "value": 175.2
                 }
               ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 1.4
-                }
-              ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 12
-                }
-              ],
-              [
-                {
-                  "label": "streamvbyte-decode",
-                  "value": 3.2
-                },
-                {
-                  "label": "rank-lookup",
-                  "value": 2.5
-                }
-              ],
-              [
-                {
-                  "label": "ANS-decode",
-                  "value": 25.1
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -2248,105 +2200,81 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              103.6,
-              112.7,
-              107.8,
-              103.2,
-              1.3,
-              11.5,
-              8.4,
-              13.8
+              119.3,
+              123.6,
+              122.9,
+              119.2,
+              0.4,
+              3.9,
+              3,
+              8.6
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "104us",
-              "113us",
-              "108us",
-              "103us",
-              "1.3us",
-              "11.5us",
-              "8.4us",
-              "13.8us"
+              "119us",
+              "124us",
+              "123us",
+              "119us",
+              "0.4us",
+              "3.9us",
+              "3.0us",
+              "8.6us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "decompress",
-                  "value": 2.9
+                  "value": 0.9
                 },
                 {
                   "label": "tokenize",
-                  "value": 100.7
+                  "value": 118.4
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 12
+                  "value": 5.2
                 },
                 {
                   "label": "tokenize",
-                  "value": 100.7
+                  "value": 118.4
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 7.1
+                  "value": 4.5
                 },
                 {
                   "label": "tokenize",
-                  "value": 100.7
+                  "value": 118.4
                 }
               ],
               [
                 {
                   "label": "decompress",
-                  "value": 2.5
+                  "value": 0.8
                 },
                 {
                   "label": "tokenize",
-                  "value": 100.7
+                  "value": 118.4
                 }
               ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 1.3
-                }
-              ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 11.5
-                }
-              ],
-              [
-                {
-                  "label": "streamvbyte-decode",
-                  "value": 5.5
-                },
-                {
-                  "label": "rank-lookup",
-                  "value": 2.9
-                }
-              ],
-              [
-                {
-                  "label": "ANS-decode",
-                  "value": 13.8
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -2372,88 +2300,79 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              4.4,
-              34.5,
-              25.9,
-              7.4,
-              25,
-              36.9,
-              34.1,
-              65.1
+              1,
+              8,
+              4.5,
+              3.2,
+              45.8,
+              54.9,
+              53.9,
+              79.1
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "4.4us",
-              "34.5us",
-              "25.9us",
-              "7.4us",
-              "25.0us",
-              "36.9us",
-              "34.1us",
-              "65.1us"
+              "1.0us",
+              "8.0us",
+              "4.5us",
+              "3.2us",
+              "45.8us",
+              "54.9us",
+              "53.9us",
+              "79.1us"
             ],
             "textPosition": "outside",
             "breakdown": [
               null,
               null,
               null,
+              null,
               [
                 {
-                  "label": "decompress",
-                  "value": 7.4
+                  "label": "decode",
+                  "value": 0.3
+                },
+                {
+                  "label": "detokenize",
+                  "value": 45.5
                 }
               ],
               [
                 {
-                  "label": "unpack",
-                  "value": 1.3
+                  "label": "decode",
+                  "value": 4.6
                 },
                 {
                   "label": "detokenize",
-                  "value": 23.7
+                  "value": 50.3
                 }
               ],
               [
                 {
-                  "label": "unpack",
-                  "value": 13.5
+                  "label": "decode",
+                  "value": 3.6
                 },
                 {
                   "label": "detokenize",
-                  "value": 23.4
+                  "value": 50.3
                 }
               ],
               [
                 {
-                  "label": "streamvbyte-decode",
-                  "value": 5.6
-                },
-                {
-                  "label": "rank-lookup",
-                  "value": 5.1
+                  "label": "decode",
+                  "value": 28.8
                 },
                 {
                   "label": "detokenize",
-                  "value": 23.4
-                }
-              ],
-              [
-                {
-                  "label": "ANS-decode",
-                  "value": 41.7
-                },
-                {
-                  "label": "detokenize",
-                  "value": 23.4
+                  "value": 50.3
                 }
               ]
             ]
@@ -2476,88 +2395,79 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              3,
-              19.7,
-              12.8,
-              3.9,
-              22.3,
-              24.9,
-              18.6,
-              38
+              0.7,
+              4.9,
+              2.4,
+              1.3,
+              33.6,
+              42.9,
+              41.8,
+              55.7
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "3.0us",
-              "19.7us",
-              "12.8us",
-              "3.9us",
-              "22.3us",
-              "24.9us",
-              "18.6us",
-              "38.0us"
+              "0.7us",
+              "4.9us",
+              "2.4us",
+              "1.3us",
+              "33.6us",
+              "42.9us",
+              "41.8us",
+              "55.7us"
             ],
             "textPosition": "outside",
             "breakdown": [
               null,
               null,
               null,
+              null,
               [
                 {
-                  "label": "decompress",
-                  "value": 3.9
-                }
-              ],
-              [
-                {
-                  "label": "unpack",
-                  "value": 1.4
+                  "label": "decode",
+                  "value": 0.4
                 },
                 {
                   "label": "detokenize",
-                  "value": 20.9
+                  "value": 33.2
                 }
               ],
               [
                 {
-                  "label": "unpack",
-                  "value": 12
+                  "label": "decode",
+                  "value": 4.3
                 },
                 {
                   "label": "detokenize",
-                  "value": 12.9
+                  "value": 38.6
                 }
               ],
               [
                 {
-                  "label": "streamvbyte-decode",
+                  "label": "decode",
                   "value": 3.2
                 },
                 {
-                  "label": "rank-lookup",
-                  "value": 2.5
-                },
-                {
                   "label": "detokenize",
-                  "value": 12.9
+                  "value": 38.6
                 }
               ],
               [
                 {
-                  "label": "ANS-decode",
-                  "value": 25.1
+                  "label": "decode",
+                  "value": 17.1
                 },
                 {
                   "label": "detokenize",
-                  "value": 12.9
+                  "value": 38.6
                 }
               ]
             ]
@@ -2580,88 +2490,79 @@ export const agentRead = [
           {
             "name": "read latency",
             "values": [
-              2.6,
-              18.7,
-              18.5,
-              2.5,
-              22.3,
-              17.2,
-              14.1,
-              19.5
+              0.9,
+              5.2,
+              4.5,
+              0.8,
+              32.7,
+              31.8,
+              30.9,
+              36.5
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "2.6us",
-              "18.7us",
-              "18.5us",
-              "2.5us",
-              "22.3us",
-              "17.2us",
-              "14.1us",
-              "19.5us"
+              "0.9us",
+              "5.2us",
+              "4.5us",
+              "0.8us",
+              "32.7us",
+              "31.8us",
+              "30.9us",
+              "36.5us"
             ],
             "textPosition": "outside",
             "breakdown": [
               null,
               null,
               null,
+              null,
               [
                 {
-                  "label": "decompress",
-                  "value": 2.5
+                  "label": "decode",
+                  "value": 0.4
+                },
+                {
+                  "label": "detokenize",
+                  "value": 32.3
                 }
               ],
               [
                 {
-                  "label": "unpack",
-                  "value": 1.3
+                  "label": "decode",
+                  "value": 3.9
                 },
                 {
                   "label": "detokenize",
-                  "value": 21
+                  "value": 27.9
                 }
               ],
               [
                 {
-                  "label": "unpack",
-                  "value": 11.5
+                  "label": "decode",
+                  "value": 3
                 },
                 {
                   "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 }
               ],
               [
                 {
-                  "label": "streamvbyte-decode",
-                  "value": 5.5
-                },
-                {
-                  "label": "rank-lookup",
-                  "value": 2.9
+                  "label": "decode",
+                  "value": 8.6
                 },
                 {
                   "label": "detokenize",
-                  "value": 5.7
-                }
-              ],
-              [
-                {
-                  "label": "ANS-decode",
-                  "value": 13.8
-                },
-                {
-                  "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 }
               ]
             ]
@@ -2693,105 +2594,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              35.1,
-              130.8,
-              727.9,
-              960.2,
-              1.9,
-              18.1,
-              8.2,
-              12.5
+              48.4,
+              71.6,
+              254.8,
+              405,
+              0.5,
+              5.3,
+              2.7,
+              3.8
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "35.1us",
-              "131us",
-              "728us",
-              "960us",
-              "1.9us",
-              "18.1us",
-              "8.2us",
-              "12.5us"
+              "48.4us",
+              "71.6us",
+              "255us",
+              "405us",
+              "0.5us",
+              "5.3us",
+              "2.7us",
+              "3.8us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "detokenize",
-                  "value": 23.7
+                  "value": 45.5
                 },
                 {
                   "label": "compress",
-                  "value": 11.4
+                  "value": 2.9
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 23.7
+                  "value": 45.5
                 },
                 {
                   "label": "compress",
-                  "value": 107.1
+                  "value": 26.1
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 23.7
+                  "value": 45.5
                 },
                 {
                   "label": "compress",
-                  "value": 704.2
+                  "value": 209.3
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 23.7
+                  "value": 45.5
                 },
                 {
                   "label": "compress",
-                  "value": 936.5
+                  "value": 359.5
                 }
               ],
-              [
-                {
-                  "label": "pack",
-                  "value": 1.9
-                }
-              ],
-              [
-                {
-                  "label": "pack",
-                  "value": 18.1
-                }
-              ],
-              [
-                {
-                  "label": "rank-remap",
-                  "value": 2
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 6.2
-                }
-              ],
-              [
-                {
-                  "label": "ANS-encode",
-                  "value": 12.5
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -2812,105 +2689,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              17.4,
-              67.4,
-              402.7,
-              416.8,
-              1.8,
-              16.3,
-              4.3,
-              7.6
+              35.5,
+              48.9,
+              171.5,
+              225.2,
+              0.5,
+              5,
+              2.4,
+              2.5
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "17.4us",
-              "67.4us",
-              "403us",
-              "417us",
-              "1.8us",
-              "16.3us",
-              "4.3us",
-              "7.6us"
+              "35.5us",
+              "48.9us",
+              "172us",
+              "225us",
+              "0.5us",
+              "5.0us",
+              "2.4us",
+              "2.5us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "detokenize",
-                  "value": 11.6
+                  "value": 34.2
                 },
                 {
                   "label": "compress",
-                  "value": 5.8
+                  "value": 1.3
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 11.6
+                  "value": 34.2
                 },
                 {
                   "label": "compress",
-                  "value": 55.8
+                  "value": 14.7
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 11.6
+                  "value": 34.2
                 },
                 {
                   "label": "compress",
-                  "value": 391.1
+                  "value": 137.3
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 11.6
+                  "value": 34.2
                 },
                 {
                   "label": "compress",
-                  "value": 405.2
+                  "value": 191
                 }
               ],
-              [
-                {
-                  "label": "pack",
-                  "value": 1.8
-                }
-              ],
-              [
-                {
-                  "label": "pack",
-                  "value": 16.3
-                }
-              ],
-              [
-                {
-                  "label": "rank-remap",
-                  "value": 1
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 3.3
-                }
-              ],
-              [
-                {
-                  "label": "ANS-encode",
-                  "value": 7.6
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -2931,105 +2784,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              10.9,
-              66.3,
-              389,
-              512.6,
-              1.9,
-              8.1,
-              5.7,
-              3.3
+              29.7,
+              43.5,
+              159.5,
+              237.9,
+              0.5,
+              4.8,
+              2.2,
+              1.5
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "10.9us",
-              "66.3us",
-              "389us",
-              "513us",
-              "1.9us",
-              "8.1us",
-              "5.7us",
-              "3.3us"
+              "29.7us",
+              "43.5us",
+              "160us",
+              "238us",
+              "0.5us",
+              "4.8us",
+              "2.2us",
+              "1.5us"
             ],
             "textPosition": "outside",
             "breakdown": [
               [
                 {
                   "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 },
                 {
                   "label": "compress",
-                  "value": 5.2
+                  "value": 1.8
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 },
                 {
                   "label": "compress",
-                  "value": 60.6
+                  "value": 15.6
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 },
                 {
                   "label": "compress",
-                  "value": 383.3
+                  "value": 131.6
                 }
               ],
               [
                 {
                   "label": "detokenize",
-                  "value": 5.7
+                  "value": 27.9
                 },
                 {
                   "label": "compress",
-                  "value": 506.9
+                  "value": 210
                 }
               ],
-              [
-                {
-                  "label": "pack",
-                  "value": 1.9
-                }
-              ],
-              [
-                {
-                  "label": "pack",
-                  "value": 8.1
-                }
-              ],
-              [
-                {
-                  "label": "rank-remap",
-                  "value": 1
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 4.7
-                }
-              ],
-              [
-                {
-                  "label": "ANS-encode",
-                  "value": 3.3
-                }
-              ]
+              null,
+              null,
+              null,
+              null
             ]
           }
         ]
@@ -3055,87 +2884,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              11.4,
-              107.1,
-              704.2,
-              936.5,
-              439.8,
-              315.7,
-              298.4,
-              412
+              2.9,
+              26.1,
+              209.3,
+              359.5,
+              235.8,
+              242,
+              239.4,
+              240.5
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "11.4us",
-              "107us",
-              "704us",
-              "937us",
-              "440us",
-              "316us",
-              "298us",
-              "412us"
+              "2.9us",
+              "26.1us",
+              "209us",
+              "360us",
+              "236us",
+              "242us",
+              "239us",
+              "241us"
             ],
             "textPosition": "outside",
             "breakdown": [
-              [
-                {
-                  "label": "compress",
-                  "value": 11.4
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 107.1
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 704.2
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 936.5
-                }
-              ],
-              [
-                {
-                  "label": "tokenize",
-                  "value": 445.6
-                },
-                {
-                  "label": "pack",
-                  "value": 1.9
-                }
-              ],
+              null,
+              null,
+              null,
               null,
               [
                 {
                   "label": "tokenize",
-                  "value": 290.2
+                  "value": 235.3
                 },
                 {
-                  "label": "rank-remap",
-                  "value": 2
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 6.2
+                  "label": "encode",
+                  "value": 0.5
                 }
               ],
-              null
+              [
+                {
+                  "label": "tokenize",
+                  "value": 236.7
+                },
+                {
+                  "label": "encode",
+                  "value": 5.3
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 236.7
+                },
+                {
+                  "label": "encode",
+                  "value": 2.7
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 236.7
+                },
+                {
+                  "label": "encode",
+                  "value": 3.8
+                }
+              ]
             ]
           }
         ]
@@ -3156,78 +2979,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              5.8,
-              55.8,
-              391.1,
-              405.2,
-              326,
-              210.4,
-              193.6,
-              271.6
+              1.3,
+              14.7,
+              137.3,
+              191,
+              164.2,
+              157.5,
+              154.9,
+              155
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "5.8us",
-              "55.8us",
-              "391us",
-              "405us",
-              "326us",
-              "210us",
-              "194us",
-              "272us"
+              "1.3us",
+              "14.7us",
+              "137us",
+              "191us",
+              "164us",
+              "158us",
+              "155us",
+              "155us"
             ],
             "textPosition": "outside",
             "breakdown": [
-              [
-                {
-                  "label": "compress",
-                  "value": 5.8
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 55.8
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 391.1
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 405.2
-                }
-              ],
+              null,
+              null,
               null,
               null,
               [
                 {
                   "label": "tokenize",
-                  "value": 189.3
+                  "value": 163.7
                 },
                 {
-                  "label": "rank-remap",
-                  "value": 1
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 3.3
+                  "label": "encode",
+                  "value": 0.5
                 }
               ],
-              null
+              [
+                {
+                  "label": "tokenize",
+                  "value": 152.5
+                },
+                {
+                  "label": "encode",
+                  "value": 5
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 152.5
+                },
+                {
+                  "label": "encode",
+                  "value": 2.4
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 152.5
+                },
+                {
+                  "label": "encode",
+                  "value": 2.5
+                }
+              ]
             ]
           }
         ]
@@ -3248,78 +3074,81 @@ export const agentWrite = [
           {
             "name": "write latency",
             "values": [
-              5.2,
-              60.6,
-              383.3,
-              506.9,
-              248,
-              115.3,
-              106.4,
-              157.1
+              1.8,
+              15.6,
+              131.6,
+              210,
+              127.9,
+              123.2,
+              120.6,
+              119.9
             ],
             "colors": [
               "#8a9099",
               "#7b828d",
               "#6c7480",
               "#5d6573",
-              "#dc244c",
-              "#dc244c",
+              "#a83865",
+              "#a83865",
               "#ef5a7c",
               "#dc244c"
             ],
             "text": [
-              "5.2us",
-              "60.6us",
-              "383us",
-              "507us",
-              "248us",
-              "115us",
-              "106us",
-              "157us"
+              "1.8us",
+              "15.6us",
+              "132us",
+              "210us",
+              "128us",
+              "123us",
+              "121us",
+              "120us"
             ],
             "textPosition": "outside",
             "breakdown": [
-              [
-                {
-                  "label": "compress",
-                  "value": 5.2
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 60.6
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 383.3
-                }
-              ],
-              [
-                {
-                  "label": "compress",
-                  "value": 506.9
-                }
-              ],
+              null,
+              null,
               null,
               null,
               [
                 {
                   "label": "tokenize",
-                  "value": 100.7
+                  "value": 127.4
                 },
                 {
-                  "label": "rank-remap",
-                  "value": 1
-                },
-                {
-                  "label": "streamvbyte-encode",
-                  "value": 4.7
+                  "label": "encode",
+                  "value": 0.5
                 }
               ],
-              null
+              [
+                {
+                  "label": "tokenize",
+                  "value": 118.4
+                },
+                {
+                  "label": "encode",
+                  "value": 4.8
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 118.4
+                },
+                {
+                  "label": "encode",
+                  "value": 2.2
+                }
+              ],
+              [
+                {
+                  "label": "tokenize",
+                  "value": 118.4
+                },
+                {
+                  "label": "encode",
+                  "value": 1.5
+                }
+              ]
             ]
           }
         ]

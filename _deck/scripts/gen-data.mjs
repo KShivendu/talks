@@ -196,13 +196,14 @@ const RATIO_SERIES = [
   // the real competition: what production stores actually run, plus
   // `zstd --train` as the strongest byte-side comparison. Darker = stronger.
   // Shapes let the lines be told apart where they cross or overlap, and give
-  // the token-native trio the eye-catching ones -- star for the headline +ANS.
+  // the token-native trio the eye-catching ones. The star is always +freq, the
+  // method being recommended, on every chart in the deck.
   ['LZ4', GREY_L, null],
   ['gzip-9', GREY_M, null],
   ['zstd-19', GREY_D, null],
   ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
-  ['+freq', RED_L, 'ring'],
-  ['+ANS', RED, 'star'],
+  ['+freq', RED_L, 'star'],
+  ['+ANS', RED, 'ring'],
   // +dict answers "you lose on code": order-0 coders model no repetition, and
   // code repeats constantly. zstd-22 with a 112KB dictionary trained on packed
   // token-ID bytes -- output is still token IDs, so a read still skips
@@ -249,8 +250,8 @@ const ENC_SERIES = [
   ['gzip-9', GREY_M, null],
   ['zstd-19', GREY_D, null],
   ['zstd --train', GREY_XD, 'diamond'],  // keeps one: the real competitor
-  ['+freq', RED_L, 'ring'],
-  ['+ANS', RED, 'star'],
+  ['+freq', RED_L, 'star'],
+  ['+ANS', RED, 'ring'],
 ]
 const chunkEncode = {
   xTicks: SIZES.map((n) => [n, n.toLocaleString()]),
@@ -315,22 +316,34 @@ const tokenizeTax = Object.fromEntries(
 )
 
 // ── the ratio/decode frontier, as a real scatter ─────────────────────────────
-// LineChart draws markers only when showLine is false, and hit-tests in 2D.
+// showLine:false turns LineChart into a scatter; it hit-tests in 2D, so every
+// point keeps its own hover tooltip. This was a PNG until the blog's marker
+// TDZ was fixed -- a scatter is nothing but markers.
+//
+// Colours and shapes follow the rest of the deck: grey and recessive for what
+// we are competing with, amaranth for token-native, and the star always marks
+// +freq, as on every other slide.
+// textPosition is per series because +ANS and the Kalcher baseline land almost
+// on top of each other at the top right; sending one label left and the other
+// down keeps both readable.
 const FRONTIER = [
-  ['LZ4 (bytes)', GREY, byteDecode('LZ4'), ratios.LZ4.prose],
-  ['raw IDs', RED, mRead('raw'), ratios['o200k raw'].prose],
-  ['+freq+vbyte', RED, mRead('+freq'), ratios['o200k +freq'].prose],
-  ['+ANS', RED, mRead('+ANS'), ratios['o200k +ANS'].prose],
-  ['+freq+leb+zstd', GREY, mRead('Kalcher(zstd)'), ratios['o200k Kalcher(zstd)'].prose],
+  ['LZ4 (bytes)', GREY_D, 'circle', byteDecode('LZ4'), ratios.LZ4.prose, 'top right'],
+  ['+freq+leb+zstd', GREY_M, 'diamond', mRead('Kalcher(zstd)'), ratios['o200k Kalcher(zstd)'].prose, 'bottom left'],
+  ['raw IDs', RED_D, 'triangle', mRead('raw'), ratios['o200k raw'].prose, 'bottom right'],
+  ['+freq+vbyte', RED_L, 'star', mRead('+freq'), ratios['o200k +freq'].prose, 'top left'],
+  ['+ANS', RED, 'ring', mRead('+ANS'), ratios['o200k +ANS'].prose, 'top left'],
 ]
 const frontier = {
-  series: FRONTIER.map(([name, color, x, y]) => ({
+  series: FRONTIER.map(([name, color, marker, x, y, textPosition]) => ({
     name,
     color,
+    marker,
     showLine: false,
-    marker: 'circle',
     points: [[x, y]],
-    labels: [`${name}  ${y.toFixed(2)}x / ${x}us`],
+    // `text` is the per-point label prop; `labels` is not one and was silently
+    // ignored. Name included, since a scatter's legend is easy to lose.
+    text: [`${name}  ${y.toFixed(2)}x / ${x}us`],
+    textPosition,
   })),
 }
 

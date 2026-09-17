@@ -385,15 +385,23 @@ slowest at 3.3x.
 
 ## Achieving even higher compression
 
-<v-clicks>
+<v-clicks depth="2">
 
-- Two ways to squeeze the IDs: an entropy coder (**ANS**, frequent tokens get fewer bits), or re-rank by frequency and pack with `streamvbyte`
+- +ANS achieves high compression (o200k: 1.6x -> 3.4x) but is slow (30us) to read
 
-- Running the frequency histogram, I found BPE hands out IDs in **merge-discovery order**, not by how often a token is used
+- I discovered that BPE assigns IDs in **merge-discovery order**, not by how often a token is used
 
-- A token you use constantly can sit at ID 40,000. A rare one sits at ID 12
+- Two methods:
+    - +ANS: an entropy coder (**ANS**, frequent tokens get fewer bits)
+    - +freq: re-rank by frequency and pack with `streamvbyte` (recommended)
 
-- Re-ranking on English: 2.13x → 2.60x. Half of `+freq`'s gain is the remap alone
+- Sorting token IDs by frequency o200k on English (+freq): 1.6x → 2.7x
+
+- The most frequent token can vary. For example, with o200k:
+    - English: ` the`: 290 -> 0 (most common. 2 -> 1 byte)
+    - English: `{`: 90 -> 200_018 (last slot because never used)
+    - Code: `␣␣␣` (3 spaces):  262 -> 2
+    - Hindi: `भारत`:  29_292 -> 73
 
 </v-clicks>
 
@@ -421,14 +429,33 @@ def compress(text):
 
 ---
 
-<img :src="$asset('imgs/frontier.png')" class="absolute inset-0 w-full h-full object-contain" alt="frontier" />
+## Pick your point on the curve
+
+<iframe :src="chart('frontier')" class="w-full border-0" style="height: 400px"
+        title="Compression ratio against decode cost" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
 
 <!--
-Still a PNG: a scatter needs markers, and the blog's LineChart throws a TDZ on
-any series with markers (onCrosshairLeave used at line 603, declared at 864).
+Live scatter now, not a PNG. It was a PNG because a scatter is nothing but
+markers and the blog's LineChart threw a TDZ on any series with markers; that
+is fixed, so every point is hoverable and the room can ask about any one of
+them.
 
-All o200k here, so raw is 1.59x, not the 2.25x from earlier: o200k IDs need
-3 bytes, r50k's fit in 2.
+Up and to the LEFT is better: more compression, less time to decode.
+
+All o200k here, so raw IDs are 1.59x rather than the 2.25x quoted earlier --
+o200k needs 3 bytes per ID where r50k fits in 2. Say that before someone spots
+the mismatch with the napkin-math slide.
+
+The shape of the argument: LZ4 is bottom-left (cheap, barely compresses),
++ANS is top (best ratio) but the dearest token method to decode, and
++freq+vbyte sits in the corner most people want -- nearly the ratio, a
+fraction of the decode.
 -->
 
 ---

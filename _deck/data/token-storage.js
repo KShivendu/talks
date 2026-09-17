@@ -457,7 +457,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -481,7 +481,7 @@ export const chunkRatio = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -630,7 +630,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -654,7 +654,7 @@ export const chunkRatio = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -803,7 +803,7 @@ export const chunkRatio = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -827,7 +827,7 @@ export const chunkRatio = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -999,7 +999,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1023,7 +1023,7 @@ export const chunkEncode = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1148,7 +1148,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1172,7 +1172,7 @@ export const chunkEncode = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1297,7 +1297,7 @@ export const chunkEncode = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1321,7 +1321,7 @@ export const chunkEncode = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1469,7 +1469,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1493,7 +1493,7 @@ export const chunkRead = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1618,7 +1618,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1642,7 +1642,7 @@ export const chunkRead = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1767,7 +1767,7 @@ export const chunkRead = {
         {
           "name": "+freq",
           "color": "#ef5a7c",
-          "marker": "ring",
+          "marker": "star",
           "showMarkers": true,
           "points": [
             [
@@ -1791,7 +1791,7 @@ export const chunkRead = {
         {
           "name": "+ANS",
           "color": "#dc244c",
-          "marker": "star",
+          "marker": "ring",
           "showMarkers": true,
           "points": [
             [
@@ -1842,78 +1842,83 @@ export const frontier = {
   "series": [
     {
       "name": "LZ4 (bytes)",
-      "color": "#7b828d",
-      "showLine": false,
+      "color": "#6c7480",
       "marker": "circle",
+      "showLine": false,
       "points": [
         [
           1,
           1.27
         ]
       ],
-      "labels": [
+      "text": [
         "LZ4 (bytes)  1.27x / 1us"
-      ]
-    },
-    {
-      "name": "raw IDs",
-      "color": "#dc244c",
-      "showLine": false,
-      "marker": "circle",
-      "points": [
-        [
-          4.6,
-          1.59
-        ]
       ],
-      "labels": [
-        "raw IDs  1.59x / 4.6us"
-      ]
-    },
-    {
-      "name": "+freq+vbyte",
-      "color": "#dc244c",
-      "showLine": false,
-      "marker": "circle",
-      "points": [
-        [
-          3.6,
-          2.73
-        ]
-      ],
-      "labels": [
-        "+freq+vbyte  2.73x / 3.6us"
-      ]
-    },
-    {
-      "name": "+ANS",
-      "color": "#dc244c",
-      "showLine": false,
-      "marker": "circle",
-      "points": [
-        [
-          28.8,
-          3.4
-        ]
-      ],
-      "labels": [
-        "+ANS  3.40x / 28.8us"
-      ]
+      "textPosition": "top right"
     },
     {
       "name": "+freq+leb+zstd",
       "color": "#7b828d",
+      "marker": "diamond",
       "showLine": false,
-      "marker": "circle",
       "points": [
         [
           29.3,
           3.22
         ]
       ],
-      "labels": [
+      "text": [
         "+freq+leb+zstd  3.22x / 29.3us"
-      ]
+      ],
+      "textPosition": "bottom left"
+    },
+    {
+      "name": "raw IDs",
+      "color": "#a83865",
+      "marker": "triangle",
+      "showLine": false,
+      "points": [
+        [
+          4.6,
+          1.59
+        ]
+      ],
+      "text": [
+        "raw IDs  1.59x / 4.6us"
+      ],
+      "textPosition": "bottom right"
+    },
+    {
+      "name": "+freq+vbyte",
+      "color": "#ef5a7c",
+      "marker": "star",
+      "showLine": false,
+      "points": [
+        [
+          3.6,
+          2.73
+        ]
+      ],
+      "text": [
+        "+freq+vbyte  2.73x / 3.6us"
+      ],
+      "textPosition": "top left"
+    },
+    {
+      "name": "+ANS",
+      "color": "#dc244c",
+      "marker": "ring",
+      "showLine": false,
+      "points": [
+        [
+          28.8,
+          3.4
+        ]
+      ],
+      "text": [
+        "+ANS  3.40x / 28.8us"
+      ],
+      "textPosition": "top left"
     }
   ]
 }

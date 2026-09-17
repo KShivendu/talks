@@ -509,26 +509,50 @@ agentic system it is also the rarer path: the agent does most of the writing.
 
 ---
 
-## Token IDs vs UTF-8
+## Someone always converts
+
+| you store | a model reads | a screen reads |
+| --- | --- | --- |
+| UTF-8 — today | **tokenize 235us** | free |
+| token IDs | free | **detokenize 45us** |
 
 <v-clicks>
 
-- Token native storage is primarily about compression. Even without agents, you get the compression gains.
+- You don't get to skip the conversion. You choose **which direction** to pay it
 
-- If you optimize for agents:
-    - Text-out reads: 1us -> 54us
-    - Text-in writes: 3us -> 239us
+- Detokenize is a **table lookup**; tokenize is a **search**: regex split, then merge against a 50-200k vocabulary. **5x cheaper**, and structural rather than an implementation detail
 
-- In agentic workloads, agents are the primary reads and writers of text.
-- Generated text is the clean case: chat logs, summaries, agent traces persist at **zero encode cost**
-- Bold idea: Human interfaces (browsers/apps) still need characters, so detokenize once for old devices that don't agree on the tokenizer
+- It is also the rarer direction: an agent reads hundreds of chunks per query, a person reads one summary at the end
+
+- Generated text never converts at all. The model already emitted the IDs
+
+- And if you never serve an agent, the **compression still holds**
 
 </v-clicks>
+
+<!--
+This slide concedes the counter-case, so lead with the table and let the room
+see both directions before you argue. Symmetric on purpose: nobody can say the
+cost was hidden.
+
+Numbers are English/r50k serving-cold from 03_latency/latency_grid_results.json:
+tokenize 235.3us, detokenize 45.5us. The ratio holds across corpora -- prose
+5.2x, code 5.1x (175.2 / 34.2), Hindi 4.2x (118.4 / 27.9) -- and widens warm,
+to 10-16x, because detokenize benefits more from a hot table.
+
+Why it is structural, which also pre-answers the next slide: detokenize is one
+lookup per token and a concat. Tokenize has to FIND the tokens first -- regex
+pre-split, then a merge loop against a 50-200k vocabulary. A faster
+implementation moves both, not the gap between them.
+
+If asked "what about a text-heavy workload with no models at all": the last
+bullet. The compression is 2.3-3.4x regardless of who reads.
+-->
 
 
 ---
 
-## Move the boundary to the client
+## Translate at the client
 
 | | today | at the client |
 | --- | --- | --- |

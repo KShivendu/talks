@@ -1,6 +1,0 @@
-import{_ as m}from"./slidev/VClicks-BvOj0ZVR.js";import{o as c,V as p,a3 as a,b as t,z as d,a2 as h,ax as _,ay as f,G as s}from"./modules/vue-Bhcaf6WO.js";import{I as k}from"./slidev/default-BffRJpGk.js";import{u as g,f as x}from"./slidev/context-3kz2CT4S.js";import{u as b}from"./slidev/useDarkMode-Cb8fzafA.js";import"./index-TqvvEqEv.js";import"./modules/shiki-Dq2beWmg.js";const v=["src"],P={__name:"token-storage.md__slidev_9",setup(w){const{$clicksContext:n,$frontmatter:r}=g();n.setup();const{isDark:l}=b(),i=e=>`/token-storage/charts/${e}.html${l.value?"?dark":""}`;return(e,o)=>{const u=m;return c(),p(k,_(f(s(x)(s(r),8))),{default:a(()=>[o[1]||(o[1]=t("h2",null,"Does the napkin math hold?",-1)),t("iframe",{src:i("ratio"),class:"w-full border-0",style:{height:"400px"},title:"Does the napkin math hold?"},null,8,v),d(`
-The blog's own BarChart, live. Toggle All/Focus, hover a bar.
-I predicted 2.25x on a napkin and measured 2.25x, with no algorithm running.
-brotli (2.57x) and zstd --train (2.72x) still beat raw token IDs, but cost
-2,777us and 359us to encode. Packing a uint16 costs 5.3us.
-`),h(u,null,{default:a(()=>[...o[0]||(o[0]=[t("ul",null,[t("li",null,"We got exactly 2.25x. Napkin math was right!"),t("li",null,"With some compression algorithms on top (+freq, +ANS) you reach 2.7-3.4x!")],-1)])]),_:1})]),_:1},16)}}};export{P as default};

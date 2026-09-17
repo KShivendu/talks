@@ -8,7 +8,7 @@
       /* An iframe gets an opaque white canvas from the UA unless the embedded
          document says otherwise, so `transparent` alone leaves a white frame
          in dark mode. Declare the ground explicitly on each side. */
-      html, body { margin: 0; padding: 0; background: #fff; }
+      html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
       html.dark, html.dark body { background: #0b0f19; }
       html { color-scheme: light; }
       html.dark { color-scheme: dark; }
@@ -17,9 +17,9 @@
          units, not screen pixels: Slidev's canvas is 980 wide and gets scaled
          up, so measuring in rendered px overstates the room by ~1.3x. The
          slide is 980x551, the title takes ~80, so the hero has ~450 to live in
-         -- which caps its width near 540. Still above the 480 threshold where
+         -- which caps its width near 490, just clear of the 480 threshold where
          the component drops to its compact phone layout. */
-      #root { padding: 0 4px; max-width: 540px; margin: 0 auto; }
+      #root { padding: 0 4px; max-width: 490px; margin: 0 auto; }
     </style>
   </head>
   <body>

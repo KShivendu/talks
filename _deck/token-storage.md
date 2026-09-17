@@ -13,12 +13,11 @@ routerMode: hash
 # Slidev disables text selection by default so click-to-advance never
 # selects prose instead. We want people to copy from the slides.
 selectable: true
-layout: cover
 class: 'text-left'
 ---
-<h1 class="!text-3xl !mb-0 !leading-tight">Token-Native Storage</h1>
+<h1 class="!text-3xl !mb-1 !leading-tight">Token-Native Storage</h1>
 
-<div class="text-sm opacity-70 mb-1">Store what the model actually reads</div>
+<div class="text-sm opacity-70 !-mt-1 mb-2">Store what the model actually reads</div>
 
 <iframe :src="chart('hero')" class="w-full border-0" style="height: 430px"
         title="The same text down two pipelines: LZ4 over bytes, and token IDs" />

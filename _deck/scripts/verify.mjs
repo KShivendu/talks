@@ -14,21 +14,23 @@ import { readFile } from 'node:fs/promises'
 import { mkdirSync, existsSync } from 'node:fs'
 import { extname, join, normalize } from 'node:path'
 
-const ROOT = new URL('../../token-storage/', import.meta.url).pathname
+// DECK=if-splade node scripts/verify.mjs   (defaults to the token-storage deck)
+const DECK = process.env.DECK || 'token-storage'
+const ROOT = new URL(`../../${DECK}/`, import.meta.url).pathname
 const OUT = new URL('./.shots/', import.meta.url).pathname
 const PORT = 8861
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' }
 
-if (!existsSync(ROOT)) throw new Error(`no build at ${ROOT} -- run: npm run build`)
+if (!existsSync(ROOT)) throw new Error(`no build at ${ROOT} -- run: npm run build${DECK === 'token-storage' ? '' : ':splade'}`)
 mkdirSync(OUT, { recursive: true })
 
 // No SPA fallback and no prefix stripping: GitHub Pages has neither, and a
 // friendlier server here once hid real 404s from the deployed deck.
 const server = createServer(async (req, res) => {
   const path = decodeURIComponent(req.url.split('?')[0])
-  if (!path.startsWith('/token-storage/')) return res.writeHead(404).end('404')
-  const raw = path.slice('/token-storage/'.length)
+  if (!path.startsWith(`/${DECK}/`)) return res.writeHead(404).end('404')
+  const raw = path.slice(DECK.length + 2)
   // normalize('') is '.', which would make us readFile() a directory and 404
   const rel = !raw || raw.endsWith('/') ? raw + 'index.html' : normalize(raw)
   const file = join(ROOT, rel)
@@ -57,7 +59,7 @@ page.on('requestfailed', (r) => {
 // per-slide frontmatter adds two more lines each, and `hide: true` slides do
 // not render at all. So take an upper bound and stop when Slidev starts
 // clamping -- asking for a slide past the end just re-renders the last one.
-const src = await readFile(new URL('../token-storage.md', import.meta.url), 'utf8')
+const src = await readFile(new URL(`../${DECK}.md`, import.meta.url), 'utf8')
 const total = (src.match(/^---$/gm) || []).length + 1
 const targets = process.argv.slice(2).length
   ? process.argv.slice(2)
@@ -68,8 +70,8 @@ let lastChars = null
 for (const t of targets) {
   const chart = t.startsWith('chart:')
   const url = chart
-    ? `http://localhost:${PORT}/token-storage/charts/${t.slice(6)}.html`
-    : `http://localhost:${PORT}/token-storage/#/${t}?clicks=99`
+    ? `http://localhost:${PORT}/${DECK}/charts/${t.slice(6)}.html`
+    : `http://localhost:${PORT}/${DECK}/#/${t}?clicks=99`
   await page.goto(url, { waitUntil: 'networkidle' })
   await page.waitForTimeout(700)
   const r = await page.evaluate(() => {

@@ -93,7 +93,7 @@ example out loud, it carries the rest of the talk.
 
 ## SPLADE expands the document instead
 
-<iframe :src="chart('activations')" class="w-full border-0" style="height: 400px"
+<iframe :src="chart('activations')" class="w-full border-0" style="height: 356px"
         title="SPLADE token activations for heart attack" />
 
 <div class="text-sm opacity-80 -mt-2">
@@ -188,7 +188,7 @@ knowing this is all it would get.
 
 ## Does it actually hold up?
 
-<iframe :src="chart('quality-latency')" class="w-full border-0" style="height: 400px"
+<iframe :src="chart('quality-latency')" class="w-full border-0" style="height: 356px"
         title="Quality against query latency" />
 
 <div class="text-sm opacity-80 -mt-2">
@@ -242,7 +242,7 @@ squints at the chart.
 
 ## Where the 13x actually comes from
 
-<iframe :src="chart('latency-split')" class="w-full border-0" style="height: 400px"
+<iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
         title="Query latency split into embed and search" />
 
 <script setup>
@@ -291,7 +291,7 @@ Sparsity table from the post: splade-v3-doc 325, splade-v3 286, opensearch GTE
 
 ## The bill: free queries, expensive index
 
-<iframe :src="chart('throughput')" class="w-full border-0" style="height: 400px"
+<iframe :src="chart('throughput')" class="w-full border-0" style="height: 356px"
         title="Document encoding throughput at index time" />
 
 <script setup>
@@ -314,6 +314,286 @@ sparse dot product.
 
 ---
 
+## One dataset is one data point
+
+<iframe :src="chart('spread')" class="w-full border-0" style="height: 430px"
+        title="Inference-free penalty per dataset" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+STOP AND SAY THIS FIRST, or the numbers look like they contradict the earlier
+slides. This is a different experiment. NanoBEIR is ~50 queries and a few
+thousand documents per dataset, scored brute-force on an A10G. The 0.7161 /
+0.7068 from before was full BEIR scifact, 300 queries, through Qdrant. Do not
+compare a bar here to a number there. Compare bars to bars.
+
+Within this panel: the inference-free penalty averages 0.0333 NDCG@10, and it
+runs from -0.0824 on arguana to +0.0154 on hotpotqa, where inference-free
+actually wins. That is a 6x spread across thirteen domains.
+
+scifact is red only because it is the dataset every earlier slide used. It
+lands at -0.0468, mid-pack. Nothing special about it either way.
+
+The honest version of "inference-free costs about 1%" is: on the one corpus I
+measured properly, yes. Across thirteen, the number you get depends heavily on
+which one you picked.
+-->
+
+---
+
+## The two ends of that chart
+
+| | full | IF | delta | mean query length |
+| --- | ---: | ---: | ---: | ---: |
+| **arguana** | 0.4891 | 0.4067 | **-0.0824** | **193 words** |
+| hotpotqa | 0.8281 | 0.8435 | **+0.0154** | 15 words |
+
+<v-clicks>
+
+- A 193-word query with every term at weight 1.0 has no way to say which words matter. A 15-word one barely needs to
+
+- Consistent with the fix: learned weights help **arguana most of all**, +0.0741
+
+- BM25 is also not beaten everywhere. It wins **touche2020** (0.7235 vs full SPLADE's 0.6129) and **climatefever** (0.3126 vs 0.3104)
+
+- Both are stance tasks: a relevant document may *support or refute* the claim, not just share its topic. Expansion finds topically-near documents, which is the wrong target
+
+</v-clicks>
+
+<!--
+The query-length row is the one to point at. ArguAna queries average 193 words,
+measured on NanoArguAna, against 15 for HotpotQA. Those are the two ends of the
+chart and also the two ends of the length range, and the direction is what you
+would expect if unweighted terms are the problem.
+
+Do not oversell it as causal from two points. The support is that learned query
+weights, which is exactly the fix for "too many equally-loud terms", help
+ArguAna more than any other dataset: +0.0741.
+
+Then touche2020. SPLADE loses by 0.11, a big loss, and it loses the same way on
+climatefever. Both are stance tasks. Touche queries are SHORT, 6.6 words on
+average, so this is not a length effect, it is a task effect.
+
+If someone asks "so when is BM25 still the right call": this slide is the
+answer, plus anything where you cannot afford a GPU at index time.
+-->
+
+---
+
+## Most of the penalty is fixable
+
+<iframe :src="chart('nano-means')" class="w-full border-0" style="height: 290px"
+        title="Gap to full SPLADE for three systems" />
+
+<div class="text-sm opacity-80 mt-1">
+
+The inference-free penalty drops from **0.0333** to **0.0072** &mdash; **78% of it removed** &mdash; and the query side still runs no model.
+
+</div>
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Four systems, mean over the same thirteen datasets.
+
+BM25 0.5479. Inference-free with uniform weights 0.6004. Inference-free with
+learned weights 0.6265. Full SPLADE 0.6337.
+
+The gap that mattered on the previous slide, 0.0333, drops to 0.0072. That is
+78% of the inference-free penalty, removed by a lookup table.
+-->
+
+---
+
+## What changed: the query terms got weights
+
+Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
+
+| term | `splade-v3-doc` (uniform) | `splade-v3-lexical` (learned) |
+| --- | ---: | ---: |
+| elderly | 1.000 | **1.881** |
+| arrest | 1.000 | **1.469** |
+| cardiac | 1.000 | **1.231** |
+| in | 1.000 | *dropped* |
+| the | 1.000 | *dropped* |
+
+<v-clicks>
+
+- Same doc encoder, same family, **still no model on the query path** &mdash; just a vocab-sized table of floats
+
+- Wins on **10 of 13**: arguana +0.0741, scifact +0.0638, climatefever +0.0538. Loses on quora (-0.0283), fiqa (-0.0180), nq (-0.0016)
+
+- Beats *full* SPLADE outright on dbpedia, hotpotqa, msmarco and scifact
+
+- Across the 13 datasets, query non-zeros go **76** (full) &rarr; **21** (uniform) &rarr; **16** (learned). Learned is the *sparsest* of the three
+
+</v-clicks>
+
+<!--
+This is the part of the talk I would build a project on if I were in the room.
+"Inference-free" is usually explained as "throw the query encoder away and use
+raw tokens". That is only one design. The query side still gets to have
+parameters, as long as they are a table you index into rather than a network
+you run.
+
+The weights on the slide are measured, not illustrative:
+research/if-splade/query_weights.py runs that exact query through both models.
+"in" and "the" come back at exactly zero and drop out, which is why the learned
+query is SPARSER than the uniform one, 16 non-zeros against 21.
+
+Worth pointing at "elderly" beating "cardiac". The table is not hand-written
+IDF from your corpus, it is learned during distillation, so it can disagree
+with your intuition about which word matters.
+
+Caveat to say out loud: uniform-vs-learned here is the naver pair, same family
+and same doc encoder, so the weight scheme is the only thing that changed.
+OpenSearch ships a learned-weight model too and it lands at 0.6187 on the same
+panel, but it is a different model, so I would not read the difference between
+0.6187 and 0.6265 as being about weights.
+-->
+
+---
+
+## Which queries actually break?
+
+scifact, 300 queries, full SPLADE against inference-free:
+
+<div class="grid grid-cols-3 gap-4 my-4 text-center">
+<div class="p-3 rounded" style="background: rgba(138,144,153,0.12)">
+<div class="text-3xl font-bold">70%</div><div class="text-xs opacity-70">identical ranking</div></div>
+<div class="p-3 rounded" style="background: rgba(220,36,76,0.12)">
+<div class="text-3xl font-bold" style="color:#dc244c">17%</div><div class="text-xs opacity-70">IF worse</div></div>
+<div class="p-3 rounded" style="background: rgba(138,144,153,0.12)">
+<div class="text-3xl font-bold">13%</div><div class="text-xs opacity-70">IF better</div></div>
+</div>
+
+<v-clicks>
+
+- The worst **10** queries carry **47%** of all the NDCG lost
+
+- All three total failures (1.00 &rarr; 0.00) hinge on words BERT's vocabulary does not have, so they shatter into pieces that each get weight 1.0:
+  - *schimmelpenning / feuerstein / mims*, *golli / anergic*, *glycolysis / glycometabolic*
+
+- Query length does **not** predict it: losers average 12.7 words, everyone else 12.5
+
+</v-clicks>
+
+<!--
+This is the slide that changes how you'd fix it. "1.3% worse on average" sounds
+like every query got slightly worse. It is not what happens. Seven queries in
+ten rank identically. The average is made almost entirely by a handful of
+catastrophes.
+
+And the catastrophes have a shape. None of those words are in BERT's 30k
+wordpiece vocabulary, so each one shatters, and with uniform weight 1.0 every
+fragment counts the same as "the". Full SPLADE reads the context and puts
+weight back on the rare pieces. Inference-free cannot.
+
+Note glycolysis is not exotic, it is a first-year biology word. It still
+shatters. So the failure mode is not "rare jargon", it is "out of vocabulary",
+and those are not the same set.
+
+One thing to square with the earlier slide: there I said long queries are where
+inference-free struggles, across datasets. Here, WITHIN scifact, length does
+not separate winners from losers at all, 12.7 against 12.5 words. Both are
+true. Across corpora the length range is 15 to 193 words; inside scifact every
+query is about 13. You cannot see a length effect in a sample with no length
+variation.
+
+Which is the same diagnosis as the previous slide, from the other direction:
+the problem is unweighted query terms, not missing expansion.
+
+If you want a 10-minute version of this talk: it is this slide plus the
+previous one.
+-->
+
+---
+
+## An idea that mostly did not work
+
+<div class="text-center -mt-2 -mb-1 text-sm">
+
+Put a BM25 floor under every term the document contains:
+$$ w_t = \max\left(w_{\text{splade}}(t, d),\; C \cdot \text{bm25}(t, d)\right) $$
+
+</div>
+
+<iframe :src="chart('floor')" class="w-full border-0" style="height: 356px"
+        title="BM25 floor sweep" />
+
+<div class="text-xs opacity-70 -mt-1">
+
+Zero is no floor. By **C = 0.20**, the value my earlier post recommends for inference-free, all three curves are already below it.
+
+</div>
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+The idea is from my own earlier post on full SPLADE: a document term that the
+model zeroed out is unrecoverable at query time, so put a floor under it. That
+post found the best coefficient was C = 0.31 for full SPLADE and C = 0.20 for
+inference-free.
+
+Across thirteen datasets and three inference-free models, the best single C
+buys +0.0001, +0.0052 and +0.0007. That is nothing. And by C = 0.20 every one
+of the three curves is already below zero: -0.0013, -0.0493, -0.0082. The
+coefficient that post recommends actively hurts these models.
+
+Say the caveat honestly: my BM25 is wordpiece counts with k1=1.2, b=0.75 over
+small Nano corpora, not the implementation that post tuned C on, so I would
+not claim "0.20 is wrong". I would claim there is no C you can hard-code.
+
+Leave this slide up a beat. A negative result reported cleanly is worth more to
+this audience than a fourth win.
+-->
+
+---
+
+## Except where BM25 was already winning
+
+<v-clicks depth="2">
+
+- Tuning C **per corpus** instead: +0.0156, +0.0129, +0.0187. Still small, and that is an oracle, tuned on the test set
+
+- C\* ranges from **0.0 to 0.65** across the 13. There is no constant to ship
+
+- But the lift is not random. It tracks how far BM25 was ahead of the model:
+  - correlation **+0.76**, **+0.73**, **+0.43** for the three models
+  - for uniform IF: **touche2020** +0.0686, **climatefever** +0.0476 &mdash; exactly the two BM25 was winning
+
+- One exception worth chasing: learned-weight IF on **quora** jumps **+0.0946** at C=0.31, the biggest lift anywhere, and BM25 was *behind* there
+
+</v-clicks>
+
+<!--
+So the floor is not a quality knob, it is a BM25-recovery knob. It buys back
+lexical matching on corpora where lexical matching was the better strategy all
+along. If you already know your corpus is one of those, you did not need the
+floor, you needed BM25 or a hybrid.
+
+The quora outlier is the one I cannot explain and would say so. Note that quora
+is also the dataset where learned weights LOST the most to uniform, -0.0283.
+The floor gives back +0.0946 there. Something about that corpus interacts badly
+with the IDF table and BM25 term frequency repairs it. That is a real open
+question, and it is a good one to hand the room.
+-->
+
+---
+
 ## Who should not use this
 
 <v-clicks>
@@ -322,7 +602,7 @@ sparse dot product.
 
 - **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
 
-- **Domain matters.** Best where vocabulary bridging is the problem (scientific, medical, legal). On e-commerce, titles already match queries and the gap narrows
+- **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+0.2559** (nq) to **-0.1106** (touche2020). Quora, where queries and docs already share words, still gives **+0.1275** &mdash; so "they already match" is not the predictor
 
 - **You need a GPU at index time**, and a re-encoding pipeline if the corpus churns
 

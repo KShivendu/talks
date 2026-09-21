@@ -42,3 +42,59 @@ export const throughput = {
   text: ['1,439 (CPU)', '98 (GPU)', '83 (GPU)', '58 (GPU)'],
   colors: [GREY_L, GREY_D, AMARANTH, AMARANTH_L],
 }
+
+// ---------------------------------------------------------------------------
+// NanoBEIR, 13 datasets. A SEPARATE experiment from the scifact numbers above:
+// different harness (zeta-alpha-ai/Nano*, ~50 queries and a few thousand docs
+// per dataset, brute-force scoring on an A10G rather than Qdrant), so these
+// NDCG@10 values are not comparable point-for-point with the 0.7161 / 0.7068
+// above. They answer a different question: how much does the inference-free
+// penalty move across domains?
+// Source: ~/projects/research/if-splade/nanobeir_results.json
+//
+// Models: full   = naver/splade-v3
+//         uniform= naver/splade-v3-doc        (every query term weight 1.0)
+//         learned= naver/splade-v3-lexical    (query term weight from an IDF table)
+//         BM25   = own implementation over the same wordpiece vocabulary
+
+// (uniform IF - full), per dataset, sorted worst first. Negative = IF is worse.
+export const ifSpread = {
+  categories: ['arguana', 'climatefever', 'scidocs', 'scifact', 'fever', 'dbpedia',
+    'touche2020', 'nfcorpus', 'msmarco', 'quora', 'nq', 'fiqa', 'hotpotqa'],
+  values: [-0.0824, -0.0634, -0.0547, -0.0468, -0.0414, -0.0364,
+    -0.0338, -0.0335, -0.0266, -0.0199, -0.0054, -0.0034, 0.0154],
+}
+
+// Distance from full SPLADE in mean NDCG@10 over those same 13 datasets.
+// Plotted as a gap rather than an absolute, because a linear bar chart has to
+// grow from zero and four bars between 0.548 and 0.634 all look identical from
+// a zero baseline. Zero here IS full SPLADE (0.6337 absolute).
+export const nanoGap = {
+  // absolute NDCG@10 rides in the category label; the bar label is the gap only,
+  // or the two run together and spill off the right of the plot
+  categories: ['BM25  0.5479', 'IF, uniform  0.6004', 'IF, learned  0.6265'],
+  values: [-0.0858, -0.0333, -0.0072],
+  text: ['-0.0858', '-0.0333', '-0.0072'],
+  colors: [GREY_L, GREY_D, AMARANTH],
+}
+
+// BM25-floor sweep. The rule from kshivendu.dev/blog/splade-bm25 applied to
+// every term a document actually contains:  w_t = max(w_splade, C * bm25).
+// y is the CHANGE in mean NDCG@10 over the 13 NanoBEIR datasets against C=0
+// (no floor). Source: ~/projects/research/if-splade/bm25floor_results.json
+//
+// Caveat worth keeping attached to these numbers: the BM25 here is computed
+// over wordpiece counts with k1=1.2, b=0.75 on the Nano corpora, not the
+// implementation the original post tuned C on. Compare the SHAPE of these
+// curves, not C against C across the two write-ups.
+export const floorSweep = [
+  { name: 'uniform (v3-doc)', color: GREY_D, marker: 'circle',
+    points: [[0, 0], [0.05, 0.0001], [0.1, -0.0011], [0.15, -0.0021], [0.2, -0.0013],
+      [0.25, -0.0066], [0.31, -0.0167], [0.4, -0.0268], [0.5, -0.035], [0.65, -0.0399], [0.8, -0.0442]] },
+  { name: 'learned (v3-lexical)', color: AMARANTH, marker: 'star',
+    points: [[0, 0], [0.05, -0.0003], [0.1, 0.0007], [0.15, 0.0002], [0.2, -0.0082],
+      [0.25, -0.0147], [0.31, -0.0258], [0.4, -0.0344], [0.5, -0.0392], [0.65, -0.0465], [0.8, -0.0507]] },
+  { name: 'learned (OpenSearch)', color: GREY_L, marker: 'square',
+    points: [[0, 0], [0.05, 0.0052], [0.1, -0.0044], [0.15, -0.0335], [0.2, -0.0493],
+      [0.25, -0.0531], [0.31, -0.0568], [0.4, -0.0613], [0.5, -0.0638], [0.65, -0.0655], [0.8, -0.0666]] },
+]

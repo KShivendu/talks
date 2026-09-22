@@ -59,7 +59,7 @@ kshivendu.dev/blog/if-splade
 
 <v-clicks>
 
-- **BM25**, and the one thing it cannot do
+- **BM25** and its limits
 
 - **SPLADE**: the same inverted index, with learned terms and weights
 
@@ -71,7 +71,7 @@ kshivendu.dev/blog/if-splade
 
 ---
 
-## BM25, and the one thing it cannot do
+## BM25 and its limits
 
 $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\text{how rare}} \cdot \underbrace{\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1(1 - b + b\frac{|d|}{\text{avgdl}})}}_{\text{how often, length-normalised}} $$
 
@@ -579,10 +579,16 @@ a sparse dot product.
 
 ---
 
-## One dataset is one data point
+## Inference-free beats BM25 on 10 of 13
 
-<iframe :src="chart('spread')" class="w-full border-0" style="height: 430px"
-        title="Inference-free penalty per dataset" />
+<iframe :src="chart('spread')" class="w-full border-0" style="height: 398px"
+        title="Inference-free against BM25 and against full SPLADE" />
+
+<div class="text-sm opacity-80 -mt-1">
+
+Toggle the view. Mean margin over BM25 is **+5.26**, and the three losses are **touche2020**, **climatefever**, **scidocs**.
+
+</div>
 
 <script setup>
 import { useDarkMode } from '@slidev/client'
@@ -591,22 +597,29 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 <!--
-STOP AND SAY THIS FIRST, or the numbers look like they contradict the earlier
-slides. This is a different experiment. NanoBEIR is ~50 queries and a few
-thousand documents per dataset, scored brute-force on an A10G. The 71.61 /
-70.68 from before was full BEIR scifact, 300 queries, through Qdrant. Do not
-compare a bar here to a number there. Compare bars to bars.
+Start on the "vs BM25" view and leave it there for a beat, because this is the
+question the room actually has: should I run this instead of what I already
+ship? Ten of thirteen say yes, and the wins are not marginal -- nq +25.05,
+msmarco +18.58, fiqa +14.74.
 
-Within this panel: the inference-free penalty averages 3.33 NDCG@10, and it
-runs from -8.24 on arguana to +1.54 on hotpotqa, where inference-free
-actually wins. That is a 6x spread across thirteen domains.
+Then the honest part. Three losses: touche2020 -14.44, climatefever -6.55,
+scidocs -3.07. But full SPLADE ALSO loses touche2020 and climatefever, so only
+scidocs is a cost of going inference-free. Everything else is a SPLADE problem,
+not an inference-free one.
 
-scifact is red only because it is the dataset every earlier slide used. It
-lands at -4.68, mid-pack. Nothing special about it either way.
+Now flip the toggle. Same datasets, same order, now measured against full
+SPLADE. Every bar goes negative except hotpotqa, and the average cost is 3.33.
 
-The honest version of "inference-free costs about 1%" is: on the one corpus I
-measured properly, yes. Across thirteen, the number you get depends heavily on
-which one you picked.
+Two things to say while it is on screen. First, one dataset is one data point:
+the penalty runs from -8.24 on arguana to +1.54 on hotpotqa, so a single number
+quoted from a single corpus tells you very little. Second, resist the tidy
+story. I checked whether inference-free is cheapest where SPLADE's margin is
+biggest, and the correlation is only +0.28. ArguAna breaks it outright: an
++8.85 margin over BM25 and the largest inference-free cost on the panel.
+
+NanoBEIR is ~50 queries and a few thousand documents per dataset, scored
+brute-force. Do not compare these bars to the scifact numbers earlier in the
+deck, which came through Qdrant on the full corpus.
 -->
 
 ---

@@ -84,13 +84,24 @@ export const throughput = {
 //         learned= naver/splade-v3-lexical    (query term weight from an IDF table)
 //         BM25   = own implementation over the same wordpiece vocabulary
 
-// (uniform IF - full), per dataset, sorted worst first. Negative = IF is worse.
+// Two views of the same 13 datasets, same order in both so the toggle compares
+// like for like. Order is by margin over BM25, descending.
+//
+// "vs BM25" is the deployment question: should I run this instead of what I
+// have? "vs full SPLADE" is the research question: what does dropping query
+// inference cost? An earlier version of this chart showed only the second,
+// which made a result that wins 10 of 13 look like a list of losses.
+const IF_DATASETS = ['nq', 'msmarco', 'fiqa', 'quora', 'dbpedia', 'fever', 'hotpotqa',
+  'scifact', 'nfcorpus', 'arguana', 'scidocs', 'climatefever', 'touche2020']
+
 export const ifSpread = {
-  categories: ['arguana', 'climatefever', 'scidocs', 'scifact', 'fever', 'dbpedia',
-    'touche2020', 'nfcorpus', 'msmarco', 'quora', 'nq', 'fiqa', 'hotpotqa'],
-  values: [-8.24, -6.34, -5.47, -4.68, -4.14, -3.64,
-    -3.38, -3.35, -2.66, -1.99, -0.54, -0.34, 1.54],
+  categories: IF_DATASETS,
+  vsBM25: [25.05, 18.58, 14.74, 10.76, 9.45, 5.40, 2.71, 2.70, 2.41, 0.61,
+    -3.07, -6.55, -14.44],
+  vsFull: [-0.54, -2.66, -0.34, -1.99, -3.64, -4.14, 1.54, -4.68, -3.35, -8.24,
+    -5.47, -6.34, -3.38],
 }
+
 
 // Distance from full SPLADE in mean NDCG@10 over those same 13 datasets.
 // Plotted as a gap rather than an absolute, because a linear bar chart has to

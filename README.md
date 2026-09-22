@@ -5,6 +5,7 @@
   - [Slides](/if-splade) · [Blog post](https://kshivendu.dev/blog/if-splade)
 
 - Token-Native Storage: Read and Write in Your Agent's Language
+  - [Youtube video](https://www.youtube.com/live/PxGlBlqTxJI?t=283)
   - [Slides](/token-storage)
   - [Paper (arXiv 2608.02376)](https://arxiv.org/abs/2608.02376) · [Blog post](https://kshivendu.dev/blog/token-storage) · [Benchmarks](https://github.com/KShivendu/token-storage)
 

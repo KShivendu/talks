@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Token-Native Storage</title>
+    <style>
+      /* An iframe gets an opaque white canvas from the UA unless the embedded
+         document says otherwise, so `transparent` alone leaves a white frame
+         in dark mode. Declare the ground explicitly on each side. */
+      html, body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
+      html.dark, html.dark body { background: #0b0f19; }
+      html { color-scheme: light; }
+      html.dark { color-scheme: dark; }
+      body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      /* The hero renders at its natural desktop width and is then scaled to
+         whatever box the slide gives it (see the fit script below). Picking a
+         max-width by hand was the wrong lever: the component's height changes
+         with its width AND through the animation AND per preset, so any fixed
+         number is right for exactly one frame of one preset.
+
+         640 is its own desktop design width. Keeping it there means the
+         component still believes it has desktop room -- it drops to a compact
+         phone layout below 480 -- while the scale shrinks it optically. */
+      #root { width: 640px; margin: 0 auto; transform-origin: top center; }
+    </style>
+    <script type="module" crossorigin src="./assets/hero-DuOSHAUZ.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Scale #root down until it fits the frame, whatever the frame is.
+      //
+      // offsetHeight reports LAYOUT size and ignores transforms, so reading it
+      // back after scaling still returns the natural size: no feedback loop,
+      // and no need to undo the transform in order to measure.
+      //
+      // Polled on a timer, deliberately. Two earlier attempts failed here:
+      // ResizeObserver alone lagged the hero's growth through its animation, so
+      // the scale stayed at a value for an earlier, shorter frame and the last
+      // row spilled past the bottom edge; and requestAnimationFrame never fired
+      // at all in this iframe (verified -- a rAF scheduled inside it does not
+      // run), so that version silently did nothing. A 100ms interval is two
+      // layout reads and a compare, and it fires regardless of how the browser
+      // throttles the frame.
+      ;(function () {
+        var root = document.getElementById('root')
+        var last = -1
+        function fit() {
+          var h = root.offsetHeight
+          var w = root.offsetWidth
+          if (!h || !w) return
+          // 6px of slack absorbs sub-pixel rounding at the bottom edge
+          var s = Math.min(1, (innerHeight - 6) / h, (innerWidth - 6) / w)
+          if (Math.abs(s - last) > 0.002) {
+            root.style.transform = s < 1 ? 'scale(' + s + ')' : 'none'
+            last = s
+          }
+        }
+        setInterval(fit, 100)
+        new ResizeObserver(fit).observe(root)
+        addEventListener('resize', fit)
+        fit()
+      })()
+    </script>
+  </body>
+</html>

@@ -43,12 +43,28 @@ export const latencySplit = {
   search: [3.8, 4.0, 4.0, 3.6, 6.6, 7.1],
 }
 
+// Document encoding throughput, remeasured under control: one A10G, one
+// container, both models in the same process, 3 repeats each in alternating
+// order (~/projects/research/if-splade/modal_doc_throughput.py).
+//
+// This REPLACES 98 / 83 / 58, which came from three single passes in three
+// separate Modal containers. Those numbers supported a claim -- "inference-free
+// is slightly dearer to index" -- that does not survive a controlled re-run:
+// the three models land at 89.1, 89.4 and 89.1 docs/sec, and the spread within
+// one model across repeats (89.0 to 94.5) is larger than the gap between them.
+// They are the same BERT-base forward pass, so that is the expected answer.
+//
+// BM25 is this machine's CPU building a postings index over the same 5,183
+// docs (bm25_index_throughput.py). The tokenizer decides the number: a plain
+// regex word tokenizer gives 13,778/sec, BERT wordpiece gives 1,809/sec. The
+// wordpiece figure is the fair one against SPLADE, which pays it too.
 export const throughput = {
-  categories: ['BM25', 'SPLADE-Full', 'IF-naver', 'IF-GTE'],
-  values: [1439, 98, 83, 58],
-  text: ['1,439 (CPU)', '98 (GPU)', '83 (GPU)', '58 (GPU)'],
-  colors: [GREY_L, GREY_D, AMARANTH, AMARANTH_L],
+  categories: ['BM25 (word)', 'BM25 (wordpiece)', 'SPLADE-Full', 'IF (v3-doc)', 'IF (v3-lexical)'],
+  values: [13778, 1809, 89.1, 89.4, 89.1],
+  text: ['13,778 (CPU)', '1,809 (CPU)', '89 (GPU)', '89 (GPU)', '89 (GPU)'],
+  colors: [GREY_L, GREY_L, GREY_D, AMARANTH, AMARANTH_L],
 }
+
 
 // ---------------------------------------------------------------------------
 // NanoBEIR, 13 datasets. A SEPARATE experiment from the scifact numbers above:

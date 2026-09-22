@@ -17,7 +17,7 @@ class: 'text-left'
 
 <div class="mt-8 text-sm opacity-70">
 
-Full SPLADE quality at **4.3ms** instead of **57ms**, with no GPU on the query path.
+Full SPLADE quality at **4.3ms** instead of **57ms** on CPU, with no GPU on the query path.
 
 </div>
 
@@ -244,7 +244,7 @@ squints at the chart.
 
 - Dropping query-side inference costs **0.0093 NDCG@10**, 1.3% relative
 
-- It saves **53ms**, a **13x** cut
+- It saves **53ms**, a **13x** cut &mdash; but that is **CPU against CPU**, see two slides on
 
 - And it still beats BM25 by **+3.5% NDCG@10** at the same 4ms
 
@@ -272,6 +272,56 @@ work, which is exactly why those two bars look alike.
 
 So "inference-free" removes a model relative to full SPLADE. Relative to BM25 it
 removes nothing, both are a sparse dot product.
+-->
+
+---
+
+## "13x" is a CPU number
+
+Query encode only, batch size 1, median of 40 runs.
+
+| | CPU<br/>Core Ultra 7 155H | A10G GPU | BERT runs? |
+| --- | ---: | ---: | :---: |
+| `splade-v3` (full) | 23.1ms | **8.7ms** | yes |
+| `splade-v3-doc` (IF) | **2.0ms** | 2.9ms | **no** |
+
+<v-clicks>
+
+- A GPU buys full SPLADE only **2.7x** (23.1 &rarr; 8.7ms). A batch-of-1 BERT forward is latency-bound; there is nothing for the parallelism to do
+
+- Inference-free is **faster on CPU than on the A10G**, 2.0 against 2.9ms. No model to run, so the GPU only adds a round trip
+
+- And **1.8 of that 2.0ms is sentence-transformers overhead.** The tokenizer itself is **0.030ms**. Batched at 64 it drops to 0.111ms
+
+</v-clicks>
+
+<!--
+This is the slide to have ready when someone says "but we serve SPLADE on a
+GPU". They are right, and the answer is better than the 13x.
+
+The 57ms from the earlier chart was measured end to end through Qdrant on a
+CPU. I did not record the device at the time, which is the mistake. These
+numbers are torch.cuda.synchronize'd so they measure kernel work, not launch.
+
+The counter-intuitive row is the second one. Inference-free is SLOWER on the
+A10G. There is no model, so the GPU contributes nothing and the host-device
+round trip costs more than it saves. If you deploy this, do not put it on a
+GPU. That is not a disappointment, it is the whole point.
+
+2.7x is the number to remember for full SPLADE: a GPU does much less for
+interactive query encoding than people expect, because batch size 1 wastes it.
+GPUs earn their keep at INDEX time, where you batch thousands of documents.
+
+The third bullet is the one to be careful with, in both directions. My 2.0ms
+for inference-free is 94% Python framework overhead; the actual tokenize is
+0.030ms. So do not quote 2.0ms as the floor, a tight implementation is far
+under it, and the post's 0.3ms is a realistic deployment number.
+
+But the same overhead sits inside full SPLADE's 23.1ms too. Subtract it from
+both and you are comparing about 21ms of BERT against 0.03ms of tokenizing.
+The honest summary is that the ratio depends entirely on how much framework
+you leave in the measurement, which is exactly why I now report the device and
+the batch size on every latency number.
 -->
 
 ---
@@ -313,15 +363,26 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 <!--
-BM25 indexes 17-25x faster, on a CPU. 1,439 docs/sec against 58-83 for the IF
-models, which need a GPU at all.
+Two honest caveats on this chart, and I would give both.
 
-The one people get wrong: inference-free is not cheaper to index than full
-SPLADE, it is slightly dearer. 83 docs/sec against 98, because the asymmetric
-model expands harder to cover the missing query expansion.
+First, the BM25 bar depends entirely on the tokenizer you give it. A plain word
+tokenizer indexes at 13,778 docs/sec, 155x faster than SPLADE. Make BM25 pay
+the same BERT wordpiece SPLADE pays and it is 1,809, about 20x. Pick the
+comparison that matches what you would actually deploy.
 
-A million documents is 3.3 to 4.8 hours, once. After that every query is a
-sparse dot product.
+Second, and this corrects the write-up: all three SPLADE models index at the
+SAME speed, 89 docs/sec. An earlier version of this slide said inference-free
+was dearer to index, 83 against 98, and explained it with the extra expansion.
+That was three single passes in three different containers. Re-run properly,
+one GPU, alternating order, three repeats: 89.1, 89.4, 89.1. The variation
+within one model was bigger than the gap between them.
+
+The explanation was wrong too, which is why I should not have shipped it. They
+are the same BERT-base forward over the same tokens. How many non-zeros come
+out the other end does not change what the forward pass costs.
+
+A million documents is 3.1 hours on one A10G, once. After that every query is
+a sparse dot product.
 -->
 
 ---
@@ -440,13 +501,15 @@ Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
 
 <v-clicks>
 
-- Same doc encoder, same family, **still no model on the query path** &mdash; just a vocab-sized table of floats
+- Same doc encoder, same family. The query weight comes from a **vocab-sized table**, not a network
 
 - Wins on **10 of 13**: arguana +0.0741, scifact +0.0638, climatefever +0.0538. Loses on quora (-0.0283), fiqa (-0.0180), nq (-0.0016)
 
 - Beats *full* SPLADE outright on dbpedia, hotpotqa, msmarco and scifact
 
 - Across the 13 datasets, query non-zeros go **76** (full) &rarr; **21** (uniform) &rarr; **16** (learned). Learned is the *sparsest* of the three
+
+- **But not inference-free as shipped.** Its `modules.json` puts the Router *last*, so `encode_query` runs BERT, discards it, then reads the table. Measured: **1 BERT forward per query**, against 0 for `splade-v3-doc`
 
 </v-clicks>
 
@@ -471,6 +534,17 @@ and same doc encoder, so the weight scheme is the only thing that changed.
 OpenSearch ships a learned-weight model too and it lands at 0.6187 on the same
 panel, but it is a different model, so I would not read the difference between
 0.6187 and 0.6265 as being about weights.
+
+The packaging bug is the honest footnote and it is worth 30 seconds. I counted
+BERT forward calls: splade-v3-doc does 0 per query, splade-v3-lexical does 1.
+Its modules.json is [MLMTransformer, SpladePooling, Router] with the Router at
+the end, so the transformer runs and its output is thrown away.
+
+The QUALITY number is unaffected, 0.6265 is what the table produces and that is
+the model working as designed. The LATENCY benefit is simply not there out of
+the box: 24.7ms per query on CPU, the same as full SPLADE. Routing to the
+Router alone gives 0.47ms, but the vectors do not match yet, so I am not
+calling that a fix. It is an open packaging issue, not a result.
 -->
 
 ---

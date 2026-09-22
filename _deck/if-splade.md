@@ -17,7 +17,7 @@ class: 'text-left'
 
 <div class="mt-8 text-sm opacity-70">
 
-Full SPLADE quality at **4.3ms** instead of **57ms** on CPU, with no GPU on the query path.
+Almost SPLADE quality at ~8x faster queries, and ~19x faster at the tail.
 
 </div>
 
@@ -65,7 +65,7 @@ kshivendu.dev/blog/if-splade
 
 - **Inference-free SPLADE**: taking the model off the query path
 
-- What it costs, where it breaks, and who should not use it
+- What it costs, where it breaks, and how to take it to production?
 
 </v-clicks>
 
@@ -527,7 +527,7 @@ sentence-transformers path and the published one did not.
 
 ---
 
-## Where the 13x actually comes from
+## Where the speedup actually comes from
 
 <iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
         title="Query latency split into embed and search" />
@@ -1035,7 +1035,7 @@ actually use to decide.
 
 <v-clicks>
 
-- **Inference-free SPLADE nearly matches full SPLADE.** 0.93 NDCG@10 (1.3%) for a **13x** latency cut, 57ms to 4.3ms
+- **Inference-free SPLADE nearly matches full SPLADE.** 0.93 NDCG@10 (1.3%) for a **7.7x** median latency cut, 57.5ms to 7.5ms &mdash; and **18.7x** at p99
 
 - **The saving is one component.** The query encoder, 50ms of it. Search time does not change
 

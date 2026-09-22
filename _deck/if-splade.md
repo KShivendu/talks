@@ -175,6 +175,10 @@ selection problem. It has read the whole document. Let it choose the terms.
         disease      0.331   0.000    0.669   0.000  →  0.669   attack
           ⋮            ⋮       ⋮        ⋮       ⋮           ⋮
      words scored:     47      19       25       0      →  71 non-zero of 30,522
+
+  the indexed vector, a bag of weighted words:
+
+     { heart: 1.599, attack: 1.133, die: 0.773, cardiac: 0.767, ... 71 entries }
 ```
 
 </div>
@@ -183,9 +187,7 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 - Not "each token proposes its own words". **Every token scores the whole vocabulary**, then each word keeps its single best score
 
-- `stroke` is kept from **attack** (0.589), not `heart` (0.323). `cardiac` only **heart** ever scores
-
-- `[CLS]` scores **47** words, more than either real token. The summary position expands too
+- `stroke` is kept from **attack**, not `heart`. And `[CLS]` scores **47** words, more than either real token
 
 </v-clicks>
 

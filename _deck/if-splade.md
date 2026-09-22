@@ -576,7 +576,7 @@ Average non-zero terms per document, BEIR scifact:
 
 - It is trained knowing every query term arrives at **1.0**, so the document side has to carry the ranking alone
 
-- It expands in **breadth**, not weight: per term full SPLADE is actually *higher*
+- It expands in **breadth**, not weight: on a document where both put `car`, full SPLADE gives it **1.704** and inference-free **1.236**. More terms, each a little quieter
 
 </v-clicks>
 
@@ -601,7 +601,7 @@ get it back on every query forever.
 
 ---
 
-## The bill: free queries, expensive index
+## Pay once at index time, queries are free forever
 
 <iframe :src="chart('throughput')" class="w-full border-0" style="height: 356px"
         title="Document encoding throughput at index time" />

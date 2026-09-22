@@ -537,6 +537,12 @@ sentence-transformers path and the published one did not.
 <iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
         title="Query latency split into embed and search" />
 
+<div class="text-sm opacity-80 -mt-1">
+
+Search does get slower &mdash; **2.4ms** BM25, **3.0ms** inference-free, **5.0ms** full SPLADE. It is just not where the 50ms lives.
+
+</div>
+
 <script setup>
 import { useDarkMode } from '@slidev/client'
 const { isDark } = useDarkMode()
@@ -547,8 +553,23 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 Point at the red segment. Query embed is 50.0ms for full SPLADE and 0.3ms for
 IF. Search barely moves, 3.6 to 7.1ms for everything on the chart.
 
-Measured search-side p99s, since the chart only shows medians: full SPLADE
-14.1ms, IF 6.1ms, BM25 5.0ms. Search has a tail too, it is just a small one.
+If someone asks whether search itself gets slower: yes, and we measured it.
+Search-side p50 is 2.37ms for BM25, 2.97ms for inference-free, 5.04ms for full
+SPLADE -- so 1.25x and 2.1x over BM25. At p99: 4.8, 6.1, 14.1ms.
+
+The mechanism is query width. BM25 walks about 20 literal postings lists, the
+inference-free query about 47, full SPLADE's expanded query about 161. Measured
+cost of an extra query term is 5 to 11 microseconds.
+
+Give the caveat before they do: scifact is 5,183 documents, so this is close to
+a best case -- search here is mostly fixed overhead. SPLADE's index is far
+denser, 325 non-zeros a document against BM25's literal terms, and at 100M docs
+postings length is what dominates. We have not measured that, so I will not put
+a number on it.
+
+What makes it not matter at this scale: even with search 1.25x slower,
+inference-free is still 7.5ms end to end against 57.5ms. Dropping the encoder
+does not make search free, it removes the biggest term.
 
 IF's 0.3ms is a tokenizer call, not a model. BM25's 0.1ms is the same kind of
 work, which is exactly why those two bars look alike.
@@ -646,17 +667,15 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
-## Four things to get right
+## Limitations and gotchas
 
 <v-clicks>
 
-- **Pick an asymmetric model.** One trained for raw-token queries. Forcing the symmetric [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF mode costs **2.1 NDCG@10** and only ties BM25
+- **Pick an asymmetric model.** One trained for raw-token queries. Forcing normal SPLADE models [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF style can still match BM25
 
-- **Re-encode when your vocabulary moves.** New drug names, new products, breaking news: the doc encoder guesses the expansion ahead of time, so a fresh word needs a fresh pass
+- **Measure on your own data.** The margin over BM25 runs **+25.59** (nq) to **-11.06** (touche2020)
 
-- **Measure on your own data.** The margin over BM25 runs **+25.59** (nq) to **-11.06** (touche2020), and quora &mdash; where queries and docs already share words &mdash; still gives **+12.75**. "They already match" does not predict it
-
-- **Budget one GPU at index time.** That is the whole bill. After it, every query is free
+- **Account for increased index time.** That's the main cost wrt BM25. While query are cheap
 
 </v-clicks>
 

@@ -306,6 +306,7 @@ regularizer settings, so say that rather than guess.
 | mx | 11.15 | 1.64 |
 | master | 8.80 | 0.93 |
 | mouse | 8.56 | **2.31** |
+| wireless | 6.84 | 1.60 |
 | 3 | 2.28 | 0.55 |
 | *mice* | &mdash; | **1.99** |
 | *keyboard* | &mdash; | 1.07 |
@@ -342,6 +343,12 @@ Third bullet is the teaching point. BM25's ordering is driven by rarity, so
 "mx" at 11.15 outranks "mouse" at 8.56. SPLADE puts "mouse" first at 2.31,
 because that is what the listing is for. Rarity is a proxy for importance and a
 model that has read the text does not need the proxy.
+
+Why "logitech" is not a row: it is not a single BERT token, it is log + ##ite +
+##ch, so a word-level table cannot show it honestly. The document does carry
+those pieces at 0.644, 0.655, 0.656, and a query for "Logitech" scores 1.955
+here. Every token in the table above IS a single wordpiece, so the two columns
+are comparing the same thing.
 
 Do NOT raise the zeroed-brand problem here. This slide is still explaining what
 SPLADE is. It comes back on the limitations slide with the numbers, which is
@@ -1008,8 +1015,6 @@ previous one.
 - **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
 
 - **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+25.59** (nq) to **-11.06** (touche2020). Quora, where queries and docs already share words, still gives **+12.75** &mdash; so "they already match" is not the predictor
-
-- **Brands and model codes can vanish.** On a real Amazon listing, `logitech` is BM25's top term at **12.31** and SPLADE scores it **0.00**
 
 - **You need a GPU at index time**, and a re-encoding pipeline if the corpus churns
 

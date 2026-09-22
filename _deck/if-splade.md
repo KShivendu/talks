@@ -232,23 +232,55 @@ squints at the chart.
 
 ---
 
-## 13x faster, 1.3% worse
+## The gap gets bigger at the tail
 
-| | NDCG@10 | median latency |
-| --- | ---: | ---: |
-| SPLADE-Full (naver) | 0.7161 | 57.2ms |
-| **SPLADE-IF (naver)** | **0.7068** | **4.3ms** |
-| BM25 | 0.6830 | 4.0ms |
+End to end through Qdrant: encode **and** search, timed together. 600 samples, top-10.
+
+| | NDCG@10 | p50 | p90 | p99 | worst |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| SPLADE-Full (naver) | 0.7161 | 57.5ms | 113.0ms | **299.9ms** | 564ms |
+| **SPLADE-IF (naver)** | **0.7068** | **7.5ms** | 10.6ms | **16.0ms** | 21ms |
+| SPLADE-IF (OpenSearch) | 0.7021 | 5.6ms | 7.8ms | 11.8ms | 16ms |
+| BM25 | 0.6830 | 2.5ms | 3.3ms | 5.0ms | 6ms |
 
 <v-clicks>
 
+- At the median the gap is **7.7x**. At p99 it is **18.7x**
+
+- Full SPLADE's p99 is **5.2x its own median**. Inference-free's is **2.1x**
+
 - Dropping query-side inference costs **0.0093 NDCG@10**, 1.3% relative
 
-- It saves **53ms**, a **13x** cut &mdash; but that is **CPU against CPU**, see two slides on
-
-- And it still beats BM25 by **+3.5% NDCG@10** at the same 4ms
-
 </v-clicks>
+
+<!--
+Everything in this table is one run, one machine, one protocol, so the rows are
+comparable to each other. That matters more than any single value.
+
+The headline is the second column against the fourth. At the median full SPLADE
+is 7.7x slower. At the 99th percentile it is 18.7x. The advantage GROWS as you
+move into the tail, which is the opposite of what people assume, and the tail is
+where your SLO lives.
+
+Why: full SPLADE's p99 is 5.2x its own median, 57.5 to 299.9ms, because a BERT
+forward on a shared CPU competes with everything else on the box. Inference-free
+has nothing to compete with, so its p99 is only 2.1x its median.
+
+Two honest caveats and I would give both.
+
+First, this is a developer laptop with other work running, so the tail is worse
+than a dedicated box would show. I would argue that is realistic, a production
+server is also shared, but it is not a clean-room number.
+
+Second, the full-SPLADE row is a u8-quantized collection because the float one
+no longer exists. Quantization affects search, which is 5ms of that 57.5ms, so
+it cannot explain a 300ms p99. The encoder can.
+
+If someone asks why these differ from the blog: same p50 for full SPLADE, 57.5
+against the published 57.2, which is the check that the setup matches. The IF
+row is higher here, 7.5 against 4.3, because my encode goes through the full
+sentence-transformers path and the published one did not.
+-->
 
 ---
 
@@ -266,6 +298,9 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 <!--
 Point at the red segment. Query embed is 50.0ms for full SPLADE and 0.3ms for
 IF. Search barely moves, 3.6 to 7.1ms for everything on the chart.
+
+Measured search-side p99s, since the chart only shows medians: full SPLADE
+14.1ms, IF 6.1ms, BM25 5.0ms. Search has a tail too, it is just a small one.
 
 IF's 0.3ms is a tokenizer call, not a model. BM25's 0.1ms is the same kind of
 work, which is exactly why those two bars look alike.

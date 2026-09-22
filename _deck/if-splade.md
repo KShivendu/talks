@@ -161,33 +161,31 @@ selection problem. It has read the whole document. Let it choose the terms.
 <div class="text-xs leading-tight">
 
 ```
-       "heart attack"  through  naver/splade-v3-doc
-                     │
-                     │  wordpiece
-             ┌───────┴───────┐
-           heart           attack                2 tokens
-             │               │
-             └───── BERT ────┘                   12 layers
-                     │
-                 MLM head                        30,522 scores per token
-                     │                           the layer that guessed masked words
-              log(1 + ReLU(·))                   negatives vanish, big values squash
-                     │
-              max over tokens                    each word once, at its strongest
-                     ▼
-  ┌──────────────────────────────────────────────────────┐
-  │  heart 1.60   attack 1.13   cardiac 0.77   die 0.77  │   71 non-zero
-  │  stroke 0.59  card 0.57     corona 0.50    …         │   of 30,522
-  └──────────────────────────────────────────────────────┘
+  "heart attack"  →  [CLS]   heart   attack   [SEP]        4 positions, through BERT
+                        │       │        │       │
+     MLM head ──────────┴───────┴────────┴───────┘
+                        ↓       ↓        ↓       ↓
+     EVERY position scores ALL 30,522 words.  score = log(1 + ReLU(logit))
+
+                     [CLS]   heart   attack   [SEP]      max    kept from
+        heart        0.537   1.599    0.962   0.000  →  1.599   heart
+        attack       0.000   0.000    1.133   0.000  →  1.133   attack
+        cardiac      0.000   0.767    0.000   0.000  →  0.767   heart
+        stroke       0.000   0.323    0.589   0.000  →  0.589   attack
+        disease      0.331   0.000    0.669   0.000  →  0.669   attack
+          ⋮            ⋮       ⋮        ⋮       ⋮           ⋮
+     words scored:     47      19       25       0      →  71 non-zero of 30,522
 ```
 
 </div>
 
 <v-clicks>
 
-- One weight per **vocabulary** word, not per document word. Still a **sparse dot product**: same index, same engine as BM25
+- Not "each token proposes its own words". **Every token scores the whole vocabulary**, then each word keeps its single best score
 
-- `ReLU` is what makes it sparse: real documents average **325 of 30,522** non-zero, about **1%**
+- `stroke` is kept from **attack** (0.589), not `heart` (0.323). `cardiac` only **heart** ever scores
+
+- `[CLS]` scores **47** words, more than either real token. The summary position expands too
 
 </v-clicks>
 

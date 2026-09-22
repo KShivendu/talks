@@ -169,9 +169,9 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 - The two expansion sets share **1 of 23** terms, and it is `mice`. A synonym list has one entry for `mouse`
 
-- `java` is starker: *indonesia, trek, vacation* against *deploy, language, azure*. **Zero** overlap
+- `spring` is starker: *flowers, bulbs, bloom* against *doors, hinges, locks*. **Zero** overlap
 
-- This happens at **index time**, where the model still runs &mdash; so inference-free keeps every bit of it
+- All of this happens on the **document**, at index time. The query side does none of it
 
 </v-clicks>
 
@@ -185,16 +185,16 @@ Point at "mice" appearing on BOTH sides, at 2.06 and 1.62. That is the honest
 detail and it usually gets a laugh: the model thinks the plural of a computer
 mouse is mice too, and it is not clear it is wrong.
 
-If the room is technical and you want it starker, java gives zero overlap:
-indonesia 1.41, trek 1.12, vacation 0.94 for the island, against deploy 1.27,
-language 1.26, azure 1.04 for the runtime.
+If you want it starker, spring gives zero overlap and needs no explaining at
+all. "The daffodils come up in early spring, before the tulips" adds flower
+1.34, bulbs 1.10, bloom 0.95, april 0.78. "The spring in the latch snapped and
+the door swung open" adds doors 1.31, hinges 1.18, locks 1.27, swing 1.31.
+Nothing in common.
 
-The third bullet is the one to land, because it pre-empts the obvious worry
-about the whole talk. All of this contextual work happens on the DOCUMENT, at
-index time, where the model is still running. Inference-free changes nothing
-about it. What inference-free gives up is only the query side, and the query
-side was never doing the contextual part -- "apple pie recipe" and "apple
-battery replacement" both arrive as three raw tokens at weight 1.0 either way.
+The third bullet is quiet here on purpose. Just plant it: the contextual work
+is document-side. You cash it in later, when the query encoder comes off --
+that is the slide where this fact stops being trivia and becomes the reason the
+whole idea works.
 
 Measured by research/if-splade/contextual_expansion.py.
 -->
@@ -391,6 +391,8 @@ in the query path to be that fast at all.
 - No model, no GPU, no inference on the query path
 
 - Pay once, upfront. Queries stay fast
+
+- And remember the `mouse` slide: the contextual expansion was **all document-side**. None of it is lost here
 
 </v-clicks>
 

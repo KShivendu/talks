@@ -77,11 +77,11 @@ kshivendu.dev/blog/if-splade
 
 <v-clicks>
 
-- Fast, no GPU, and standard baseline for any dataset
+- Fast, no GPU, and standard baseline
 
-- It matches **terms**, not meaning
+- Matches **terms**, not meaning
 
-- A query for `cardiac arrest` will not retrieve a document that says `heart attack`
+- `cardiac arrest` will not retrieve `heart attack`
 
 - That document might be the best answer in the corpus
 
@@ -137,13 +137,13 @@ this is the answer: a third of the signal is spelling.
 
 <v-clicks>
 
-- SPLADE runs a neural model at **query** time as well as index time
+- SPLADE runs a neural network (transformer) at **query** time as well as index time
 
-- That adds **50-100ms** per query
+- That adds **20-50ms** per query
 
 - BM25 answers in ~4ms
 
-- So you buy relevance with the cost of ~10x latency and expensive GPUs
+- So you buy relevance with the cost of ~10x latency and maybe even expensive GPUs
 
 </v-clicks>
 
@@ -276,52 +276,49 @@ removes nothing, both are a sparse dot product.
 
 ---
 
-## "13x" is a CPU number
+## The tail, not just the median
 
-Query encode only, batch size 1, median of 40 runs.
+1,000 samples, batch 1, cycling the real 300 scifact queries. Query encode only.
 
-| | CPU<br/>Core Ultra 7 155H | A10G GPU | BERT runs? |
-| --- | ---: | ---: | :---: |
-| `splade-v3` (full) | 23.1ms | **8.7ms** | yes |
-| `splade-v3-doc` (IF) | **2.0ms** | 2.9ms | **no** |
+| | CPU p50 | CPU p99 | A10G p50 | A10G p99 |
+| --- | ---: | ---: | ---: | ---: |
+| `splade-v3` (full) | 42.9ms | 71.2ms | 7.2ms | 7.6ms |
+| `splade-v3-doc` (IF) | **1.8ms** | **2.7ms** | 2.6ms | 2.7ms |
+| `splade-v3-lexical` | 48.2ms | 75.5ms | 7.2ms | 7.5ms |
 
 <v-clicks>
 
-- A GPU buys full SPLADE only **2.7x** (23.1 &rarr; 8.7ms). A batch-of-1 BERT forward is latency-bound; there is nothing for the parallelism to do
+- **A CPU has a tail; a GPU does not.** Full SPLADE on CPU: p99/p50 = **1.66**, worst sample **144ms**. On the A10G: **1.06**, worst **9.9ms**. Standard deviation 10.5ms against 0.15ms
 
-- Inference-free is **faster on CPU than on the A10G**, 2.0 against 2.9ms. No model to run, so the GPU only adds a round trip
+- **Inference-free on CPU beats full SPLADE on a GPU at both ends**: 1.8 vs 7.2 at p50, 2.7 vs 7.6 at p99
 
-- And **1.8 of that 2.0ms is sentence-transformers overhead.** The tokenizer itself is **0.030ms**. Batched at 64 it drops to 0.111ms
+- `splade-v3-lexical` is **slower than the full model** on CPU. It runs BERT *and* then the table
 
 </v-clicks>
 
 <!--
-This is the slide to have ready when someone says "but we serve SPLADE on a
-GPU". They are right, and the answer is better than the 13x.
+This is the slide for anyone who runs a search system, because nobody is paged
+about a median.
 
-The 57ms from the earlier chart was measured end to end through Qdrant on a
-CPU. I did not record the device at the time, which is the mistake. These
-numbers are torch.cuda.synchronize'd so they measure kernel work, not launch.
+The shape is the point. On CPU, full SPLADE's p99 is 71ms and the worst single
+sample was 144ms, over three times the median. That is BERT competing with
+everything else on the box: scheduling, thermal, other tenants. On the A10G the
+p99 is 7.6 against a 7.2 median and the standard deviation is 0.15ms. The GPU
+is not only faster, it is boring, and boring is what you want in an SLO.
 
-The counter-intuitive row is the second one. Inference-free is SLOWER on the
-A10G. There is no model, so the GPU contributes nothing and the host-device
-round trip costs more than it saves. If you deploy this, do not put it on a
-GPU. That is not a disappointment, it is the whole point.
+Second bullet is the one to leave up. Inference-free on a CPU is faster at the
+99th percentile, 2.7ms, than full SPLADE is at the MEDIAN on a rented A10G,
+7.2ms. That is the deployment argument in one line.
 
-2.7x is the number to remember for full SPLADE: a GPU does much less for
-interactive query encoding than people expect, because batch size 1 wastes it.
-GPUs earn their keep at INDEX time, where you batch thousands of documents.
+Third bullet is the packaging bug biting: splade-v3-lexical at 48.2ms is slower
+than the full model's 42.9ms, because it pays the BERT forward and then does
+the table lookup on top.
 
-The third bullet is the one to be careful with, in both directions. My 2.0ms
-for inference-free is 94% Python framework overhead; the actual tokenize is
-0.030ms. So do not quote 2.0ms as the floor, a tight implementation is far
-under it, and the post's 0.3ms is a realistic deployment number.
-
-But the same overhead sits inside full SPLADE's 23.1ms too. Subtract it from
-both and you are comparing about 21ms of BERT against 0.03ms of tokenizing.
-The honest summary is that the ratio depends entirely on how much framework
-you leave in the measurement, which is exactly why I now report the device and
-the batch size on every latency number.
+Honesty note if anyone asks why this differs from the write-up: the post's
+50.0ms is about right. I earlier measured 23ms on five short hand-picked
+queries, which was the unrepresentative number -- those averaged 8.6 wordpieces
+against the real queries' 20.1. Longer queries, more compute. Always benchmark
+the query distribution you actually serve.
 -->
 
 ---

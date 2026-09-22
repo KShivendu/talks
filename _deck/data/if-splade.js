@@ -128,20 +128,35 @@ export const nanoGap = {
   colors: [GREY_L, GREY_D, AMARANTH],
 }
 
-// Recall@10 at the mean and at two percentiles, POOLED over all 649 NanoBEIR
-// queries -- a real percentile of the query population, not an average of each
-// dataset's own p25. Source: nanobeir_full_results.json, the `pooled` block.
+// Recall@10 per dataset at two percentiles and the mean, for BM25, full SPLADE
+// and inference-free. Source: nanobeir_full_results.json, `per_dataset`.
 //
-// Charted as absolute values, three bars per statistic, because a DELTA between
-// two distributions' p25 is not the p25 of anything: no single query moved by
-// that amount. The absolute bars say what actually happens to a hard query.
+// Absolute values, three bars per dataset, because a DELTA between two
+// distributions' p25 is not the p25 of anything: no single query moved by that
+// amount. The bars carry the values and the reader does the comparison.
 //
-// The point of the chart: at the median the three systems are 53.3 / 100 / 100,
-// so for half the queries the choice of retriever barely matters. At p25 they
-// are 14.1 / 26.1 / 20.0, and the choice matters enormously.
+// Read p25 as a cliff, not a gradient. NanoBEIR queries often have a single
+// relevant document, so recall@10 per query is close to binary, and the p25 bar
+// answers one question: does the worst quarter of queries find anything at all?
+// It is 0 on six datasets for BM25, three for inference-free, one for full
+// SPLADE. The two where inference-free falls back to a BM25-like zero are
+// arguana and climatefever.
 export const recallTail = {
-  categories: ['p25 (hardest quarter)', 'p50 (median query)', 'mean'],
-  bm25: [14.06, 53.33, 57.44],
-  full: [26.09, 100.00, 65.71],
-  inferenceFree: [20.00, 100.00, 63.62],
+  categories: ['nq', 'msmarco', 'fiqa', 'quora', 'dbpedia', 'fever', 'hotpotqa',
+    'scifact', 'nfcorpus', 'arguana', 'scidocs', 'climatefever', 'touche2020'],
+  p25: {
+    bm25: [0.0, 0.0, 0.0, 100.0, 15.7, 100.0, 100.0, 100.0, 0.0, 0.0, 5.0, 0.0, 19.2],
+    full: [100.0, 100.0, 21.3, 100.0, 15.3, 100.0, 50.0, 100.0, 0.0, 100.0, 20.0, 21.3, 18.5],
+    inferenceFree: [100.0, 100.0, 5.0, 100.0, 16.3, 100.0, 100.0, 100.0, 0.0, 0.0, 20.0, 0.0, 15.8],
+  },
+  p50: {
+    bm25: [100.0, 100.0, 50.0, 100.0, 25.0, 100.0, 100.0, 100.0, 5.7, 100.0, 20.0, 33.3, 33.3],
+    full: [100.0, 100.0, 50.0, 100.0, 28.5, 100.0, 100.0, 100.0, 5.8, 100.0, 40.0, 33.3, 26.9],
+    inferenceFree: [100.0, 100.0, 50.0, 100.0, 27.0, 100.0, 100.0, 100.0, 5.3, 100.0, 25.0, 33.3, 28.6],
+  },
+  mean: {
+    bm25: [66.0, 68.0, 48.1, 92.1, 35.0, 92.0, 88.0, 83.0, 13.9, 58.0, 30.0, 37.1, 35.1],
+    full: [86.0, 90.0, 58.0, 97.6, 38.7, 98.3, 86.0, 89.0, 16.1, 84.0, 36.9, 39.6, 33.4],
+    inferenceFree: [86.0, 92.0, 56.7, 96.3, 38.4, 96.0, 90.0, 89.0, 14.3, 72.0, 30.8, 32.0, 32.8],
+  },
 }

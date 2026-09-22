@@ -667,16 +667,10 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
-## The median query barely notices. The hard quarter does.
+## Does the hardest quarter of queries find anything?
 
-<iframe :src="chart('recall-tail')" class="w-full border-0" style="height: 342px"
-        title="Recall@10 at p25, p50 and the mean for BM25, full SPLADE and inference-free" />
-
-<div class="text-sm opacity-80 -mt-1">
-
-Half your queries are fine on BM25. The bottom quarter is where a model earns its keep.
-
-</div>
+<iframe :src="chart('recall-tail')" class="w-full border-0" style="height: 430px"
+        title="Recall@10 per dataset at p25, p50 and the mean" />
 
 <script setup>
 import { useDarkMode } from '@slidev/client'
@@ -685,22 +679,28 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 <!--
-This is the slide I would defend hardest, because every other chart in the deck
-is a mean and a mean is the wrong summary here.
+Every other chart in the deck is a mean, and the mean is the wrong summary here.
+Start on p25 and let them look before saying anything.
 
-Read the middle cluster first. At the MEDIAN query, full SPLADE and
-inference-free both score 100 on recall@10 -- everything relevant is in the top
-ten -- and BM25 gets 53. Then the left cluster: at p25, the hardest quarter,
-the three are 14, 26 and 20. That is where the systems actually separate.
+Read p25 as a cliff, not a gradient. NanoBEIR queries usually have one relevant
+document, so recall@10 per query is close to binary and the p25 bar answers one
+question: does the worst quarter of queries find anything at all? BM25 is at
+zero on six of thirteen -- nq, msmarco, fiqa, nfcorpus, arguana, climatefever.
+Full SPLADE is at zero on one, nfcorpus. Inference-free is at zero on three:
+nfcorpus, and then arguana and climatefever, where it falls back to BM25-like
+behaviour.
 
-The mean, on the right, is the least informative of the three. 57 / 66 / 64
-makes the three look closer than they are anywhere in the distribution.
+nq and msmarco are the headline: BM25's worst quarter finds NOTHING, both
+SPLADEs find everything. That is the whole case for a learned sparse model, and
+it is invisible in the means, where those datasets read 66 vs 86 and 68 vs 90.
 
-Absolute bars, not differences, on purpose. A delta between two distributions'
-p25 values is not the p25 of anything: no single query moved by that amount.
+Then switch to p50 and let it land: at the median the three are almost
+identical, 100 across the board on eight datasets. Half your traffic does not
+care which retriever you run. The mean view is last because it is the least
+informative of the three -- it blends the cliff and the flat part together.
 
-649 queries pooled across the 13 datasets, so these are real percentiles of the
-query population rather than an average of each dataset's own quartile.
+Pair with the NDCG@10 numbers if asked: macro p25 is 24.7 BM25, 45.7 full,
+38.3 inference-free, against means of 53.6, 63.4 and 60.0.
 -->
 
 ---

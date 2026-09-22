@@ -487,9 +487,10 @@ End to end: encode **and** search, timed together. BEIR scifact, 5,183 docs, the
 | SPLADE-IF (OS) | 70.21 | 5.6ms | 7.8ms | 11.8ms | 16ms |
 | BM25 | 68.30 | 2.5ms | 3.3ms | 5.0ms | 6ms |
 
-<v-clicks>
+<v-clicks depth="2">
 
-- Inference-free lands **near BM25's speed** and keeps SPLADE's quality: 7.5ms against 2.5ms, 70.68 against 68.30
+- Inference-free lands **near BM25's speed** and keeps SPLADE's quality: 
+    - 7.5ms against 2.5ms, 70.68 against 68.30
 
 - Full SPLADE is **8x slower at the median and 19x at p99**, for 0.93 more NDCG@10
 
@@ -527,48 +528,6 @@ If someone asks why these differ from the blog: same p50 for full SPLADE, 57.5
 against the published 57.2, which is the check that the setup matches. The IF
 row is higher here, 7.5 against 4.3, because my encode goes through the full
 sentence-transformers path and the published one did not.
--->
-
----
-
-## The tail, not just the median
-
-1,000 samples, batch 1, cycling the real 300 scifact queries. Query encode only.
-
-| | CPU p50 | CPU p99 | A10G p50 | A10G p99 |
-| --- | ---: | ---: | ---: | ---: |
-| `splade-v3` (full) | 42.9ms | 71.2ms | 7.2ms | 7.6ms |
-| `splade-v3-doc` (IF) | **1.8ms** | **2.7ms** | 2.6ms | 2.7ms |
-
-<v-clicks>
-
-- **A CPU has a tail; a GPU does not.** Full SPLADE on CPU: p99/p50 = **1.66**, worst sample **144ms**. On the A10G: **1.06**, worst **9.9ms**. Standard deviation 10.5ms against 0.15ms
-
-- **Inference-free on CPU beats full SPLADE on a GPU at both ends**: 1.8 vs 7.2 at p50, 2.7 vs 7.6 at p99
-
-
-</v-clicks>
-
-<!--
-This is the slide for anyone who runs a search system, because nobody is paged
-about a median.
-
-The shape is the point. On CPU, full SPLADE's p99 is 71ms and the worst single
-sample was 144ms, over three times the median. That is BERT competing with
-everything else on the box: scheduling, thermal, other tenants. On the A10G the
-p99 is 7.6 against a 7.2 median and the standard deviation is 0.15ms. The GPU
-is not only faster, it is boring, and boring is what you want in an SLO.
-
-Second bullet is the one to leave up. Inference-free on a CPU is faster at the
-99th percentile, 2.7ms, than full SPLADE is at the MEDIAN on a rented A10G,
-7.2ms. That is the deployment argument in one line.
-
-
-Honesty note if anyone asks why this differs from the write-up: the post's
-50.0ms is about right. I earlier measured 23ms on five short hand-picked
-queries, which was the unrepresentative number -- those averaged 8.6 wordpieces
-against the real queries' 20.1. Longer queries, more compute. Always benchmark
-the query distribution you actually serve.
 -->
 
 ---

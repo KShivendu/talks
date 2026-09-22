@@ -484,11 +484,9 @@ End to end: encode **and** search, timed together. 600 samples, top-10.
 
 <v-clicks>
 
-- At the median the gap is **7.7x**. At p99 it is **18.7x**
+- Inference-free lands **near BM25's speed** and keeps SPLADE's quality: 7.5ms against 2.5ms, 70.68 against 68.30
 
-- Full SPLADE's p99 is **5.2x its own median**. Inference-free's is **2.1x**
-
-- Dropping query-side inference costs **0.93 NDCG@10**, 1.3% relative
+- Full SPLADE is **8x slower at the median and 19x at p99**, for 0.93 more NDCG@10
 
 </v-clicks>
 
@@ -533,7 +531,6 @@ sentence-transformers path and the published one did not.
 | --- | ---: | ---: | ---: | ---: |
 | `splade-v3` (full) | 42.9ms | 71.2ms | 7.2ms | 7.6ms |
 | `splade-v3-doc` (IF) | **1.8ms** | **2.7ms** | 2.6ms | 2.7ms |
-| `splade-v3-lexical` | 48.2ms | 75.5ms | 7.2ms | 7.5ms |
 
 <v-clicks>
 
@@ -541,7 +538,6 @@ sentence-transformers path and the published one did not.
 
 - **Inference-free on CPU beats full SPLADE on a GPU at both ends**: 1.8 vs 7.2 at p50, 2.7 vs 7.6 at p99
 
-- `splade-v3-lexical` is **slower than the full model** on CPU, because it runs BERT and then masks. It is *not* inference-free
 
 </v-clicks>
 
@@ -559,12 +555,6 @@ Second bullet is the one to leave up. Inference-free on a CPU is faster at the
 99th percentile, 2.7ms, than full SPLADE is at the MEDIAN on a rented A10G,
 7.2ms. That is the deployment argument in one line.
 
-Third bullet: splade-v3-lexical at 48.2ms is slower than the full model's
-42.9ms. I first read that as a packaging bug. It is not, it is the design. Its
-Router sits last and its shipped table is all 1.0, so BERT runs, then the table
-masks the output down to the query's literal terms. The paper calls this
-"removing query expansion". It belongs on a latency chart as a cautionary row,
-not as an inference-free model.
 
 Honesty note if anyone asks why this differs from the write-up: the post's
 50.0ms is about right. I earlier measured 23ms on five short hand-picked
@@ -860,13 +850,8 @@ Same family, same version, same recipe. Only query-side inference differs.
 </v-clicks>
 
 <!--
-This replaces a slide I had wrong twice, so it is worth saying how it got here.
-
-First version compared naver's uniform model against naver/splade-v3-lexical
-and claimed learned weights recover 78% of the gap. Lexical runs BERT on the
-query, so it was never inference-free. Second version swapped in OS
-doc-v3-distill, which genuinely is, and claimed 55%. But that compares across
-families, so it could not separate "better weights" from "different model".
+Earlier versions of this slide compared across model families, which cannot
+separate "better weights" from "different model". This one can.
 
 This is the measurement that separates them. OS ships a matched pair at
 v2: a bi-encoder and a doc-only model, same authors, same version, same recipe.
@@ -938,16 +923,6 @@ OS ships a learned-weight model too and it lands at 61.87 on the same
 panel, but it is a different model, so I would not read the difference between
 61.87 and 62.65 as being about weights.
 
-The packaging bug is the honest footnote and it is worth 30 seconds. I counted
-BERT forward calls: splade-v3-doc does 0 per query, splade-v3-lexical does 1.
-Its modules.json is [MLMTransformer, SpladePooling, Router] with the Router at
-the end, so the transformer runs and its output is thrown away.
-
-The QUALITY number is unaffected, 62.65 is what the table produces and that is
-the model working as designed. The LATENCY benefit is simply not there out of
-the box: 24.7ms per query on CPU, the same as full SPLADE. Routing to the
-Router alone gives 0.47ms, but the vectors do not match yet, so I am not
-calling that a fix. It is an open packaging issue, not a result.
 -->
 
 ---

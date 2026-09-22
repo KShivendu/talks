@@ -3,7 +3,7 @@ import { ifSpread } from '@data/if-splade'
 import { mount } from './mount.jsx'
 import { qdrantChrome } from './qdrant-chrome.js'
 
-// Two views behind a toggle, because the two comparisons answer different
+// Three views behind a toggle, because the comparisons answer different
 // questions and showing only the second made a 10-of-13 win look like a loss.
 // Amaranth where inference-free is ahead, grey where it is behind, in both.
 const AMARANTH = '#dc244c'
@@ -33,8 +33,9 @@ mount(
     barGap={0.32}
     chrome={qdrantChrome}
     views={[
-      view('vs BM25', ifSpread.vsBM25, 'NDCG@10, inference-free minus BM25'),
-      view('vs full SPLADE', ifSpread.vsFull, 'NDCG@10, inference-free minus full'),
+      view('IF vs BM25', ifSpread.vsBM25, 'NDCG@10, inference-free minus BM25'),
+      view('full vs BM25', ifSpread.fullVsBM25, 'NDCG@10, full SPLADE minus BM25'),
+      view('IF vs full', ifSpread.vsFull, 'NDCG@10, inference-free minus full'),
     ]}
   />
 )

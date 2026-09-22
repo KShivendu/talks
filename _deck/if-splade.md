@@ -65,7 +65,7 @@ kshivendu.dev/blog/if-splade
 
 - **Inference-free SPLADE**: taking the model off the query path
 
-- What it costs, where it breaks, and how to take it to production?
+- What it costs, where it wins and loses, and how to ship it
 
 </v-clicks>
 
@@ -713,7 +713,7 @@ You are buying speed with precision, which is a real trade, not a bug.
 
 <div class="text-sm opacity-80 -mt-1">
 
-Toggle the view. Mean margin over BM25 is **+5.26**, and the three losses are **touche2020**, **climatefever**, **scidocs**.
+Toggle the view. Inference-free beats BM25 by **+5.26** mean, full SPLADE by **+8.59** — same datasets win and lose in both.
 
 </div>
 
@@ -790,178 +790,25 @@ answer, plus anything where you cannot afford a GPU at index time.
 
 ---
 
-## What inference-free costs depends who built it
-
-Same family, same version, same recipe. Only query-side inference differs.
-
-| family | full | inference-free | cost |
-| --- | ---: | ---: | ---: |
-| OS `v2-distill` | 62.59 | **61.73** | **-0.86** |
-| naver `splade-v3` | 63.37 | 60.04 | **-3.33** |
+## Four things to get right
 
 <v-clicks>
 
-- Nearly **4x** difference in what the same design decision costs
+- **Pick an asymmetric model.** One trained for raw-token queries. Forcing the symmetric [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF mode costs **2.1 NDCG@10** and only ties BM25
 
-- It is **not** the IDF table. Grafting OS's `idf.json` onto naver's doc vectors **loses 1.21**; corpus IDF loses 1.01
+- **Re-encode when your vocabulary moves.** New drug names, new products, breaking news: the doc encoder guesses the expansion ahead of time, so a fresh word needs a fresh pass
 
-- For a model trained to expect weight 1.0, **uniform is the best query weighting there is**
+- **Measure on your own data.** The margin over BM25 runs **+25.59** (nq) to **-11.06** (touche2020), and quora &mdash; where queries and docs already share words &mdash; still gives **+12.75**. "They already match" does not predict it
 
-- BM25 sits at **54.79**. Both inference-free models clear it by 5 to 7
+- **Budget one GPU at index time.** That is the whole bill. After it, every query is free
 
 </v-clicks>
 
 <!--
-Earlier versions of this slide compared across model families, which cannot
-separate "better weights" from "different model". This one can.
-
-This is the measurement that separates them. OS ships a matched pair at
-v2: a bi-encoder and a doc-only model, same authors, same version, same recipe.
-Dropping query inference inside that family costs 0.86. Doing it inside naver's
-costs 3.33.
-
-And the second bullet is the one that kills the weights story outright. I took
-OS's actual shipped idf.json, grafted it onto naver's document vectors,
-and it LOST 1.21. Corpus IDF computed from the dataset itself lost 1.01. Every
-weighting scheme I tried was worse than uniform.
-
-Why: splade-v3-doc was trained knowing every query term arrives at exactly 1.0.
-Its document weights are calibrated against that. Reweighting the query
-afterwards feeds it a distribution it never saw. Same lesson as forcing a
-symmetric model inference-free.
-
-So the honest claim is not "learned weights fix it". It is "how much
-inference-free costs is a property of how the family was trained for it", and
-the range across two real families is 0.86 to 3.33.
--->
-
----
-
-## What changed: the query gets IDF, still no model
-
-Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
-
-| term | `splade-v3-doc` | `OS doc-v3-distill` |
-| --- | ---: | ---: |
-| elderly | 1.000 | **7.009** |
-| cardiac | 1.000 | **6.533** |
-| the | 1.000 | **0.135** |
-
-<v-clicks>
-
-- Both run **zero BERT forwards** on the query. Verified by counting calls
-
-- The weights ship in the repo: `idf.json`, a 30,522-float table, range **0.016 to 15.59**
-
-- Wins **7 of 13**, mean **+1.83**: fever +8.17, arguana +6.52, climatefever +6.49. Loses fiqa (-2.87)
-
-- Beats *full* SPLADE outright on **fever, quora, climatefever, hotpotqa**
-
-</v-clicks>
-
-<!--
-This is the part of the talk I would build a project on if I were in the room.
-"Inference-free" is usually explained as "throw the query encoder away and use
-raw tokens". That is only one design. The query side still gets to have
-parameters, as long as they are a table you index into rather than a network
-you run. OS ships exactly that: idf.json, right there in the repo.
-
-Point at the last row. "the" gets 0.135 while "cardiac" gets 6.533, a 48x
-spread, and the uniform model gives both exactly 1.0. That is the entire
-difference and it costs one array lookup.
-
-The weights on the slide are measured, not illustrative:
-research/if-splade/query_weights.py runs that exact query through both models.
-"in" and "the" come back at exactly zero and drop out, which is why the learned
-query is SPARSER than the uniform one, 16 non-zeros against 21.
-
-Worth pointing at "elderly" beating "cardiac". The table is not hand-written
-IDF from your corpus, it is learned during distillation, so it can disagree
-with your intuition about which word matters.
-
-Caveat to say out loud: uniform-vs-learned here is the naver pair, same family
-and same doc encoder, so the weight scheme is the only thing that changed.
-OS ships a learned-weight model too and it lands at 61.87 on the same
-panel, but it is a different model, so I would not read the difference between
-61.87 and 62.65 as being about weights.
-
--->
-
----
-
-## Which queries actually break?
-
-scifact, 300 queries, full SPLADE against inference-free:
-
-<div class="grid grid-cols-3 gap-4 my-4 text-center">
-<div class="p-3 rounded" style="background: rgba(138,144,153,0.12)">
-<div class="text-3xl font-bold">70%</div><div class="text-xs opacity-70">identical ranking</div></div>
-<div class="p-3 rounded" style="background: rgba(220,36,76,0.12)">
-<div class="text-3xl font-bold" style="color:#dc244c">17%</div><div class="text-xs opacity-70">IF worse</div></div>
-<div class="p-3 rounded" style="background: rgba(138,144,153,0.12)">
-<div class="text-3xl font-bold">13%</div><div class="text-xs opacity-70">IF better</div></div>
-</div>
-
-<v-clicks>
-
-- The worst **10** queries carry **47%** of all the NDCG lost
-
-- All three total failures (1.00 &rarr; 0.00) hinge on words BERT's vocabulary does not have, so they shatter into pieces that each get weight 1.0:
-  - *schimmelpenning / feuerstein / mims*, *golli / anergic*, *glycolysis / glycometabolic*
-
-- Query length does **not** predict it: losers average 12.7 words, everyone else 12.5
-
-</v-clicks>
-
-<!--
-This is the slide that changes how you'd fix it. "1.3% worse on average" sounds
-like every query got slightly worse. It is not what happens. Seven queries in
-ten rank identically. The average is made almost entirely by a handful of
-catastrophes.
-
-And the catastrophes have a shape. None of those words are in BERT's 30k
-wordpiece vocabulary, so each one shatters, and with uniform weight 1.0 every
-fragment counts the same as "the". Full SPLADE reads the context and puts
-weight back on the rare pieces. Inference-free cannot.
-
-Note glycolysis is not exotic, it is a first-year biology word. It still
-shatters. So the failure mode is not "rare jargon", it is "out of vocabulary",
-and those are not the same set.
-
-One thing to square with the earlier slide: there I said long queries are where
-inference-free struggles, across datasets. Here, WITHIN scifact, length does
-not separate winners from losers at all, 12.7 against 12.5 words. Both are
-true. Across corpora the length range is 15 to 193 words; inside scifact every
-query is about 13. You cannot see a length effect in a sample with no length
-variation.
-
-Which is the same diagnosis as the previous slide, from the other direction:
-the problem is unweighted query terms, not missing expansion.
-
-If you want a 10-minute version of this talk: it is this slide plus the
-previous one.
--->
-
----
-
-## Who should not use this
-
-<v-clicks>
-
-- **Pick an asymmetric model.** Forcing the symmetric [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF mode costs **2.1 NDCG@10** and only ties BM25
-
-- **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
-
-- **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+25.59** (nq) to **-11.06** (touche2020). Quora, where queries and docs already share words, still gives **+12.75** &mdash; so "they already match" is not the predictor
-
-- **You need a GPU at index time**, and a re-encoding pipeline if the corpus churns
-
-</v-clicks>
-
-<!--
-Ship the limitations slide. This is where the credibility comes back after four
-slides of wins, and in a course full of practitioners it is the slide they will
-actually use to decide.
+Frame this as the setup checklist, not a list of caveats. Same four facts a
+practitioner needs, but they walk out with something to do rather than a reason
+not to. The quora number is the one to dwell on: the obvious intuition about
+when SPLADE helps is simply wrong, so run it yourself.
 -->
 
 ---

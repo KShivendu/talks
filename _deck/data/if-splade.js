@@ -100,6 +100,12 @@ export const ifSpread = {
     -3.07, -6.55, -14.44],
   vsFull: [-0.54, -2.66, -0.34, -1.99, -3.64, -4.14, 1.54, -4.68, -3.35, -8.24,
     -5.47, -6.34, -3.38],
+  // Full SPLADE (naver/splade-v3) minus BM25, same 13 datasets, same order.
+  // The third view: shows the same shape as inference-free, so the ranking of
+  // which datasets sparse retrieval wins on is a property of SPLADE, not of
+  // dropping the query encoder.
+  fullVsBM25: [25.59, 21.25, 15.08, 12.75, 13.09, 9.55, 1.17, 7.38, 5.76, 8.85,
+    2.40, -0.21, -11.06],
 }
 
 

@@ -687,6 +687,57 @@ a sparse dot product.
 
 ---
 
+## Your engine matters, and it matters most here
+
+Same models, same corpus. Qdrant scores exact floats; Lucene quantizes to integers.
+
+| NDCG@10 | Qdrant | Lucene | cost |
+| --- | ---: | ---: | ---: |
+| SPLADE-Full (naver) | 71.61 | 71.56 | **-0.05** |
+| **SPLADE-IF (naver)** | **70.68** | **69.53** | **-1.15** |
+| BM25 | 68.30 | 67.89 | -0.41 |
+
+<v-clicks>
+
+- **OS** and **Elasticsearch** quantize too. None of the three do exact float sparse scoring
+
+- Both IF models pay **1.15 to 1.35**. Full SPLADE pays **0.05**. Roughly **27x** more
+
+- Probably because inference-free puts **all** the ranking signal in the doc weights. The query is uniform 1.0
+
+- Not free either way: integer search is **faster** for IF (4.0 &rarr; 3.0ms), **slower** for BM25 (3.8 &rarr; 5.5ms)
+
+</v-clicks>
+
+<!--
+This is the most practically useful slide in the deck for anyone who already
+runs Elasticsearch or OpenSearch, and it is the thing the write-up buried in a
+collapsed section.
+
+The column that matters is the last one. Full SPLADE loses 0.05 to integer
+quantization, which is nothing. Inference-free loses 1.15 to 1.55. Same
+quantization, same corpus, twenty-seven times the damage.
+
+The explanation in the third bullet is mine and it is a hypothesis, not a
+measurement, so say it that way. Full SPLADE has weighted terms on BOTH sides,
+so even after you round the document weights the query weights still sort the
+results. Inference-free sends every query term at exactly 1.0, so the document
+weights are the only thing doing any ranking, and rounding them is rounding
+everything. If someone wants it tested, the experiment is one line: quantize D
+and rescore.
+
+Practical upshot to say plainly. If you are on Elasticsearch or OpenSearch,
+budget about a point and a half for inference-free that you would not pay for
+full SPLADE. It is still ahead of BM25 there, 69.53 against 67.89, just by less
+than the Qdrant numbers promise.
+
+And the last bullet keeps it honest in the other direction: the integer
+arithmetic genuinely is faster for the sparse vectors, 4.0ms down to 3.0ms.
+You are buying speed with precision, which is a real trade, not a bug.
+-->
+
+---
+
 ## Inference-free beats BM25 on 10 of 13
 
 <iframe :src="chart('spread')" class="w-full border-0" style="height: 398px"

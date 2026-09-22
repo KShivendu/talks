@@ -108,7 +108,7 @@ export const ifSpread = {
 // grow from zero and four bars between 54.79 and 63.37 all look identical from
 // a zero baseline. Zero here IS full SPLADE (63.37 absolute).
 //
-// The learned-weight row is OpenSearch doc-v3-distill, NOT naver/splade-v3-lexical.
+// The learned-weight row is OS doc-v3-distill, NOT naver/splade-v3-lexical.
 // Verified by counting BERT forwards per query: doc-v3-distill does 0 and ships a
 // real IDF table (the 0.135, cardiac 6.533, range 0.016-15.59), while
 // splade-v3-lexical does 1. Lexical's shipped table is all 1.0 and acts as a
@@ -139,7 +139,7 @@ export const floorSweep = [
   { name: 'learned (v3-lexical)', color: AMARANTH, marker: 'star',
     points: [[0, 0.0], [0.05, -0.03], [0.1, 0.07], [0.15, 0.02], [0.2, -0.82],
       [0.25, -1.47], [0.31, -2.58], [0.4, -3.44], [0.5, -3.92], [0.65, -4.65], [0.8, -5.07]] },,
-  { name: 'learned (OpenSearch)', color: GREY_L, marker: 'square',
+  { name: 'learned (OS)', color: GREY_L, marker: 'square',
     points: [[0, 0.0], [0.05, 0.52], [0.1, -0.44], [0.15, -3.35], [0.2, -4.93],
       [0.25, -5.31], [0.31, -5.68], [0.4, -6.13], [0.5, -6.38], [0.65, -6.55], [0.8, -6.66]] },,
 ]

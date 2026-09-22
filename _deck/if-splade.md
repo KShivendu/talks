@@ -375,7 +375,7 @@ End to end through Qdrant: encode **and** search, timed together. 600 samples, t
 | --- | ---: | ---: | ---: | ---: | ---: |
 | SPLADE-Full (naver) | 71.61 | 57.5ms | 113.0ms | **299.9ms** | 564ms |
 | **SPLADE-IF (naver)** | **70.68** | **7.5ms** | 10.6ms | **16.0ms** | 21ms |
-| SPLADE-IF (OpenSearch) | 70.21 | 5.6ms | 7.8ms | 11.8ms | 16ms |
+| SPLADE-IF (OS) | 70.21 | 5.6ms | 7.8ms | 11.8ms | 16ms |
 | BM25 | 68.30 | 2.5ms | 3.3ms | 5.0ms | 6ms |
 
 <v-clicks>
@@ -537,7 +537,7 @@ corpus average is 325 against 286, only 1.14x. This document is 11 words long
 and short documents show a much bigger relative expansion. The mechanism is the
 same, the magnitude here is flattering.
 
-Sparsity table from the post: splade-v3-doc 325, splade-v3 286, opensearch GTE
+Sparsity table from the post: splade-v3-doc 325, splade-v3 286, OS GTE
 244, Splade_PP 205.
 -->
 
@@ -669,14 +669,14 @@ Same family, same version, same recipe. Only query-side inference differs.
 
 | family | full | inference-free | cost |
 | --- | ---: | ---: | ---: |
-| OpenSearch `v2-distill` | 62.59 | **61.73** | **-0.86** |
+| OS `v2-distill` | 62.59 | **61.73** | **-0.86** |
 | naver `splade-v3` | 63.37 | 60.04 | **-3.33** |
 
 <v-clicks>
 
 - Nearly **4x** difference in what the same design decision costs
 
-- It is **not** the IDF table. Grafting OpenSearch's `idf.json` onto naver's doc vectors **loses 1.21**; corpus IDF loses 1.01
+- It is **not** the IDF table. Grafting OS's `idf.json` onto naver's doc vectors **loses 1.21**; corpus IDF loses 1.01
 
 - For a model trained to expect weight 1.0, **uniform is the best query weighting there is**
 
@@ -689,17 +689,17 @@ This replaces a slide I had wrong twice, so it is worth saying how it got here.
 
 First version compared naver's uniform model against naver/splade-v3-lexical
 and claimed learned weights recover 78% of the gap. Lexical runs BERT on the
-query, so it was never inference-free. Second version swapped in OpenSearch
+query, so it was never inference-free. Second version swapped in OS
 doc-v3-distill, which genuinely is, and claimed 55%. But that compares across
 families, so it could not separate "better weights" from "different model".
 
-This is the measurement that separates them. OpenSearch ships a matched pair at
+This is the measurement that separates them. OS ships a matched pair at
 v2: a bi-encoder and a doc-only model, same authors, same version, same recipe.
 Dropping query inference inside that family costs 0.86. Doing it inside naver's
 costs 3.33.
 
 And the second bullet is the one that kills the weights story outright. I took
-OpenSearch's actual shipped idf.json, grafted it onto naver's document vectors,
+OS's actual shipped idf.json, grafted it onto naver's document vectors,
 and it LOST 1.21. Corpus IDF computed from the dataset itself lost 1.01. Every
 weighting scheme I tried was worse than uniform.
 
@@ -719,7 +719,7 @@ the range across two real families is 0.86 to 3.33.
 
 Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
 
-| term | `splade-v3-doc` | `opensearch doc-v3-distill` |
+| term | `splade-v3-doc` | `OS doc-v3-distill` |
 | --- | ---: | ---: |
 | elderly | 1.000 | **7.009** |
 | cardiac | 1.000 | **6.533** |
@@ -742,7 +742,7 @@ This is the part of the talk I would build a project on if I were in the room.
 "Inference-free" is usually explained as "throw the query encoder away and use
 raw tokens". That is only one design. The query side still gets to have
 parameters, as long as they are a table you index into rather than a network
-you run. OpenSearch ships exactly that: idf.json, right there in the repo.
+you run. OS ships exactly that: idf.json, right there in the repo.
 
 Point at the last row. "the" gets 0.135 while "cardiac" gets 6.533, a 48x
 spread, and the uniform model gives both exactly 1.0. That is the entire
@@ -759,7 +759,7 @@ with your intuition about which word matters.
 
 Caveat to say out loud: uniform-vs-learned here is the naver pair, same family
 and same doc encoder, so the weight scheme is the only thing that changed.
-OpenSearch ships a learned-weight model too and it lands at 61.87 on the same
+OS ships a learned-weight model too and it lands at 61.87 on the same
 panel, but it is a different model, so I would not read the difference between
 61.87 and 62.65 as being about weights.
 
@@ -903,7 +903,7 @@ The quora outlier is the one I cannot explain and would say so. It belongs to
 splade-v3-lexical, which runs BERT, so it is not an inference-free finding --
 flag that before someone else does.
 
-Worth adding: OpenSearch already applies IDF on the query side, so putting an
+Worth adding: OS already applies IDF on the query side, so putting an
 idf-based BM25 floor on ITS documents partly double-counts the same signal.
 That is the model where the floor helped most (+0.52), which cuts against the
 double-counting worry rather than for it. I do not have an explanation.

@@ -16,8 +16,8 @@ mount(
     orientation="horizontal"
     valueLabel="NDCG@10, inference-free minus full"
     valueUnit=""
-    valueTicks={[[-0.08, '-0.08'], [-0.06, '-0.06'], [-0.04, '-0.04'], [-0.02, '-0.02'], [0, '0'], [0.02, '+0.02']]}
-    valueMax={0.025}
+    valueTicks={[[-8, '-8'], [-6, '-6'], [-4, '-4'], [-2, '-2'], [0, '0'], [2, '+2']]}
+    valueMax={2.5}
     showLegend={false}
     height={330}
     barGap={0.32}
@@ -29,7 +29,7 @@ mount(
         values: ifSpread.values,
         colors,
         // the one positive bar needs its sign, or it reads as another loss
-        text: ifSpread.values.map((v) => (v > 0 ? '+' : '') + v.toFixed(4)),
+        text: ifSpread.values.map((v) => (v > 0 ? '+' : '') + v.toFixed(2)),
         textPosition: 'outside',
       },
     ]}

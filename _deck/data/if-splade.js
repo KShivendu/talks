@@ -1,3 +1,7 @@
+// NDCG@10 IS REPORTED x100 THROUGHOUT (71.61, not 0.7161). The deck uses the
+// percentage-style convention because it reads faster from the back of a room.
+// The source JSON files in ~/projects/research/if-splade keep the 0-1 values.
+//
 // Numbers transcribed from ~/projects/blog/data/blog/if-splade.mdx, which is the
 // published write-up of this benchmark: BEIR scifact (5,183 docs, 300 queries),
 // Qdrant with native float sparse scoring, doc encoding on a Modal A10G.
@@ -28,12 +32,12 @@ export const activations = {
 
 // [median total latency ms, NDCG@10]
 export const frontier = [
-  { name: 'SPLADE-Full', color: GREY_D, marker: 'circle', points: [[57.2, 0.7161], [60.4, 0.7093]],
-    text: ['naver  0.7161 / 57ms', 'PP  0.7093 / 60ms'], textPositions: ['top left', 'bottom left'] },
-  { name: 'SPLADE-IF', color: AMARANTH, marker: 'star', points: [[4.3, 0.7068], [4.29, 0.7021], [3.9, 0.6859]],
-    text: ['naver  0.7068 / 4.3ms', 'GTE  0.7021', 'PP-sym  0.6859'], textPositions: ['top right', 'bottom right', 'top left'] },
-  { name: 'BM25', color: GREY_L, marker: 'square', points: [[4.0, 0.683]],
-    text: ['BM25  0.6830 / 4.0ms'], textPositions: ['bottom right'] },
+  { name: 'SPLADE-Full', color: GREY_D, marker: 'circle', points: [[57.2, 71.61], [60.4, 70.93]],
+    text: ['naver  71.61 / 57ms', 'PP  70.93 / 60ms'], textPositions: ['top left', 'bottom left'] },
+  { name: 'SPLADE-IF', color: AMARANTH, marker: 'star', points: [[4.3, 70.68], [4.29, 70.21], [3.9, 68.59]],
+    text: ['naver  70.68 / 4.3ms', 'GTE  70.21', 'PP-sym  68.59'], textPositions: ['top right', 'bottom right', 'top left'] },
+  { name: 'BM25', color: GREY_L, marker: 'square', points: [[4.0, 68.30]],
+    text: ['BM25  68.30 / 4.0ms'], textPositions: ['bottom right'] },
 ]
 
 // the 13x is one component, not a diffuse win
@@ -70,7 +74,7 @@ export const throughput = {
 // NanoBEIR, 13 datasets. A SEPARATE experiment from the scifact numbers above:
 // different harness (zeta-alpha-ai/Nano*, ~50 queries and a few thousand docs
 // per dataset, brute-force scoring on an A10G rather than Qdrant), so these
-// NDCG@10 values are not comparable point-for-point with the 0.7161 / 0.7068
+// NDCG@10 values are not comparable point-for-point with the 71.61 / 70.68
 // above. They answer a different question: how much does the inference-free
 // penalty move across domains?
 // Source: ~/projects/research/if-splade/nanobeir_results.json
@@ -84,20 +88,20 @@ export const throughput = {
 export const ifSpread = {
   categories: ['arguana', 'climatefever', 'scidocs', 'scifact', 'fever', 'dbpedia',
     'touche2020', 'nfcorpus', 'msmarco', 'quora', 'nq', 'fiqa', 'hotpotqa'],
-  values: [-0.0824, -0.0634, -0.0547, -0.0468, -0.0414, -0.0364,
-    -0.0338, -0.0335, -0.0266, -0.0199, -0.0054, -0.0034, 0.0154],
+  values: [-8.24, -6.34, -5.47, -4.68, -4.14, -3.64,
+    -3.38, -3.35, -2.66, -1.99, -0.54, -0.34, 1.54],
 }
 
 // Distance from full SPLADE in mean NDCG@10 over those same 13 datasets.
 // Plotted as a gap rather than an absolute, because a linear bar chart has to
 // grow from zero and four bars between 0.548 and 0.634 all look identical from
-// a zero baseline. Zero here IS full SPLADE (0.6337 absolute).
+// a zero baseline. Zero here IS full SPLADE (63.37 absolute).
 export const nanoGap = {
   // absolute NDCG@10 rides in the category label; the bar label is the gap only,
   // or the two run together and spill off the right of the plot
-  categories: ['BM25  0.5479', 'IF, uniform  0.6004', 'IF, learned  0.6265'],
-  values: [-0.0858, -0.0333, -0.0072],
-  text: ['-0.0858', '-0.0333', '-0.0072'],
+  categories: ['BM25  54.79', 'IF, uniform  60.04', 'IF, learned  62.65'],
+  values: [-8.58, -3.33, -0.72],
+  text: ['-8.58', '-3.33', '-0.72'],
   colors: [GREY_L, GREY_D, AMARANTH],
 }
 
@@ -112,12 +116,12 @@ export const nanoGap = {
 // curves, not C against C across the two write-ups.
 export const floorSweep = [
   { name: 'uniform (v3-doc)', color: GREY_D, marker: 'circle',
-    points: [[0, 0], [0.05, 0.0001], [0.1, -0.0011], [0.15, -0.0021], [0.2, -0.0013],
-      [0.25, -0.0066], [0.31, -0.0167], [0.4, -0.0268], [0.5, -0.035], [0.65, -0.0399], [0.8, -0.0442]] },
+    points: [[0, 0.0], [0.05, 0.01], [0.1, -0.11], [0.15, -0.21], [0.2, -0.13],
+      [0.25, -0.66], [0.31, -1.67], [0.4, -2.68], [0.5, -3.5], [0.65, -3.99], [0.8, -4.42]] },,
   { name: 'learned (v3-lexical)', color: AMARANTH, marker: 'star',
-    points: [[0, 0], [0.05, -0.0003], [0.1, 0.0007], [0.15, 0.0002], [0.2, -0.0082],
-      [0.25, -0.0147], [0.31, -0.0258], [0.4, -0.0344], [0.5, -0.0392], [0.65, -0.0465], [0.8, -0.0507]] },
+    points: [[0, 0.0], [0.05, -0.03], [0.1, 0.07], [0.15, 0.02], [0.2, -0.82],
+      [0.25, -1.47], [0.31, -2.58], [0.4, -3.44], [0.5, -3.92], [0.65, -4.65], [0.8, -5.07]] },,
   { name: 'learned (OpenSearch)', color: GREY_L, marker: 'square',
-    points: [[0, 0], [0.05, 0.0052], [0.1, -0.0044], [0.15, -0.0335], [0.2, -0.0493],
-      [0.25, -0.0531], [0.31, -0.0568], [0.4, -0.0613], [0.5, -0.0638], [0.65, -0.0655], [0.8, -0.0666]] },
+    points: [[0, 0.0], [0.05, 0.52], [0.1, -0.44], [0.15, -3.35], [0.2, -4.93],
+      [0.25, -5.31], [0.31, -5.68], [0.4, -6.13], [0.5, -6.38], [0.65, -6.55], [0.8, -6.66]] },,
 ]

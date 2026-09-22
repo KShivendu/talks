@@ -15,11 +15,11 @@ mount(
     xTicks={[[3, '3'], [4, '4'], [5, '5'], [10, '10'], [20, '20'], [60, '60']]}
     xMin={2.6}
     xMax={95}
-    yMin={0.678}
-    yMax={0.724}
-    yTicks={[[0.68, '0.68'], [0.69, '0.69'], [0.7, '0.70'], [0.71, '0.71'], [0.72, '0.72']]}
+    yMin={67.8}
+    yMax={72.4}
+    yTicks={[[68, '68'], [69, '69'], [70, '70'], [71, '71'], [72, '72']]}
     xUnit=" ms"
-    yTipDecimals={4}
+    yTipDecimals={2}
     height={300}
     chrome={qdrantChrome}
     series={frontier.map((s) => ({ ...s, showLine: false }))}

@@ -218,15 +218,15 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 <!--
 Let them read it before you talk. Then:
 
-Dropping query-side inference costs 0.0093 NDCG@10, 1.3% relative, and saves
+Dropping query-side inference costs 0.93 NDCG@10, 1.3% relative, and saves
 53ms. Same model family, naver/splade-v3 against naver/splade-v3-doc, which is
 the cleanest apples-to-apples measure available.
 
 Nothing sits above and to the left of SPLADE-IF, because at 4.3ms the only
 thing left on the query path is the sparse dot product itself.
 
-The one that surprised me: PP-sym in IF mode lands at 0.6859 against BM25's
-0.6830. On 300 queries I call that a tie, not a win. Say so before someone
+The one that surprised me: PP-sym in IF mode lands at 68.59 against BM25's
+68.30. On 300 queries I call that a tie, not a win. Say so before someone
 squints at the chart.
 -->
 
@@ -238,10 +238,10 @@ End to end through Qdrant: encode **and** search, timed together. 600 samples, t
 
 | | NDCG@10 | p50 | p90 | p99 | worst |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| SPLADE-Full (naver) | 0.7161 | 57.5ms | 113.0ms | **299.9ms** | 564ms |
-| **SPLADE-IF (naver)** | **0.7068** | **7.5ms** | 10.6ms | **16.0ms** | 21ms |
-| SPLADE-IF (OpenSearch) | 0.7021 | 5.6ms | 7.8ms | 11.8ms | 16ms |
-| BM25 | 0.6830 | 2.5ms | 3.3ms | 5.0ms | 6ms |
+| SPLADE-Full (naver) | 71.61 | 57.5ms | 113.0ms | **299.9ms** | 564ms |
+| **SPLADE-IF (naver)** | **70.68** | **7.5ms** | 10.6ms | **16.0ms** | 21ms |
+| SPLADE-IF (OpenSearch) | 70.21 | 5.6ms | 7.8ms | 11.8ms | 16ms |
+| BM25 | 68.30 | 2.5ms | 3.3ms | 5.0ms | 6ms |
 
 <v-clicks>
 
@@ -249,7 +249,7 @@ End to end through Qdrant: encode **and** search, timed together. 600 samples, t
 
 - Full SPLADE's p99 is **5.2x its own median**. Inference-free's is **2.1x**
 
-- Dropping query-side inference costs **0.0093 NDCG@10**, 1.3% relative
+- Dropping query-side inference costs **0.93 NDCG@10**, 1.3% relative
 
 </v-clicks>
 
@@ -433,16 +433,16 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 <!--
 STOP AND SAY THIS FIRST, or the numbers look like they contradict the earlier
 slides. This is a different experiment. NanoBEIR is ~50 queries and a few
-thousand documents per dataset, scored brute-force on an A10G. The 0.7161 /
-0.7068 from before was full BEIR scifact, 300 queries, through Qdrant. Do not
+thousand documents per dataset, scored brute-force on an A10G. The 71.61 /
+70.68 from before was full BEIR scifact, 300 queries, through Qdrant. Do not
 compare a bar here to a number there. Compare bars to bars.
 
-Within this panel: the inference-free penalty averages 0.0333 NDCG@10, and it
-runs from -0.0824 on arguana to +0.0154 on hotpotqa, where inference-free
+Within this panel: the inference-free penalty averages 3.33 NDCG@10, and it
+runs from -8.24 on arguana to +1.54 on hotpotqa, where inference-free
 actually wins. That is a 6x spread across thirteen domains.
 
 scifact is red only because it is the dataset every earlier slide used. It
-lands at -0.0468, mid-pack. Nothing special about it either way.
+lands at -4.68, mid-pack. Nothing special about it either way.
 
 The honest version of "inference-free costs about 1%" is: on the one corpus I
 measured properly, yes. Across thirteen, the number you get depends heavily on
@@ -455,16 +455,16 @@ which one you picked.
 
 | | full | IF | delta | mean query length |
 | --- | ---: | ---: | ---: | ---: |
-| **arguana** | 0.4891 | 0.4067 | **-0.0824** | **193 words** |
-| hotpotqa | 0.8281 | 0.8435 | **+0.0154** | 15 words |
+| **arguana** | 48.91 | 40.67 | **-8.24** | **193 words** |
+| hotpotqa | 82.81 | 84.35 | **+1.54** | 15 words |
 
 <v-clicks>
 
 - A 193-word query with every term at weight 1.0 has no way to say which words matter. A 15-word one barely needs to
 
-- Consistent with the fix: learned weights help **arguana most of all**, +0.0741
+- Consistent with the fix: learned weights help **arguana most of all**, +7.41
 
-- BM25 is also not beaten everywhere. It wins **touche2020** (0.7235 vs full SPLADE's 0.6129) and **climatefever** (0.3126 vs 0.3104)
+- BM25 is also not beaten everywhere. It wins **touche2020** (72.35 vs full SPLADE's 61.29) and **climatefever** (31.26 vs 31.04)
 
 - Both are stance tasks: a relevant document may *support or refute* the claim, not just share its topic. Expansion finds topically-near documents, which is the wrong target
 
@@ -478,7 +478,7 @@ would expect if unweighted terms are the problem.
 
 Do not oversell it as causal from two points. The support is that learned query
 weights, which is exactly the fix for "too many equally-loud terms", help
-ArguAna more than any other dataset: +0.0741.
+ArguAna more than any other dataset: +7.41.
 
 Then touche2020. SPLADE loses by 0.11, a big loss, and it loses the same way on
 climatefever. Both are stance tasks. Touche queries are SHORT, 6.6 words on
@@ -497,7 +497,7 @@ answer, plus anything where you cannot afford a GPU at index time.
 
 <div class="text-sm opacity-80 mt-1">
 
-The inference-free penalty drops from **0.0333** to **0.0072** &mdash; **78% of it removed** &mdash; and the query side still runs no model.
+The inference-free penalty drops from **3.33** to **0.72** &mdash; **78% of it removed** &mdash; and the query side still runs no model.
 
 </div>
 
@@ -510,10 +510,10 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 <!--
 Four systems, mean over the same thirteen datasets.
 
-BM25 0.5479. Inference-free with uniform weights 0.6004. Inference-free with
-learned weights 0.6265. Full SPLADE 0.6337.
+BM25 54.79. Inference-free with uniform weights 60.04. Inference-free with
+learned weights 62.65. Full SPLADE 63.37.
 
-The gap that mattered on the previous slide, 0.0333, drops to 0.0072. That is
+The gap that mattered on the previous slide, 3.33, drops to 0.72. That is
 78% of the inference-free penalty, removed by a lookup table.
 -->
 
@@ -535,7 +535,7 @@ Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
 
 - Same doc encoder, same family. The query weight comes from a **vocab-sized table**, not a network
 
-- Wins on **10 of 13**: arguana +0.0741, scifact +0.0638, climatefever +0.0538. Loses on quora (-0.0283), fiqa (-0.0180), nq (-0.0016)
+- Wins on **10 of 13**: arguana +7.41, scifact +6.38, climatefever +5.38. Loses on quora (-2.83), fiqa (-1.80), nq (-0.16)
 
 - Beats *full* SPLADE outright on dbpedia, hotpotqa, msmarco and scifact
 
@@ -563,16 +563,16 @@ with your intuition about which word matters.
 
 Caveat to say out loud: uniform-vs-learned here is the naver pair, same family
 and same doc encoder, so the weight scheme is the only thing that changed.
-OpenSearch ships a learned-weight model too and it lands at 0.6187 on the same
+OpenSearch ships a learned-weight model too and it lands at 61.87 on the same
 panel, but it is a different model, so I would not read the difference between
-0.6187 and 0.6265 as being about weights.
+61.87 and 62.65 as being about weights.
 
 The packaging bug is the honest footnote and it is worth 30 seconds. I counted
 BERT forward calls: splade-v3-doc does 0 per query, splade-v3-lexical does 1.
 Its modules.json is [MLMTransformer, SpladePooling, Router] with the Router at
 the end, so the transformer runs and its output is thrown away.
 
-The QUALITY number is unaffected, 0.6265 is what the table produces and that is
+The QUALITY number is unaffected, 62.65 is what the table produces and that is
 the model working as designed. The LATENCY benefit is simply not there out of
 the box: 24.7ms per query on CPU, the same as full SPLADE. Routing to the
 Router alone gives 0.47ms, but the vectors do not match yet, so I am not
@@ -667,8 +667,8 @@ post found the best coefficient was C = 0.31 for full SPLADE and C = 0.20 for
 inference-free.
 
 Across thirteen datasets and three inference-free models, the best single C
-buys +0.0001, +0.0052 and +0.0007. That is nothing. And by C = 0.20 every one
-of the three curves is already below zero: -0.0013, -0.0493, -0.0082. The
+buys +0.01, +0.52 and +0.07 NDCG@10. That is nothing. And by C = 0.20 every one
+of the three curves is already below zero: -0.13, -4.93, -0.82. The
 coefficient that post recommends actively hurts these models.
 
 Say the caveat honestly: my BM25 is wordpiece counts with k1=1.2, b=0.75 over
@@ -685,15 +685,15 @@ this audience than a fourth win.
 
 <v-clicks depth="2">
 
-- Tuning C **per corpus** instead: +0.0156, +0.0129, +0.0187. Still small, and that is an oracle, tuned on the test set
+- Tuning C **per corpus** instead: +1.56, +1.29, +1.87. Still small, and that is an oracle, tuned on the test set
 
 - C\* ranges from **0.0 to 0.65** across the 13. There is no constant to ship
 
 - But the lift is not random. It tracks how far BM25 was ahead of the model:
   - correlation **+0.76**, **+0.73**, **+0.43** for the three models
-  - for uniform IF: **touche2020** +0.0686, **climatefever** +0.0476 &mdash; exactly the two BM25 was winning
+  - for uniform IF: **touche2020** +6.86, **climatefever** +4.76 &mdash; exactly the two BM25 was winning
 
-- One exception worth chasing: learned-weight IF on **quora** jumps **+0.0946** at C=0.31, the biggest lift anywhere, and BM25 was *behind* there
+- One exception worth chasing: learned-weight IF on **quora** jumps **+9.46** at C=0.31, the biggest lift anywhere, and BM25 was *behind* there
 
 </v-clicks>
 
@@ -704,8 +704,8 @@ along. If you already know your corpus is one of those, you did not need the
 floor, you needed BM25 or a hybrid.
 
 The quora outlier is the one I cannot explain and would say so. Note that quora
-is also the dataset where learned weights LOST the most to uniform, -0.0283.
-The floor gives back +0.0946 there. Something about that corpus interacts badly
+is also the dataset where learned weights LOST the most to uniform, -2.83.
+The floor gives back +9.46 there. Something about that corpus interacts badly
 with the IDF table and BM25 term frequency repairs it. That is a real open
 question, and it is a good one to hand the room.
 -->
@@ -716,11 +716,11 @@ question, and it is a good one to hand the room.
 
 <v-clicks>
 
-- **Pick an asymmetric model.** A symmetric one in IF mode costs **0.021 NDCG@10** (3.0% relative) and only ties BM25
+- **Pick an asymmetric model.** A symmetric one in IF mode costs **2.1 NDCG@10** (3.0% relative) and only ties BM25
 
 - **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
 
-- **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+0.2559** (nq) to **-0.1106** (touche2020). Quora, where queries and docs already share words, still gives **+0.1275** &mdash; so "they already match" is not the predictor
+- **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+25.59** (nq) to **-11.06** (touche2020). Quora, where queries and docs already share words, still gives **+12.75** &mdash; so "they already match" is not the predictor
 
 - **You need a GPU at index time**, and a re-encoding pipeline if the corpus churns
 
@@ -738,7 +738,7 @@ actually use to decide.
 
 <v-clicks>
 
-- **Inference-free SPLADE nearly matches full SPLADE.** 0.0093 NDCG@10 (1.3%) for a **13x** latency cut, 57ms to 4.3ms
+- **Inference-free SPLADE nearly matches full SPLADE.** 0.93 NDCG@10 (1.3%) for a **13x** latency cut, 57ms to 4.3ms
 
 - **The saving is one component.** The query encoder, 50ms of it. Search time does not change
 

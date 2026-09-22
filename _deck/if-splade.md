@@ -95,6 +95,143 @@ example out loud, it carries the rest of the talk.
 
 ---
 
+## BM25, and the two levers it gives you
+
+$$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\text{how rare}} \cdot \underbrace{\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1(1 - b + b\frac{|d|}{\text{avgdl}})}}_{\text{how often, length-normalised}} $$
+
+<v-clicks>
+
+- **Which terms** are in the sum: `t ∈ q ∩ d`. Miss the word, score nothing
+
+- **What each one is worth**: idf and saturating term frequency
+
+- Expanding the term set buys **recall**. Better weights buy **precision**
+
+- BM25 gives you excellent weights over a term set it cannot change
+
+</v-clicks>
+
+<!--
+Write the formula out because everyone half-remembers it and the decomposition
+is the whole talk. Two levers, and BM25 only ever pulls one.
+
+The sum runs over t in q intersect d. If the query says "cardiac" and the
+document says "heart", the intersection is empty and the score is zero. Not
+low. Zero. No amount of clever weighting rescues a term that is not in the sum.
+
+So: expansion changes WHICH terms are in the sum and buys recall. Weighting
+changes what each is worth and buys precision. Hold that pair, the rest of the
+talk is about who gets to pull which lever.
+-->
+
+---
+
+## Expansion is old. Picking the right words is the hard part
+
+<v-clicks>
+
+- Synonym lists, stemming, RM3 pseudo-relevance feedback: all decades old, all buy recall
+
+- All **context-free**. `apple` expands to `fruit` and `iphone` in the same breath
+
+- Expand wrongly and you have bought recall by spending precision
+
+- The expansion a document needs depends on **what the document is about** &mdash; which is exactly what a language model is good at
+
+</v-clicks>
+
+<!--
+This is the slide that stops SPLADE sounding like magic. Expansion is not new.
+Lucene has shipped synonym filters forever, and RM3 has been in the literature
+since 2001.
+
+What was always hard is choosing. A static synonym list cannot know that
+"apple" in a produce catalogue and "apple" in a phone review need opposite
+expansions. So classic expansion is a blunt recall instrument that costs you
+precision, which is why most teams tune it down or turn it off.
+
+The pitch for SPLADE in one sentence: a contextual model already solves the
+selection problem. It has read the whole document. Let it choose the terms.
+-->
+
+---
+
+## SPLADE: the same dot product, learned terms and weights
+
+<div class="text-sm">
+
+$$ w_{j} = \max_{i \,\in\, \text{tokens}} \;\log\!\left(1 + \text{ReLU}\!\left(\text{MLM}(h_i)_j\right)\right), \qquad j = 1 \ldots 30{,}522 $$
+
+</div>
+
+<v-clicks>
+
+- BERT's **masked-language-model head** already scores every vocabulary word at every position. SPLADE reuses it as a term-weighter
+
+- `max` over positions, `log1p` to stop frequent words dominating. Output is one weight per **vocabulary** word, not per document word
+
+- Still a **sparse dot product** at search time. Same index, same engine as BM25
+
+- Measured: **286 of 30,522** dimensions non-zero, **0.9%**
+
+</v-clicks>
+
+<!--
+The point of the formula is that the output lives in the same space as BM25's:
+a sparse vector over a fixed vocabulary, scored by a dot product. You can put
+it in Lucene or Qdrant and nothing downstream changes. That is why this is an
+extension of BM25 rather than a replacement for it.
+
+Where the numbers come from: BERT's MLM head is the layer that, during
+pre-training, guessed the masked word. It emits a score for all 30,522
+wordpieces at every position. SPLADE takes ReLU so only positive evidence
+counts, log1p so a word screamed ten times does not swamp everything, and max
+over positions so a term counts once at its strongest.
+
+ReLU plus log1p is also what makes it sparse: most of the 30,522 go to exactly
+zero. Measured on scifact, 286 survive. That is 0.9%, which is why a normal
+inverted index handles it.
+-->
+
+---
+
+## What it is trained to do
+
+<v-clicks>
+
+- `naver/splade-v3` distills from a cross-encoder with **two** losses: KL-Div (λ=1) and MarginMSE (λ=0.05), 8 negatives per query
+
+- From the paper: *"MarginMSE (resp. KL-Div) focused more on **Recall** (resp. **Precision**)"*
+
+- The same two levers as BM25, now both learned &mdash; and tuned against each other by cross-validation
+
+- Everything after this slide is about **who computes those weights, and when**
+
+</v-clicks>
+
+<div class="text-xs opacity-60 mt-4">
+
+Lassance et al., *SPLADE-v3: New baselines for SPLADE*, arXiv:2403.06789
+
+</div>
+
+<!--
+Do not spend long here, but do land the quoted line, because it is the same
+recall/precision split from two slides ago showing up inside the loss function.
+The authors literally weight one loss for recall and another for precision and
+cross-validate the ratio. Expansion and weighting are not my framing, they are
+the training objective.
+
+If someone asks about sparsity: the SPLADE line regularizes toward sparse
+vectors, and I have the measured density (0.9%) but not the v3 regularizer
+settings in front of me. Say that rather than guess.
+
+Then the hinge into the rest of the talk: none of this says the model has to
+run at QUERY time. That is the assumption inference-free breaks.
+-->
+
+---
+
 ## SPLADE models
 
 <iframe :src="chart('activations')" class="w-full border-0" style="height: 356px"

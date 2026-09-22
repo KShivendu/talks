@@ -59,7 +59,7 @@ kshivendu.dev/blog/if-splade
 
 <v-clicks>
 
-- What BM25 gets right, and the one thing it can't do
+- BM25 is a good baseline
 
 - What SPLADE adds, and what it costs you
 
@@ -79,11 +79,11 @@ kshivendu.dev/blog/if-splade
 
 - Fast, no GPU, and standard baseline
 
-- Matches **terms**, not meaning
+- Matches **terms**, doesn't understand meaning like dense vectors do
 
-- `cardiac arrest` will not retrieve `heart attack`
+- `cardiac arrest` will not retrieve `heart attack`. missed doc
 
-- That document might be the best answer in the corpus
+- Can we somehow introduce meaning while still using keywords/tokens? 
 
 </v-clicks>
 
@@ -95,7 +95,7 @@ example out loud, it carries the rest of the talk.
 
 ---
 
-## SPLADE expands the document instead
+## SPLADE models
 
 <iframe :src="chart('activations')" class="w-full border-0" style="height: 356px"
         title="SPLADE token activations for heart attack" />
@@ -139,11 +139,11 @@ this is the answer: a third of the signal is spelling.
 
 - SPLADE runs a neural network (transformer) at **query** time as well as index time
 
-- That adds **20-50ms** per query
+- That adds **50-100ms** per query on CPU
 
-- BM25 answers in ~4ms
+- BM25 answers in <5ms on CPU
 
-- So you buy relevance with the cost of ~10x latency and maybe even expensive GPUs
+- So you buy relevance at the cost of ~10x latency OR expensive GPUs
 
 </v-clicks>
 
@@ -155,7 +155,7 @@ in the query path to be that fast at all.
 
 ---
 
-## What if the model never sees the query?
+## What if we remove model from query path?
 
 <v-clicks>
 
@@ -360,22 +360,44 @@ the query distribution you actually serve.
 
 ## Why does it work at all?
 
+Query `"car insurance premium"` &mdash; the document contains **none of those three words**:
+
+> Vehicle coverage costs rose 12% for drivers under 25 last year.
+
+| term | full doc vector | **IF doc vector** |
+| --- | ---: | ---: |
+| car | 1.704 | **1.236** |
+| insurance | 1.923 | **1.546** |
+| premium | 1.233 | **0.484** |
+
 <v-clicks>
 
-- `naver/splade-v3-doc` is an **asymmetric** model: trained knowing queries will be raw tokens with no weighting
+- BM25 scores this pair **zero**. The IF index already put all three words in the document at encode time
 
-- So the doc encoder over-expands to compensate
+- `splade-v3-doc` is **asymmetric**: every query term arrives at weight 1.0, so the document side carries the ranking alone
 
-- Avg non-zeros per doc: **325** for the IF model against **286** for full SPLADE
-
-- The densest index in the benchmark is the inference-free one. That is not an accident, it is the trade
+- It over-expands in **breadth**, not weight. Per term full SPLADE is *higher*; it is the term count that grows &mdash; **197** against **96** here, **325** against **286** corpus-wide
 
 </v-clicks>
 
 <!--
-This is the mechanism slide and it is the answer to "surely dropping the query
-encoder must hurt". It does not hurt much because the work moved rather than
-disappeared. Front-loaded into the index.
+Read the query and the document out loud and let the room notice there is not
+one word in common. BM25 gives this pair exactly zero. Both SPLADE models
+retrieve it, and inference-free does it with no model on the query side.
+
+The three rows are the whole idea. "car", "insurance" and "premium" are sitting
+in the document's vector even though the document never says them. That is the
+index doing the work a query encoder would otherwise do at search time.
+
+Be precise about "over-expands", because the table contradicts the lazy reading
+of it. Per term, full SPLADE is actually HIGHER: 1.704 against 1.236 on "car".
+Inference-free does not shout louder on any one word. It covers roughly twice
+as many words, 197 against 96 here. Breadth, not volume.
+
+Caveat if someone checks the arithmetic: 197 against 96 is about 2x, but the
+corpus average is 325 against 286, only 1.14x. This document is 11 words long
+and short documents show a much bigger relative expansion. The mechanism is the
+same, the magnitude here is flattering.
 
 Sparsity table from the post: splade-v3-doc 325, splade-v3 286, opensearch GTE
 244, Splade_PP 205.

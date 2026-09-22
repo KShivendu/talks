@@ -303,14 +303,14 @@ regularizer settings, so say that rather than guess.
 
 | token | BM25 | SPLADE |
 | --- | ---: | ---: |
-| mx | 11.15 | 1.64 |
-| master | 8.80 | 0.93 |
+| logitech | **12.31** | |
+| &nbsp;&nbsp;`log` | | 0.64 |
+| &nbsp;&nbsp;`##ite` | | 0.66 |
+| &nbsp;&nbsp;`##ch` | | 0.66 |
 | mouse | 8.56 | **2.31** |
 | wireless | 6.84 | 1.60 |
-| 3 | 2.28 | 0.55 |
-| *mice* | &mdash; | **1.99** |
-| *keyboard* | &mdash; | 1.07 |
-| *click* | &mdash; | 0.73 |
+| *mice* | | **1.99** |
+| *keyboard* | | 1.07 |
 
 </div>
 <div>
@@ -322,6 +322,8 @@ regularizer settings, so say that rather than guess.
 - The italic rows are **added**, not in the text. All **peripheral** sense, no rodent
 
 - BM25 ranks by **rarity**. SPLADE puts `mouse` on top &mdash; what the document is **about**
+
+- `logitech` is not a BERT token, so SPLADE stores it as **three wordpieces**. A query for it tokenizes the same way and matches
 
 </v-clicks>
 

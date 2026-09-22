@@ -701,44 +701,54 @@ answer, plus anything where you cannot afford a GPU at index time.
 
 ---
 
-## Most of the penalty is fixable
+## What inference-free costs depends who built it
 
-<iframe :src="chart('nano-means')" class="w-full border-0" style="height: 290px"
-        title="Gap to full SPLADE for three systems" />
+Same family, same version, same recipe. Only query-side inference differs.
 
-<div class="text-sm opacity-80 mt-1">
+| family | full | inference-free | cost |
+| --- | ---: | ---: | ---: |
+| OpenSearch `v2-distill` | 62.59 | **61.73** | **-0.86** |
+| naver `splade-v3` | 63.37 | 60.04 | **-3.33** |
 
-The inference-free penalty drops from **3.33** to **1.50** &mdash; **55% of it removed** &mdash; and the query side still runs no model.
+<v-clicks>
 
-</div>
+- Nearly **4x** difference in what the same design decision costs
 
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
+- It is **not** the IDF table. Grafting OpenSearch's `idf.json` onto naver's doc vectors **loses 1.21**; corpus IDF loses 1.01
+
+- For a model trained to expect weight 1.0, **uniform is the best query weighting there is**
+
+- BM25 sits at **54.79**. Both inference-free models clear it by 5 to 7
+
+</v-clicks>
 
 <!--
-Four systems, mean over the same thirteen datasets.
+This replaces a slide I had wrong twice, so it is worth saying how it got here.
 
-BM25 54.79. Inference-free with uniform weights 60.04. Inference-free with a
-learned IDF table 61.87. Full SPLADE 63.37.
+First version compared naver's uniform model against naver/splade-v3-lexical
+and claimed learned weights recover 78% of the gap. Lexical runs BERT on the
+query, so it was never inference-free. Second version swapped in OpenSearch
+doc-v3-distill, which genuinely is, and claimed 55%. But that compares across
+families, so it could not separate "better weights" from "different model".
 
-The gap that mattered on the previous slide, 3.33, drops to 1.50. That is 55%
-of the inference-free penalty, removed by a lookup table, with still zero model
-calls on the query path.
+This is the measurement that separates them. OpenSearch ships a matched pair at
+v2: a bi-encoder and a doc-only model, same authors, same version, same recipe.
+Dropping query inference inside that family costs 0.86. Doing it inside naver's
+costs 3.33.
 
-Say which model, because I got this wrong the first time. The learned row is
-OpenSearch doc-v3-distill. I originally used naver/splade-v3-lexical here and
-it is NOT inference-free: it runs a BERT forward per query. Its shipped weight
-table is all 1.0 and acts as a mask, so what looks like learned weights is
-really full SPLADE query encoding with the expansion stripped off.
+And the second bullet is the one that kills the weights story outright. I took
+OpenSearch's actual shipped idf.json, grafted it onto naver's document vectors,
+and it LOST 1.21. Corpus IDF computed from the dataset itself lost 1.01. Every
+weighting scheme I tried was worse than uniform.
 
-The honest caveat: OpenSearch is a different model family from naver, so this
-comparison changes the weights AND the model. I cannot attribute the whole
-+1.83 to the weight scheme alone. What I can say is that a genuinely
-inference-free model with an IDF table beats a genuinely inference-free model
-without one, by 1.83 mean, winning on 7 of 13.
+Why: splade-v3-doc was trained knowing every query term arrives at exactly 1.0.
+Its document weights are calibrated against that. Reweighting the query
+afterwards feeds it a distribution it never saw. Same lesson as forcing a
+symmetric model inference-free.
+
+So the honest claim is not "learned weights fix it". It is "how much
+inference-free costs is a property of how the family was trained for it", and
+the range across two real families is 0.86 to 3.33.
 -->
 
 ---

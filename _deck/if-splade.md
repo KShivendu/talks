@@ -343,10 +343,16 @@ deletes the brand and the model name. That is not a rounding error, it is the
 model deciding those tokens are not worth index space.
 
 Land the last bullet and let it sit. Someone searching "DHP Paxson" gets
-nothing from the SPLADE vector. This is the concrete version of the failure the
-BM25-floor slide later tries to fix, and it is the same thing behind the
-product-search numbers. If the room takes one worry away from this talk, it
-should be this one.
+nothing from the SPLADE vector. If the room takes one worry away from this
+talk, it should be this one.
+
+If someone asks whether you can patch it: I tried the max(w_splade, C*bm25)
+floor from my splade-bm25 post across 13 datasets. On inference-free it buys
++0.0001 at the best single C, and even with C tuned per dataset on the test set
+it never closes the gap to BM25 on the three datasets that lose -- touche2020
+stays 7.6 behind, climatefever 1.8, scidocs 2.1. It does work on FULL SPLADE at
+C=0.31, where it flips climatefever and scidocs into wins. Numbers are in
+research/if-splade/blog_numbers_audit.md if it comes up.
 
 What SPLADE gives back: bed 1.85 ranked above couch, and sofa, furniture,
 mattress added. Good category sense, no memory for names.
@@ -930,85 +936,6 @@ the problem is unweighted query terms, not missing expansion.
 
 If you want a 10-minute version of this talk: it is this slide plus the
 previous one.
--->
-
----
-
-## An idea that mostly did not work
-
-<div class="text-center -mt-2 -mb-1 text-sm">
-
-Put a BM25 floor under every term the document contains:
-$$ w_t = \max\left(w_{\text{splade}}(t, d),\; C \cdot \text{bm25}(t, d)\right) $$
-
-</div>
-
-<iframe :src="chart('floor')" class="w-full border-0" style="height: 356px"
-        title="BM25 floor sweep" />
-
-<div class="text-xs opacity-70 -mt-1">
-
-Zero is no floor. By **C = 0.20**, the value my earlier post recommends for inference-free, all three curves are already below it.
-
-</div>
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-The idea is from my own earlier post on full SPLADE: a document term that the
-model zeroed out is unrecoverable at query time, so put a floor under it. That
-post found the best coefficient was C = 0.31 for full SPLADE and C = 0.20 for
-inference-free.
-
-Across thirteen datasets and three inference-free models, the best single C
-buys +0.01, +0.52 and +0.07 NDCG@10. That is nothing. And by C = 0.20 every one
-of the three curves is already below zero: -0.13, -4.93, -0.82. The
-coefficient that post recommends actively hurts these models.
-
-Say the caveat honestly: my BM25 is wordpiece counts with k1=1.2, b=0.75 over
-small Nano corpora, not the implementation that post tuned C on, so I would
-not claim "0.20 is wrong". I would claim there is no C you can hard-code.
-
-Leave this slide up a beat. A negative result reported cleanly is worth more to
-this audience than a fourth win.
--->
-
----
-
-## Except where BM25 was already winning
-
-<v-clicks depth="2">
-
-- Tuning C **per corpus** instead: +1.56, +1.29, +1.87. Still small, and that is an oracle, tuned on the test set
-
-- C\* ranges from **0.0 to 0.65** across the 13. There is no constant to ship
-
-- But the lift is not random. It tracks how far BM25 was ahead of the model:
-  - correlation **+0.76**, **+0.73**, **+0.43** for the three models
-  - for uniform IF: **touche2020** +6.86, **climatefever** +4.76 &mdash; exactly the two BM25 was winning
-
-- One exception worth chasing: `splade-v3-lexical` on **quora** jumps **+9.46** at C=0.31, the biggest lift anywhere &mdash; though that model runs BERT, so it is not an inference-free result
-
-</v-clicks>
-
-<!--
-So the floor is not a quality knob, it is a BM25-recovery knob. It buys back
-lexical matching on corpora where lexical matching was the better strategy all
-along. If you already know your corpus is one of those, you did not need the
-floor, you needed BM25 or a hybrid.
-
-The quora outlier is the one I cannot explain and would say so. It belongs to
-splade-v3-lexical, which runs BERT, so it is not an inference-free finding --
-flag that before someone else does.
-
-Worth adding: OS already applies IDF on the query side, so putting an
-idf-based BM25 floor on ITS documents partly double-counts the same signal.
-That is the model where the floor helped most (+0.52), which cuts against the
-double-counting worry rather than for it. I do not have an explanation.
 -->
 
 ---

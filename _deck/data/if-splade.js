@@ -123,23 +123,3 @@ export const nanoGap = {
 }
 
 
-// BM25-floor sweep. The rule from kshivendu.dev/blog/splade-bm25 applied to
-// every term a document actually contains:  w_t = max(w_splade, C * bm25).
-// y is the CHANGE in mean NDCG@10 over the 13 NanoBEIR datasets against C=0
-// (no floor). Source: ~/projects/research/if-splade/bm25floor_results.json
-//
-// Caveat worth keeping attached to these numbers: the BM25 here is computed
-// over wordpiece counts with k1=1.2, b=0.75 on the Nano corpora, not the
-// implementation the original post tuned C on. Compare the SHAPE of these
-// curves, not C against C across the two write-ups.
-export const floorSweep = [
-  { name: 'uniform (v3-doc)', color: GREY_D, marker: 'circle',
-    points: [[0, 0.0], [0.05, 0.01], [0.1, -0.11], [0.15, -0.21], [0.2, -0.13],
-      [0.25, -0.66], [0.31, -1.67], [0.4, -2.68], [0.5, -3.5], [0.65, -3.99], [0.8, -4.42]] },,
-  { name: 'learned (v3-lexical)', color: AMARANTH, marker: 'star',
-    points: [[0, 0.0], [0.05, -0.03], [0.1, 0.07], [0.15, 0.02], [0.2, -0.82],
-      [0.25, -1.47], [0.31, -2.58], [0.4, -3.44], [0.5, -3.92], [0.65, -4.65], [0.8, -5.07]] },,
-  { name: 'learned (OS)', color: GREY_L, marker: 'square',
-    points: [[0, 0.0], [0.05, 0.52], [0.1, -0.44], [0.15, -3.35], [0.2, -4.93],
-      [0.25, -5.31], [0.31, -5.68], [0.4, -6.13], [0.5, -6.38], [0.65, -6.55], [0.8, -6.66]] },,
-]

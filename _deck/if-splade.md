@@ -303,7 +303,6 @@ regularizer settings, so say that rather than guess.
 
 | token | BM25 | SPLADE |
 | --- | ---: | ---: |
-| logitech | **12.31** | **0.00** |
 | mx | 11.15 | 1.64 |
 | master | 8.80 | 0.93 |
 | mouse | 8.56 | **2.31** |
@@ -321,9 +320,7 @@ regularizer settings, so say that rather than guess.
 
 - The italic rows are **added**, not in the text. All **peripheral** sense, no rodent
 
-- BM25's top term is `logitech`. SPLADE gives the brand **zero**
-
-- Search `Logitech` and SPLADE has **nothing to match**
+- BM25 ranks by **rarity**. SPLADE puts `mouse` on top &mdash; what the document is **about**
 
 </v-clicks>
 
@@ -341,18 +338,14 @@ model has read "Logitech" and "wireless" and gone entirely to the peripheral
 sense -- mice, keyboard, click, peripheral -- with nothing about rodents. That
 is the contextual expansion working, on a product listing.
 
-Third bullet is the one to land. BM25 rates "logitech" highest of anything in
-the document, 12.31, because it appears in 166 of 315,663 products. SPLADE
-gives it 0.00. It deletes the brand.
+Third bullet is the teaching point. BM25's ordering is driven by rarity, so
+"mx" at 11.15 outranks "mouse" at 8.56. SPLADE puts "mouse" first at 2.31,
+because that is what the listing is for. Rarity is a proxy for importance and a
+model that has read the text does not need the proxy.
 
-And be precise about the scope, because someone will push: SPLADE keeps brands
-it knows. Sony 1.93, Nikon 1.56, and "mx" here survives at 1.64. What it drops
-is brands it has not seen enough of -- logitech 0.00, and on a furniture
-listing dhp 0.00 and paxson 0.00. That is the long tail of any real catalogue.
-
-If asked whether the BM25 floor fixes it: on inference-free it buys +0.0001 at
-the best single C, and even with C tuned per dataset on test it never closes
-the gap on the three datasets that lose. It does work on full SPLADE at C=0.31.
+Do NOT raise the zeroed-brand problem here. This slide is still explaining what
+SPLADE is. It comes back on the limitations slide with the numbers, which is
+where it earns its weight.
 
 Measured by research/if-splade/bag_of_words_esci.py.
 -->
@@ -1015,6 +1008,8 @@ previous one.
 - **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
 
 - **Domain matters, but not the way I assumed.** SPLADE's margin over BM25 runs from **+25.59** (nq) to **-11.06** (touche2020). Quora, where queries and docs already share words, still gives **+12.75** &mdash; so "they already match" is not the predictor
+
+- **Brands and model codes can vanish.** On a real Amazon listing, `logitech` is BM25's top term at **12.31** and SPLADE scores it **0.00**
 
 - **You need a GPU at index time**, and a re-encoding pipeline if the corpus churns
 

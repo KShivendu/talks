@@ -667,6 +667,44 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
+## The median query barely notices. The hard quarter does.
+
+<iframe :src="chart('recall-tail')" class="w-full border-0" style="height: 342px"
+        title="Recall@10 at p25, p50 and the mean for BM25, full SPLADE and inference-free" />
+
+<div class="text-sm opacity-80 -mt-1">
+
+Half your queries are fine on BM25. The bottom quarter is where a model earns its keep.
+
+</div>
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+This is the slide I would defend hardest, because every other chart in the deck
+is a mean and a mean is the wrong summary here.
+
+Read the middle cluster first. At the MEDIAN query, full SPLADE and
+inference-free both score 100 on recall@10 -- everything relevant is in the top
+ten -- and BM25 gets 53. Then the left cluster: at p25, the hardest quarter,
+the three are 14, 26 and 20. That is where the systems actually separate.
+
+The mean, on the right, is the least informative of the three. 57 / 66 / 64
+makes the three look closer than they are anywhere in the distribution.
+
+Absolute bars, not differences, on purpose. A delta between two distributions'
+p25 values is not the p25 of anything: no single query moved by that amount.
+
+649 queries pooled across the 13 datasets, so these are real percentiles of the
+query population rather than an average of each dataset's own quartile.
+-->
+
+---
+
 ## Summary
 
 <div class="grid grid-cols-[1fr_auto] gap-8 items-start">

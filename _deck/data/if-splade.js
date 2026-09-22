@@ -128,4 +128,20 @@ export const nanoGap = {
   colors: [GREY_L, GREY_D, AMARANTH],
 }
 
-
+// Recall@10 at the mean and at two percentiles, POOLED over all 649 NanoBEIR
+// queries -- a real percentile of the query population, not an average of each
+// dataset's own p25. Source: nanobeir_full_results.json, the `pooled` block.
+//
+// Charted as absolute values, three bars per statistic, because a DELTA between
+// two distributions' p25 is not the p25 of anything: no single query moved by
+// that amount. The absolute bars say what actually happens to a hard query.
+//
+// The point of the chart: at the median the three systems are 53.3 / 100 / 100,
+// so for half the queries the choice of retriever barely matters. At p25 they
+// are 14.1 / 26.1 / 20.0, and the choice matters enormously.
+export const recallTail = {
+  categories: ['p25 (hardest quarter)', 'p50 (median query)', 'mean'],
+  bm25: [14.06, 53.33, 57.44],
+  full: [26.09, 100.00, 65.71],
+  inferenceFree: [20.00, 100.00, 63.62],
+}

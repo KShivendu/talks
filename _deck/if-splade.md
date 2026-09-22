@@ -203,6 +203,69 @@ regularizer settings, so say that rather than guess.
 
 ---
 
+## Both are a bag of weighted tokens
+
+> Patients who suffered a heart attack were followed for five years.
+
+<div class="grid grid-cols-[auto_1fr] gap-x-8 text-sm">
+<div>
+
+| token | BM25 | SPLADE |
+| --- | ---: | ---: |
+| suffered | **10.50** | 1.51 |
+| attack | 9.14 | 1.60 |
+| heart | 5.28 | **2.16** |
+| who | 3.97 | **0.00** |
+| a | 0.11 | **0.00** |
+| cardiac | &mdash; | 1.02 |
+| attacks | &mdash; | 1.34 |
+
+</div>
+<div>
+
+<v-clicks>
+
+- Same structure. Same index. **11 tokens** against **57**
+
+- BM25 spends 3.97 on **"who"** and rates **"suffered"** top, because df=8 makes it rare. Rare is not the same as important
+
+- SPLADE zeroes the stopwords and puts **"heart"** first. It read the sentence
+
+- And it adds `cardiac`, which is the only reason a `cardiac arrest` query finds this at all
+
+</v-clicks>
+
+</div>
+</div>
+
+<!--
+This is the slide to point at when someone says SPLADE is a dense model with
+extra steps. Both sides are {token: weight} over a vocabulary. You can put
+either one in the same inverted index.
+
+Three differences, in increasing order of interest.
+
+One, the stopwords. BM25 has to score "who" and "a" because they are in the
+document; idf pushes them down but never to zero. SPLADE sets them to exactly
+zero and they leave the index.
+
+Two, and this is the good one: BM25's top term is "suffered", at 10.50,
+because it appears in 8 of 5,183 documents. That is idf doing its job
+correctly and still being wrong. The document is not about suffering. SPLADE
+puts "heart" on top. Rarity is a proxy for importance; a model that has read
+the sentence does not need the proxy.
+
+Three, "cardiac" is in the bag with weight 1.02 and the document never says it.
+That is the expansion lever from two slides ago, being pulled by something that
+knows what the sentence is about.
+
+BM25 numbers are real, computed against the 5,183-doc scifact corpus with
+k1=1.2 and b=0.75, so the idf is a genuine corpus statistic.
+research/if-splade/bag_of_words.py.
+-->
+
+---
+
 ## SPLADE models
 
 <iframe :src="chart('activations')" class="w-full border-0" style="height: 356px"

@@ -601,42 +601,6 @@ get it back on every query forever.
 
 ---
 
-## Pay once at index time, queries are free forever
-
-<iframe :src="chart('throughput')" class="w-full border-0" style="height: 356px"
-        title="Document encoding throughput at index time" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Two honest caveats on this chart, and I would give both.
-
-First, the BM25 bar depends entirely on the tokenizer you give it. A plain word
-tokenizer indexes at 13,778 docs/sec, 155x faster than SPLADE. Make BM25 pay
-the same BERT wordpiece SPLADE pays and it is 1,809, about 20x. Pick the
-comparison that matches what you would actually deploy.
-
-Second, and this corrects the write-up: all three SPLADE models index at the
-SAME speed, 89 docs/sec. An earlier version of this slide said inference-free
-was dearer to index, 83 against 98, and explained it with the extra expansion.
-That was three single passes in three different containers. Re-run properly,
-one GPU, alternating order, three repeats: 89.1, 89.4, 89.1. The variation
-within one model was bigger than the gap between them.
-
-The explanation was wrong too, which is why I should not have shipped it. They
-are the same BERT-base forward over the same tokens. How many non-zeros come
-out the other end does not change what the forward pass costs.
-
-A million documents is 3.1 hours on one A10G, once. After that every query is
-a sparse dot product.
--->
-
----
-
 ## Comparison on NanoBEIR
 
 <iframe :src="chart('spread')" class="w-full border-0" style="height: 398px"
@@ -715,13 +679,13 @@ when SPLADE helps is simply wrong, so run it yourself.
 
 - **Use an asymmetric model**, trained for raw-token queries. Forcing a symmetric one into IF mode only ties BM25
 
-- **The cost is index time, and only index time.** 83 docs/sec on an A10G, then queries are free forever
+- **The cost is index time, and only index time.** 89 docs/sec on an A10G &mdash; a million documents in 3.1 hours, once &mdash; then queries are free forever
 
 </v-clicks>
 
 <div class="mt-6 text-sm opacity-70">
 
-Full write-up and the Lucene/pyserini numbers: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
+Full write-up, with every number and how it was measured: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
 
 </div>
 

@@ -597,7 +597,7 @@ Average non-zero terms per document, BEIR scifact:
 
 - It is trained knowing every query term arrives at **1.0**, so the document side has to carry the ranking alone
 
-- It expands in **breadth**, not weight: on a document where both put `car`, full SPLADE gives it **1.704** and inference-free **1.236**. More terms, each a little quieter
+- It over expands in **breadth**, not weight. `car`, full SPLADE gives it **1.704** and inference-free **1.236**
 
 </v-clicks>
 
@@ -667,27 +667,6 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
-## Limitations and gotchas
-
-<v-clicks>
-
-- **Pick an asymmetric model.** One trained for raw-token queries. Forcing normal SPLADE models [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF style can still match BM25
-
-- **Measure on your own data.** The margin over BM25 runs **+25.59** (nq) to **-11.06** (touche2020)
-
-- **Account for increased index time.** That's the main cost wrt BM25. While query are cheap
-
-</v-clicks>
-
-<!--
-Frame this as the setup checklist, not a list of caveats. Same four facts a
-practitioner needs, but they walk out with something to do rather than a reason
-not to. The quora number is the one to dwell on: the obvious intuition about
-when SPLADE helps is simply wrong, so run it yourself.
--->
-
----
-
 ## Summary
 
 <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
@@ -695,20 +674,18 @@ when SPLADE helps is simply wrong, so run it yourself.
 
 <v-clicks depth="2">
 
-- **Inference-free SPLADE nearly matches full SPLADE.** 0.93 NDCG@10 (1.3%) for a **7.7x** median latency cut, 57.5ms to 7.5ms &mdash; and **18.7x** at p99
+- **Inference-free SPLADE can nearly match full SPLADE** while dropping latency from 57.5ms to 7.5ms without GPU
 
-- **The saving is one component.** The query encoder, 50ms of it. Search gets a little slower, 2.4ms to 3.0ms
+- The main cost is increased CPU indexing time and storage cost (more expansions)
 
-- **Use an asymmetric model**, trained for raw-token queries. Forcing a symmetric one into IF mode costs real quality
-
-- **The cost is index time, and only index time.** 89 docs/sec on an A10G &mdash; a million documents in 3.1 hours, once
+- Prefer using dedicated inference free models and measure on your own data. The gain over BM25 can be **-11.06** (touche2020) to **+25.59** (nq)
 
 - Links
   - [kshivendu.dev/x](https://kshivendu.dev/x)
   - [kshivendu.dev/linkedin](https://kshivendu.dev/linkedin)
   - [talks.kshivendu.dev](https://talks.kshivendu.dev)
 
-- Write-up with every number: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
+- Full blog: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
 
 </v-clicks>
 

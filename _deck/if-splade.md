@@ -317,9 +317,9 @@ regularizer settings, so say that rather than guess.
 
 <v-clicks>
 
-- Same structure, same index. **6 tokens** against **66**
+- Both BM25 and SPLADE are sparse vectors. **6 tokens** against **66**
 
-- The italic rows are **added**, not in the text. All **peripheral** sense, no rodent
+- The italic tokens are **expansions**. All **hardware** sense, no rodent
 
 - BM25 ranks by **rarity**. SPLADE puts `mouse` on top &mdash; what the document is **about**
 
@@ -1046,3 +1046,56 @@ actually use to decide.
 Full write-up and the Lucene/pyserini numbers: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
 
 </div>
+
+---
+
+## Bonus: which lever is doing the work?
+
+Strip expansion to literal terms only, so every row scores the **same term set** as BM25.
+
+| | nDCG@10 | gain |
+| --- | ---: | ---: |
+| BM25 | 53.63 | |
+| SPLADE weights, no expansion anywhere | **57.93** | **+4.30** |
+| &nbsp;&nbsp;+ document expansion | 60.65 | +2.72 |
+| &nbsp;&nbsp;+ query expansion as well | 63.37 | +0.88 |
+
+<v-clicks>
+
+- Same terms as BM25, only the weights differ: **+4.30**. The weighting lever is real on its own
+
+- **Document** expansion is worth **3x** query expansion, +2.72 against +0.88
+
+- That ratio is the whole argument: inference-free drops the **cheap** half
+
+</v-clicks>
+
+<!--
+This is the slide that turns "expansion buys recall, weights buy precision"
+from a framing into a measurement, and it is the best justification for
+inference-free in the deck.
+
+The trick is the masking. Every vector is cut down to terms the raw text
+actually contains, so the second row and BM25 score over an identical term set:
+the intersection of the query's literal wordpieces and the document's. Same
+sum, same index, different numbers in the slots. So +4.30 is purely whose
+weighting is better, with expansion removed from the picture.
+
+Then add the levers back one at a time. Document expansion +2.72. Query
+expansion, on top of that, +0.88. Three to one.
+
+Land the last bullet slowly. Inference-free throws away query-side expansion,
+which is the 0.88, and keeps document-side, which is the 2.72. It is not a
+compromise between the two, it is dropping the cheaper one. That is why the
+measured penalty is small, and why it is small for a reason rather than by luck.
+
+Numbers do not add exactly, 57.93 + 2.72 + 0.88 is 61.53 rather than 63.37.
+The missing 1.84 is interaction: the two expansions help each other, since an
+expanded query has more chances to hit an expanded document. Say so if anyone
+adds it up.
+
+One more thing in the data if it comes up: masking the document to literal
+terms drops it to 67 non-zeros, below BM25's 99. The full model carries 232.
+Measured by research/if-splade/modal_literal_only.py.
+-->
+

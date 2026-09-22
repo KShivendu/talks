@@ -151,25 +151,25 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 ---
 
-## Same word, two documents, zero shared expansions
+## Same word, two documents, opposite expansions
 
 <div class="text-sm">
 
 ```
-"He spent a month backpacking across Java and Bali."
-    adds   indonesia 1.41   trek 1.12   hike 0.98   indonesian 0.95   vacation 0.94
+"A mouse had got into the flour and chewed through the bag."
+    adds   mice 2.06   rodents 1.37   chew 1.29   rat 1.21   bread 1.17
 
-"The service is written in Java and deployed on Kubernetes."
-    adds   deploy 1.27   language 1.26   services 1.06   azure 1.04   cloud 0.88
+"My mouse stopped scrolling so I replaced the batteries."
+    adds   battery 1.69   mice 1.62   scroll 1.41   keyboard 0.96   replacement 0.98
 ```
 
 </div>
 
 <v-clicks>
 
-- The two expansion sets share **0 of 24** terms. A synonym list has one entry for `java`
+- The two expansion sets share **1 of 23** terms, and it is `mice`. A synonym list has one entry for `mouse`
 
-- `mouse` behaves the same: *rodents, rat, chew* against *battery, scroll, keyboard*
+- `java` is starker: *indonesia, trek, vacation* against *deploy, language, azure*. **Zero** overlap
 
 - This happens at **index time**, where the model still runs &mdash; so inference-free keeps every bit of it
 
@@ -178,12 +178,16 @@ selection problem. It has read the whole document. Let it choose the terms.
 <!--
 This is the slide that earns the previous one. "Context-free expansion is
 blunt" was an assertion until now; here it is measured. Same word, two ordinary
-sentences, and the expansions do not overlap at all -- 0 of 24. A synonym
-dictionary has exactly one entry for "java" and has to pick.
+sentences, and the rodent reading and the peripheral reading share exactly one
+term. A synonym dictionary has one entry for "mouse" and has to pick.
 
-Take mouse if the room is less technical: rodents 1.37, rat 1.21, chew 1.29
-against battery 1.69, scroll 1.41, keyboard 0.96. One term in common, "mice",
-which is honest and a bit funny.
+Point at "mice" appearing on BOTH sides, at 2.06 and 1.62. That is the honest
+detail and it usually gets a laugh: the model thinks the plural of a computer
+mouse is mice too, and it is not clear it is wrong.
+
+If the room is technical and you want it starker, java gives zero overlap:
+indonesia 1.41, trek 1.12, vacation 0.94 for the island, against deploy 1.27,
+language 1.26, azure 1.04 for the runtime.
 
 The third bullet is the one to land, because it pre-empts the obvious worry
 about the whole talk. All of this contextual work happens on the DOCUMENT, at

@@ -688,24 +688,32 @@ when SPLADE helps is simply wrong, so run it yourself.
 
 ---
 
-## Key takeaways
+## Summary
 
-<v-clicks>
+<div class="grid grid-cols-[1fr_auto] gap-8 items-start">
+<div>
+
+<v-clicks depth="2">
 
 - **Inference-free SPLADE nearly matches full SPLADE.** 0.93 NDCG@10 (1.3%) for a **7.7x** median latency cut, 57.5ms to 7.5ms &mdash; and **18.7x** at p99
 
-- **The saving is one component.** The query encoder, 50ms of it. Search time does not change
+- **The saving is one component.** The query encoder, 50ms of it. Search gets a little slower, 2.4ms to 3.0ms
 
-- **Use an asymmetric model**, trained for raw-token queries. Forcing a symmetric one into IF mode only ties BM25
+- **Use an asymmetric model**, trained for raw-token queries. Forcing a symmetric one into IF mode costs real quality
 
-- **The cost is index time, and only index time.** 89 docs/sec on an A10G &mdash; a million documents in 3.1 hours, once &mdash; then queries are free forever
+- **The cost is index time, and only index time.** 89 docs/sec on an A10G &mdash; a million documents in 3.1 hours, once
+
+- Links
+  - [kshivendu.dev/x](https://kshivendu.dev/x)
+  - [kshivendu.dev/linkedin](https://kshivendu.dev/linkedin)
+  - [talks.kshivendu.dev](https://talks.kshivendu.dev)
+
+- Write-up with every number: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
 
 </v-clicks>
 
-<div class="mt-6 text-sm opacity-70">
-
-Full write-up, with every number and how it was measured: [kshivendu.dev/blog/if-splade](https://kshivendu.dev/blog/if-splade)
-
+</div>
+<img :src="$asset('linkedin-qr.png')" class="h-48" />
 </div>
 
 ---

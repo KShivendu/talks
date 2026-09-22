@@ -292,36 +292,35 @@ regularizer settings, so say that rather than guess.
 
 ## Both are a bag of weighted tokens
 
-<div class="text-xs">
+<div class="text-sm">
 
-> DHP **Paxson** Convertible **Futon** Couch Bed with Linen **Upholstery** and Wood Legs &mdash; Black
+> Logitech MX Master 3 Wireless Mouse
 
 </div>
 
-<div class="grid grid-cols-[auto_1fr] gap-x-6 text-sm">
+<div class="grid grid-cols-[auto_1fr] gap-x-8 text-sm">
 <div>
 
 | token | BM25 | SPLADE | df |
 | --- | ---: | ---: | ---: |
-| paxson | **19.17** | **0.00** | 1 |
-| dhp | 14.51 | **0.00** | 29 |
-| futon | 13.06 | **0.00** | 74 |
-| couch | 8.40 | 1.70 | 1,471 |
-| bed | 6.85 | **1.85** | 3,946 |
-| and | 1.43 | 0.00 | 126,425 |
+| logitech | **12.31** | **0.00** | 166 |
+| mx | 11.15 | 1.64 | 338 |
+| master | 8.80 | 0.93 | 1,427 |
+| mouse | 8.56 | **2.31** | 1,657 |
+| 3 | 2.28 | 0.55 | 78,156 |
 
 </div>
 <div>
 
 <v-clicks>
 
-- Same structure, same index. **13 tokens** against **130**
+- Same structure, same index. **6 tokens** against **66**
 
-- SPLADE adds `sofa` 1.43, `furniture` 1.15, `mattress` 1.29
+- Adds `mice` 1.99, `keyboard` 1.07, `click` 0.73 &mdash; the **peripheral** sense, not the rodent
 
-- BM25's top term is `paxson`, in **1 of 315,663** products. SPLADE gives it **zero**
+- BM25's top term is `logitech`. SPLADE gives the brand **zero**
 
-- Search `DHP Paxson` and SPLADE has **nothing to match**. Remember this
+- Search `Logitech` and SPLADE has **nothing to match**
 
 </v-clicks>
 
@@ -329,33 +328,28 @@ regularizer settings, so say that rather than guess.
 </div>
 
 <!--
-Real Amazon product, real ESCI corpus statistics over 315,663 items.
+Real Amazon product, real ESCI statistics over 315,663 items.
 
-Start with the shape: both sides are {token: weight} over a vocabulary, so
-either one drops into the same inverted index. Then the differences.
+Both sides are {token: weight} over a vocabulary, so either drops into the same
+inverted index. Then the differences.
 
-BM25 has to spend weight on "and" and "with" because they are in the text. Its
-top term is "paxson", which occurs in exactly one product out of 315,663, so
-idf is doing precisely what it was designed to do.
+Second bullet is the callback. Two slides ago "mouse" was ambiguous; here the
+model has read "Logitech" and "wireless" and gone entirely to the peripheral
+sense -- mice, keyboard, click, peripheral -- with nothing about rodents. That
+is the contextual expansion working, on a product listing.
 
-And SPLADE gives paxson 0.00. Also dhp 0.00, futon 0.00, upholstery 0.00. It
-deletes the brand and the model name. That is not a rounding error, it is the
-model deciding those tokens are not worth index space.
+Third bullet is the one to land. BM25 rates "logitech" highest of anything in
+the document, 12.31, because it appears in 166 of 315,663 products. SPLADE
+gives it 0.00. It deletes the brand.
 
-Land the last bullet and let it sit. Someone searching "DHP Paxson" gets
-nothing from the SPLADE vector. If the room takes one worry away from this
-talk, it should be this one.
+And be precise about the scope, because someone will push: SPLADE keeps brands
+it knows. Sony 1.93, Nikon 1.56, and "mx" here survives at 1.64. What it drops
+is brands it has not seen enough of -- logitech 0.00, and on a furniture
+listing dhp 0.00 and paxson 0.00. That is the long tail of any real catalogue.
 
-If someone asks whether you can patch it: I tried the max(w_splade, C*bm25)
-floor from my splade-bm25 post across 13 datasets. On inference-free it buys
-+0.0001 at the best single C, and even with C tuned per dataset on the test set
-it never closes the gap to BM25 on the three datasets that lose -- touche2020
-stays 7.6 behind, climatefever 1.8, scidocs 2.1. It does work on FULL SPLADE at
-C=0.31, where it flips climatefever and scidocs into wins. Numbers are in
-research/if-splade/blog_numbers_audit.md if it comes up.
-
-What SPLADE gives back: bed 1.85 ranked above couch, and sofa, furniture,
-mattress added. Good category sense, no memory for names.
+If asked whether the BM25 floor fixes it: on inference-free it buys +0.0001 at
+the best single C, and even with C tuned per dataset on test it never closes
+the gap on the three datasets that lose. It does work on full SPLADE at C=0.31.
 
 Measured by research/if-splade/bag_of_words_esci.py.
 -->

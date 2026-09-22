@@ -20,7 +20,7 @@ mount(
     valueMin={1}
     valueMax={1000}
     valueTicks={[1, 10, 100, 1000]}
-    height={255}
+    height={243}
     chrome={qdrantChrome}
     views={agentWrite}
   />

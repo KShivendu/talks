@@ -20,7 +20,7 @@ mount(
     yTicks={[[68, '68'], [69, '69'], [70, '70'], [71, '71'], [72, '72']]}
     xUnit=" ms"
     yTipDecimals={2}
-    height={300}
+    height={294}
     chrome={qdrantChrome}
     series={frontier.map((s) => ({ ...s, showLine: false }))}
   />

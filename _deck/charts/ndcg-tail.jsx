@@ -26,7 +26,7 @@ mount(
     valueLabel="NDCG@10"
     valueTicks={[0, 25, 50, 75, 100]}
     valueMax={104}
-    height={392}
+    height={310}
     barGap={0.26}
     chrome={qdrantChrome}
     views={[

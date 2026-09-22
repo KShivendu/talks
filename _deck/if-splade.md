@@ -439,7 +439,7 @@ a distribution it never saw in training.
 
 ## Does it actually hold up?
 
-<iframe :src="chart('quality-latency')" class="w-full border-0" style="height: 356px"
+<iframe :src="chart('quality-latency')" class="w-full border-0 mt-3" style="height: 366px"
         title="Quality against query latency" />
 
 <div class="text-sm opacity-80 -mt-2">
@@ -534,7 +534,7 @@ sentence-transformers path and the published one did not.
 
 ## Latency breakdown
 
-<iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
+<iframe :src="chart('latency-split')" class="w-full border-0 mt-3" style="height: 372px"
         title="Query latency split into embed and search" />
 
 <div class="text-sm opacity-80 -mt-1">
@@ -624,7 +624,7 @@ get it back on every query forever.
 
 ## Comparison on NanoBEIR
 
-<iframe :src="chart('spread')" class="w-full border-0" style="height: 398px"
+<iframe :src="chart('spread')" class="w-full border-0 mt-3" style="height: 380px"
         title="Inference-free against BM25 and against full SPLADE" />
 
 <div class="text-sm opacity-80 -mt-1">
@@ -667,9 +667,9 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
-## The mean hides the hardest quarter
+## A better way to look at NDCG@10
 
-<iframe :src="chart('ndcg-tail')" class="w-full border-0" style="height: 430px"
+<iframe :src="chart('ndcg-tail')" class="w-full border-0 mt-3" style="height: 424px"
         title="NDCG@10 per dataset at p25, p50 and the mean" />
 
 <script setup>

@@ -14,7 +14,7 @@ mount(
     valueUnit="us"
     valueMax={500}
     valueTicks={[0, 100, 200, 300, 400, 500]}
-    height={255}
+    height={243}
     chrome={qdrantChrome}
     views={agentRead}
   />

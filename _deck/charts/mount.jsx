@@ -17,5 +17,16 @@ export function mount(element) {
   if (new URLSearchParams(location.search).has('dark')) {
     document.documentElement.classList.add('dark')
   }
+  // The blog's chart components ship `margin: 1.5rem 0`, which reads as
+  // breathing room in an article and as 48px of unreachable dead space inside a
+  // fixed-height iframe -- enough to push the document past the frame and give
+  // every chart a scrollbar. On a slide the slide itself is the margin.
+  //
+  // !important is not decoration here: BarChart sets that margin as an INLINE
+  // style (components/BarChart.jsx, `style={{ margin: '1.5rem 0' }}`), and an
+  // inline style beats any stylesheet rule without it.
+  const reset = document.createElement('style')
+  reset.textContent = '#root > * { margin-top: 0 !important; margin-bottom: 0 !important; }'
+  document.head.appendChild(reset)
   createRoot(document.getElementById('root')).render(element)
 }

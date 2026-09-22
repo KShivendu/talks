@@ -2,7 +2,7 @@
 
 - Inference-Free SPLADE: Neural search at BM25 latency
   - Event: [Doug Turnbull's Maven course](https://maven.com/p/73ce5d/neural-search-at-bm25-latency) (Virtual)
-  - [Slides](/if-splade) &middot; [Blog post](https://kshivendu.dev/blog/if-splade)
+  - [Slides](/if-splade) · [Blog post](https://kshivendu.dev/blog/if-splade)
 
 - Token-Native Storage: Read and Write in Your Agent's Language
   - [Slides](/token-storage)

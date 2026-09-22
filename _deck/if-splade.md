@@ -398,11 +398,11 @@ def encode_query_inference_free(tokenizer, query: str):
 
 - The model runs **only at index time**, on documents. You pay once, upfront
 
-- And remember the `mouse` slide: the contextual expansion was **all document-side**. None of it is lost here
+- The SPLADE model is trained to have no query side model
 
 - Weights do not have to be 1.0
   - `naver` sends every query term at exactly **1.0**
-  - `os` ships `idf.json`, so `the` gets **0.135** and `cardiac` **6.533** &mdash; still zero model calls
+  - `os` ships `idf.json`, so `the` gets **0.135** and `cardiac` **6.533** (still zero model calls)
 
 </v-clicks>
 
@@ -444,7 +444,7 @@ a distribution it never saw in training.
 
 <div class="text-sm opacity-80 -mt-2">
 
-BEIR scifact, 5,183 docs, 300 queries. Three models, full and inference-free, plus BM25.
+5,183 docs, 300 queries. **PP** is [Splade_PP_en_v1](https://huggingface.co/prithivida/Splade_PP_en_v1), a *symmetric* model, and **PP-sym** is that same model forced inference-free. **GTE** is [OS doc-v3-gte](https://huggingface.co/opensearch-project/opensearch-neural-sparse-encoding-doc-v3-gte).
 
 </div>
 
@@ -463,6 +463,11 @@ the cleanest apples-to-apples measure available.
 
 Nothing sits above and to the left of SPLADE-IF, because at 4.3ms the only
 thing left on the query path is the sparse dot product itself.
+
+PP is prithivida/Splade_PP_en_v1, an independent reproduction of SPLADE++, and
+it is SYMMETRIC: one encoder for both sides. So "PP" is that model used as
+designed and "PP-sym" is the same model forced to take raw tokens on the query.
+It is the control for "can I just switch inference-free on?".
 
 The one that surprised me: PP-sym in IF mode lands at 68.59 against BM25's
 68.30. On 300 queries I call that a tie, not a win. Say so before someone
@@ -986,7 +991,7 @@ previous one.
 
 <v-clicks>
 
-- **Pick an asymmetric model.** A symmetric one in IF mode costs **2.1 NDCG@10** (3.0% relative) and only ties BM25
+- **Pick an asymmetric model.** Forcing the symmetric [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) into IF mode costs **2.1 NDCG@10** and only ties BM25
 
 - **No query-time adaptation.** New drug names, new products, breaking news: the doc encoder had to guess the expansion in advance
 
@@ -1012,7 +1017,7 @@ actually use to decide.
 
 - **The saving is one component.** The query encoder, 50ms of it. Search time does not change
 
-- **Use an asymmetric model.** Trained for raw-token queries. A symmetric one only ties BM25
+- **Use an asymmetric model**, trained for raw-token queries. Forcing a symmetric one into IF mode only ties BM25
 
 - **The cost is index time, and only index time.** 83 docs/sec on an A10G, then queries are free forever
 

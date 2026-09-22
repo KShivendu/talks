@@ -8,7 +8,7 @@ import { qdrantChrome } from './qdrant-chrome.js'
 // Up and to the LEFT is better.
 mount(
   <LineChart
-    title="BEIR scifact, Qdrant — up and to the left is better"
+    title="BEIR scifact — up and to the left is better"
     xLabel="median query latency (ms), log"
     yLabel="NDCG@10"
     xScale="log"

@@ -301,13 +301,16 @@ regularizer settings, so say that rather than guess.
 <div class="grid grid-cols-[auto_1fr] gap-x-8 text-sm">
 <div>
 
-| token | BM25 | SPLADE | df |
-| --- | ---: | ---: | ---: |
-| logitech | **12.31** | **0.00** | 166 |
-| mx | 11.15 | 1.64 | 338 |
-| master | 8.80 | 0.93 | 1,427 |
-| mouse | 8.56 | **2.31** | 1,657 |
-| 3 | 2.28 | 0.55 | 78,156 |
+| token | BM25 | SPLADE |
+| --- | ---: | ---: |
+| logitech | **12.31** | **0.00** |
+| mx | 11.15 | 1.64 |
+| master | 8.80 | 0.93 |
+| mouse | 8.56 | **2.31** |
+| 3 | 2.28 | 0.55 |
+| *mice* | &mdash; | **1.99** |
+| *keyboard* | &mdash; | 1.07 |
+| *click* | &mdash; | 0.73 |
 
 </div>
 <div>
@@ -316,7 +319,7 @@ regularizer settings, so say that rather than guess.
 
 - Same structure, same index. **6 tokens** against **66**
 
-- Adds `mice` 1.99, `keyboard` 1.07, `click` 0.73 &mdash; the **peripheral** sense, not the rodent
+- The italic rows are **added**, not in the text. All **peripheral** sense, no rodent
 
 - BM25's top term is `logitech`. SPLADE gives the brand **zero**
 

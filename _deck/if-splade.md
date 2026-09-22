@@ -667,10 +667,10 @@ deck, which came through Qdrant on the full corpus.
 
 ---
 
-## Does the hardest quarter of queries find anything?
+## The mean hides the hardest quarter
 
-<iframe :src="chart('recall-tail')" class="w-full border-0" style="height: 430px"
-        title="Recall@10 per dataset at p25, p50 and the mean" />
+<iframe :src="chart('ndcg-tail')" class="w-full border-0" style="height: 430px"
+        title="NDCG@10 per dataset at p25, p50 and the mean" />
 
 <script setup>
 import { useDarkMode } from '@slidev/client'
@@ -679,28 +679,28 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 </script>
 
 <!--
-Every other chart in the deck is a mean, and the mean is the wrong summary here.
-Start on p25 and let them look before saying anything.
+Every other chart in the deck is a mean. This is the one that says what the
+means cost you. Start on p25 and let them look before saying anything.
 
-Read p25 as a cliff, not a gradient. NanoBEIR queries usually have one relevant
-document, so recall@10 per query is close to binary and the p25 bar answers one
-question: does the worst quarter of queries find anything at all? BM25 is at
-zero on six of thirteen -- nq, msmarco, fiqa, nfcorpus, arguana, climatefever.
-Full SPLADE is at zero on one, nfcorpus. Inference-free is at zero on three:
-nfcorpus, and then arguana and climatefever, where it falls back to BM25-like
-behaviour.
+p25 is the score of the query a quarter of the way up from the bottom. BM25 is
+at ZERO on six of thirteen -- nq, msmarco, fiqa, nfcorpus, arguana,
+climatefever. Full SPLADE is at zero on one, nfcorpus. Inference-free on three:
+nfcorpus, arguana, climatefever.
 
-nq and msmarco are the headline: BM25's worst quarter finds NOTHING, both
-SPLADEs find everything. That is the whole case for a learned sparse model, and
-it is invisible in the means, where those datasets read 66 vs 86 and 68 vs 90.
+nq is the row to dwell on. The means are 46.4, 72.8, 72.2, a normal-looking
+gap. The p25s are 0.0, 45.6 and 50.0 -- BM25's hard quarter returns nothing
+usable, and inference-free is the BEST of the three, ahead of full SPLADE.
 
-Then switch to p50 and let it land: at the median the three are almost
-identical, 100 across the board on eight datasets. Half your traffic does not
-care which retriever you run. The mean view is last because it is the least
-informative of the three -- it blends the cliff and the flat part together.
+arguana and climatefever are the honest other side: inference-free drops to
+zero where full SPLADE holds 30.9 and 13.0. That is the real cost of taking the
+encoder off the query path, and it is barely visible in the means.
 
-Pair with the NDCG@10 numbers if asked: macro p25 is 24.7 BM25, 45.7 full,
-38.3 inference-free, against means of 53.6, 63.4 and 60.0.
+Then p50. Eight datasets sit at or near 100 for all three. Half your traffic
+does not care which retriever you run. The mean view last, because it blends
+the two halves into one number that describes neither.
+
+Macro if asked: p25 is 24.7 BM25, 45.7 full, 38.3 inference-free, against means
+of 53.6, 63.4 and 60.0.
 -->
 
 ---

@@ -128,35 +128,35 @@ export const nanoGap = {
   colors: [GREY_L, GREY_D, AMARANTH],
 }
 
-// Recall@10 per dataset at two percentiles and the mean, for BM25, full SPLADE
+// NDCG@10 per dataset at two percentiles and the mean, for BM25, full SPLADE
 // and inference-free. Source: nanobeir_full_results.json, `per_dataset`.
+// Reported x100 like everything else here, so 45.6 not 0.456.
 //
 // Absolute values, three bars per dataset, because a DELTA between two
 // distributions' p25 is not the p25 of anything: no single query moved by that
 // amount. The bars carry the values and the reader does the comparison.
 //
-// Read p25 as a cliff, not a gradient. NanoBEIR queries often have a single
-// relevant document, so recall@10 per query is close to binary, and the p25 bar
-// answers one question: does the worst quarter of queries find anything at all?
-// It is 0 on six datasets for BM25, three for inference-free, one for full
-// SPLADE. The two where inference-free falls back to a BM25-like zero are
-// arguana and climatefever.
-export const recallTail = {
+// What p25 shows that the mean does not: BM25's worst quarter scores ZERO on
+// six of thirteen (nq, msmarco, fiqa, nfcorpus, arguana, climatefever), where
+// full SPLADE is zero on one (nfcorpus) and inference-free on three (nfcorpus,
+// arguana, climatefever). On nq the means are 46.4 / 72.8 / 72.2 and the p25s
+// are 0.0 / 45.6 / 50.0 -- and inference-free is the BEST of the three there.
+export const ndcgTail = {
   categories: ['nq', 'msmarco', 'fiqa', 'quora', 'dbpedia', 'fever', 'hotpotqa',
     'scifact', 'nfcorpus', 'arguana', 'scidocs', 'climatefever', 'touche2020'],
   p25: {
-    bm25: [0.0, 0.0, 0.0, 100.0, 15.7, 100.0, 100.0, 100.0, 0.0, 0.0, 5.0, 0.0, 19.2],
-    full: [100.0, 100.0, 21.3, 100.0, 15.3, 100.0, 50.0, 100.0, 0.0, 100.0, 20.0, 21.3, 18.5],
-    inferenceFree: [100.0, 100.0, 5.0, 100.0, 16.3, 100.0, 100.0, 100.0, 0.0, 0.0, 20.0, 0.0, 15.8],
+    bm25: [0.0, 0.0, 0.0, 63.1, 37.0, 61.8, 61.3, 44.8, 0.0, 0.0, 2.5, 0.0, 50.8],
+    full: [45.6, 50.0, 17.0, 100.0, 49.9, 100.0, 61.3, 63.1, 0.0, 30.9, 14.1, 13.0, 49.5],
+    inferenceFree: [50.0, 43.1, 4.2, 100.0, 43.2, 90.8, 63.3, 50.0, 0.0, 0.0, 10.9, 0.0, 42.5],
   },
   p50: {
-    bm25: [100.0, 100.0, 50.0, 100.0, 25.0, 100.0, 100.0, 100.0, 5.7, 100.0, 20.0, 33.3, 33.3],
-    full: [100.0, 100.0, 50.0, 100.0, 28.5, 100.0, 100.0, 100.0, 5.8, 100.0, 40.0, 33.3, 26.9],
-    inferenceFree: [100.0, 100.0, 50.0, 100.0, 27.0, 100.0, 100.0, 100.0, 5.3, 100.0, 25.0, 33.3, 28.6],
+    bm25: [43.1, 50.0, 35.0, 100.0, 57.6, 100.0, 87.7, 100.0, 20.0, 35.6, 33.7, 27.1, 62.8],
+    full: [100.0, 81.5, 61.3, 100.0, 75.8, 100.0, 100.0, 100.0, 26.6, 50.0, 33.9, 25.0, 64.9],
+    inferenceFree: [100.0, 63.1, 56.0, 100.0, 72.3, 100.0, 100.0, 100.0, 23.5, 38.7, 33.1, 17.7, 59.9],
   },
   mean: {
-    bm25: [66.0, 68.0, 48.1, 92.1, 35.0, 92.0, 88.0, 83.0, 13.9, 58.0, 30.0, 37.1, 35.1],
-    full: [86.0, 90.0, 58.0, 97.6, 38.7, 98.3, 86.0, 89.0, 16.1, 84.0, 36.9, 39.6, 33.4],
-    inferenceFree: [86.0, 92.0, 56.7, 96.3, 38.4, 96.0, 90.0, 89.0, 14.3, 72.0, 30.8, 32.0, 32.8],
+    bm25: [46.4, 49.1, 36.3, 82.2, 57.7, 79.8, 81.6, 73.3, 33.2, 33.9, 30.6, 30.1, 62.9],
+    full: [72.8, 70.0, 51.4, 90.8, 68.7, 91.3, 82.8, 79.8, 38.7, 48.9, 36.3, 31.0, 61.3],
+    inferenceFree: [72.2, 67.3, 51.1, 88.8, 65.1, 87.2, 84.4, 75.1, 35.3, 40.7, 30.8, 24.7, 57.9],
   },
 }

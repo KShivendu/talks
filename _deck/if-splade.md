@@ -37,13 +37,17 @@ kshivendu.dev/blog/if-splade
 <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
 <div>
 
+<v-clicks>
+
 - Kumar Shivendu
 
 - Engineer @ Qdrant
 
 - I ❤️ search, databases, and performance.
 
-- Blog: [kshivendu.dev/blog](https://kshivendu.dev/blog)
+- Neural Search at BM25 Latency
+
+</v-clicks>
 
 </div>
 <img :src="$asset('shivendu.jpg')" class="h-64 rounded-lg" />
@@ -69,15 +73,15 @@ kshivendu.dev/blog/if-splade
 
 ---
 
-## BM25 is hard to beat
+## BM25 is a good baseline
 
 <v-clicks>
 
-- Fast, no GPU, and competitive on most retrieval benchmarks
+- Fast, no GPU, and standard baseline for any dataset
 
 - It matches **terms**, not meaning
 
-- A query for `cardiac arrest` will not retrieve a document that says **heart attack**
+- A query for `cardiac arrest` will not retrieve a document that says `heart attack`
 
 - That document might be the best answer in the corpus
 
@@ -98,7 +102,7 @@ example out loud, it carries the rest of the talk.
 
 <div class="text-sm opacity-80 -mt-2">
 
-`naver/splade-v3-doc` on the text **"heart attack"**. Grey is what the document says. Red is what SPLADE adds.
+`naver/splade-v3-doc` on the text **"heart attack"**: 2 words in, **71 terms out**. Grey is what the document says, red is what SPLADE adds. Top 10 whole words; 39 of the 71 are subword pieces.
 
 </div>
 
@@ -112,11 +116,19 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 Point at the two grey bars first: heart 1.60, attack 1.13. The words are still
 the top two, so this is addition, not replacement.
 
-Then the red: cardiac 0.77, stroke 0.59, chest 0.50, death 0.36. None of those
-words are in the document. The cardiac-arrest query now hits at 0.77.
+Then the red: cardiac 0.77, stroke 0.59, chest 0.50. None of those words are in
+the document. A "cardiac arrest" query now hits this document at 0.77 on a word
+it never contained.
 
-Weights fall off fast, 1.60 down to 0.27 across ten terms. The tail contributes
-but does not win the match.
+Two numbers worth saying out loud. 84% of the weight mass is on terms the text
+never had, 14.36 against 2.73. And 39 of the 71 terms are subword fragments
+carrying 35% of the weight.
+
+That is what `card` and `corona` are doing on this chart, and it is the best
+part of the slide. card + ##io is cardio. corona + ##ry is coronary. BERT has
+30k wordpieces and no single token for those words, so the model spells them
+out. If someone asks why the vectors are less interpretable than they look,
+this is the answer: a third of the signal is spelling.
 -->
 
 ---
@@ -131,7 +143,7 @@ but does not win the match.
 
 - BM25 answers in ~4ms
 
-- So you buy relevance with an order of magnitude of latency
+- So you buy relevance with the cost of ~10x latency and expensive GPUs
 
 </v-clicks>
 

@@ -61,7 +61,7 @@ kshivendu.dev/blog/if-splade
 
 - **BM25** and its limits
 
-- **SPLADE**: the same inverted index, with learned terms and weights
+- **SPLADE**: learned terms and weights
 
 - **Inference-free SPLADE**: taking the model off the query path
 
@@ -83,12 +83,11 @@ $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\te
 
 - Users can ask for the same thing in different ways.
 
-    - A query for `sofa` can never find a document saying `couch` 
+    - A query for `sofa` ignores a document saying `couch` 
 
 - **Weights** of those terms buys **precision/ranking** (BM25 handles only this)
 
 - **Which terms** are considered buys **recall** (wider net)
-
 
 </v-clicks>
 
@@ -127,8 +126,8 @@ when.
 
 - All **context-free**, so all are naive. 
     - `apple` expands into `fruit` and `iphone`
-    - You bought recall by spending precision
-    - Imagine extreme: you expand too much and return everything - it becomes brute force
+    - You bought recall but hurt precision
+    - Imagine extreme: expand too much and return all vocab items - it becomes brute force search
 
 - The right expansion and weighting depends on **what the document is about**
     - BERT/transformer models are great at understanding documents
@@ -165,13 +164,11 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 </div>
 
-<v-clicks>
+<v-clicks depth="2"> 
 
-- The two expansion sets share **1 of 23** terms, and it is `mice`. A synonym list has one entry for `mouse`
-
-- `spring` is starker: *flowers, bulbs, bloom* against *doors, hinges, locks*. **Zero** overlap
-
-- All of this happens on the **document**, at index time. The query side does none of it
+- The two expansion sets share **1 of 23** terms, and it is `mice`. 
+    - A synonym list could only cover `mouse -> mice`
+    - Notice `mice: 2.06` vs `mice: 1.62` depending on context
 
 </v-clicks>
 
@@ -293,37 +290,38 @@ regularizer settings, so say that rather than guess.
 
 ---
 
-## Both are bag of tokens
+## Both are a bag of weighted tokens
 
-> Patients who suffered a heart attack were followed for five years.
+<div class="text-xs">
 
-<div class="grid grid-cols-[auto_1fr] gap-x-8 text-sm">
+> DHP **Paxson** Convertible **Futon** Couch Bed with Linen **Upholstery** and Wood Legs &mdash; Black
+
+</div>
+
+<div class="grid grid-cols-[auto_1fr] gap-x-6 text-sm">
 <div>
 
-| token | BM25 | SPLADE |
-| --- | ---: | ---: |
-| suffered | **10.50** | 1.51 |
-| attack | 9.14 | 1.60 |
-| heart | 5.28 | **2.16** |
-| who | 3.97 | **0.00** |
-| a | 0.11 | **0.00** |
-| cardiac | &mdash; | 1.02 |
-| attacks | &mdash; | 1.34 |
+| token | BM25 | SPLADE | df |
+| --- | ---: | ---: | ---: |
+| paxson | **19.17** | **0.00** | 1 |
+| dhp | 14.51 | **0.00** | 29 |
+| futon | 13.06 | **0.00** | 74 |
+| couch | 8.40 | 1.70 | 1,471 |
+| bed | 6.85 | **1.85** | 3,946 |
+| and | 1.43 | 0.00 | 126,425 |
 
 </div>
 <div>
 
-<v-clicks depth="2">
+<v-clicks>
 
-- Bag of tokens. **11 tokens** against **57**
+- Same structure, same index. **13 tokens** against **130**
 
-- BM25 spends 3.97 on **"who"** and rates **"suffered"** top, because df=8 makes it rare. Rare is not the same as important
+- SPLADE adds `sofa` 1.43, `furniture` 1.15, `mattress` 1.29
 
-- SPLADE zeroes the stopwords and puts **"heart"** first. It read the sentence
-    - Stopwords are also contextual. SPLADE is smarter than BM25
-    - `To be or to not be`
+- BM25's top term is `paxson`, in **1 of 315,663** products. SPLADE gives it **zero**
 
-- And it adds `cardiac`, which is the only reason a `cardiac arrest` query finds this at all
+- Search `DHP Paxson` and SPLADE has **nothing to match**. Remember this
 
 </v-clicks>
 
@@ -331,29 +329,29 @@ regularizer settings, so say that rather than guess.
 </div>
 
 <!--
-This is the slide to point at when someone says SPLADE is a dense model with
-extra steps. Both sides are {token: weight} over a vocabulary. You can put
-either one in the same inverted index.
+Real Amazon product, real ESCI corpus statistics over 315,663 items.
 
-Three differences, in increasing order of interest.
+Start with the shape: both sides are {token: weight} over a vocabulary, so
+either one drops into the same inverted index. Then the differences.
 
-One, the stopwords. BM25 has to score "who" and "a" because they are in the
-document; idf pushes them down but never to zero. SPLADE sets them to exactly
-zero and they leave the index.
+BM25 has to spend weight on "and" and "with" because they are in the text. Its
+top term is "paxson", which occurs in exactly one product out of 315,663, so
+idf is doing precisely what it was designed to do.
 
-Two, and this is the good one: BM25's top term is "suffered", at 10.50,
-because it appears in 8 of 5,183 documents. That is idf doing its job
-correctly and still being wrong. The document is not about suffering. SPLADE
-puts "heart" on top. Rarity is a proxy for importance; a model that has read
-the sentence does not need the proxy.
+And SPLADE gives paxson 0.00. Also dhp 0.00, futon 0.00, upholstery 0.00. It
+deletes the brand and the model name. That is not a rounding error, it is the
+model deciding those tokens are not worth index space.
 
-Three, "cardiac" is in the bag with weight 1.02 and the document never says it.
-That is the expansion lever from two slides ago, being pulled by something that
-knows what the sentence is about.
+Land the last bullet and let it sit. Someone searching "DHP Paxson" gets
+nothing from the SPLADE vector. This is the concrete version of the failure the
+BM25-floor slide later tries to fix, and it is the same thing behind the
+product-search numbers. If the room takes one worry away from this talk, it
+should be this one.
 
-BM25 numbers are real, computed against the 5,183-doc scifact corpus with
-k1=1.2 and b=0.75, so the idf is a genuine corpus statistic.
-research/if-splade/bag_of_words.py.
+What SPLADE gives back: bed 1.85 ranked above couch, and sofa, furniture,
+mattress added. Good category sense, no memory for names.
+
+Measured by research/if-splade/bag_of_words_esci.py.
 -->
 
 ---
@@ -392,8 +390,6 @@ in the query path to be that fast at all.
 
 - Pay once, upfront. Queries stay fast
 
-- And remember the `mouse` slide: the contextual expansion was **all document-side**. None of it is lost here
-
 </v-clicks>
 
 ---
@@ -402,20 +398,18 @@ in the query path to be that fast at all.
 
 ```python
 def encode_query_inference_free(tokenizer, query: str):
-    enc = tokenizer(query, add_special_tokens=False,
-                    truncation=True, max_length=512)
+    enc = tokenizer(query, add_special_tokens=False, truncation=True, max_length=512)
     unique_ids = list(set(enc["input_ids"]))
-    return SparseVector(indices=unique_ids,
-                        values=[1.0] * len(unique_ids))
+    return SparseVector(indices=unique_ids, values=[1.0] * len(unique_ids))
 ```
 
-<v-clicks>
+<v-clicks depth="2">
 
 - One tokenizer call, then one sparse dot product
 
-- Every weight is 1.0. There is nothing to learn at query time
-  - Except a **lookup**: OS ships `idf.json`, so `the` gets 0.135 and `cardiac` 6.533. Still zero model calls
-  - But you cannot bolt that onto naver's model. Grafting OS's table on **loses 1.21**
+- No model at query time
+  - `naver` models assign `weight = 1.0` to each query
+  - `os` models add `idf.json` so `the` gets 0.135 and `cardiac` 6.533. Still zero model calls
 
 </v-clicks>
 

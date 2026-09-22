@@ -83,7 +83,7 @@ $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\te
 
 - Users can ask for the same thing in different ways.
 
-    - A query for `cardiac arrest` and can never find a document saying `heart attack` 
+    - A query for `sofa` can never find a document saying `couch` 
 
 - **Weights** of those terms buys **precision/ranking** (BM25 handles only this)
 
@@ -96,10 +96,20 @@ $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\te
 One slide, because the formula is the explanation. Set BM25 up as the thing to
 respect, not the strawman.
 
-Point at the summation index. If the query says "cardiac" and the document says
-"heart", the intersection is empty and the score is zero. Not low. Zero. No
-amount of clever weighting rescues a term that is not in the sum. Say the
-cardiac/heart example out loud, it carries the rest of the talk.
+Point at the summation index. Query "sofa", document "We delivered the couch to
+the living room on Tuesday." The intersection is empty, so the score is zero.
+Not low. Zero. No amount of clever weighting rescues a term that is not in the
+sum. Say it out loud, it carries the rest of the talk.
+
+Checked: those two share no wordpieces at all, so BM25 really does score that
+pair 0.000. And splade-v3-doc puts "sofa" in that document's vector at 1.513,
+the fourth-heaviest term in a document that never says the word. It also adds
+furniture 1.11 and cushions 0.97.
+
+I used cardiac arrest / heart attack here before and it was wrong. Those are
+different conditions -- a heart attack is a blocked artery, a cardiac arrest is
+an electrical failure -- so the slide was asserting a relevance judgment a
+clinician would reject. Do not go back to it.
 
 Then the pair to hold for the next forty minutes: expansion changes WHICH terms
 are in the sum and buys recall. Weighting changes what each is worth and buys
@@ -198,6 +208,15 @@ Two numbers in the diagram worth pointing at: [CLS] scores 47 words, more than
 either real token, and [SEP] scores none. The summary position does its own
 expansion.
 
+Do not claim cardiac is a synonym here. A heart attack is a blocked artery, a
+cardiac arrest is an electrical failure; they are different conditions. The
+row is still a fine MECHANISM demo -- it shows heart scoring a word the text
+never contained -- but if anyone in the room does health search, get in first:
+splade-v3-doc gives cardiac 0.767 on this document and gives myocardial
+exactly 0.000, so it learned the co-occurrence and missed the true synonym.
+That is the precision cost of expansion, live. The vocabulary-mismatch claim
+itself is made earlier with sofa and couch, which really are synonyms.
+
 The "original tokens outrank expansions" claim is measured, not an impression:
 across 40 scifact documents the single highest-weighted term is one the
 document actually contains in 40 of 40, and 91% of each top 10 is its own
@@ -224,7 +243,7 @@ regularizer settings, so say that rather than guess.
 
 ---
 
-## Both are a bag of weighted tokens
+## Both are bag of tokens
 
 > Patients who suffered a heart attack were followed for five years.
 
@@ -244,13 +263,15 @@ regularizer settings, so say that rather than guess.
 </div>
 <div>
 
-<v-clicks>
+<v-clicks depth="2">
 
-- Same structure. Same index. **11 tokens** against **57**
+- Bag of tokens. **11 tokens** against **57**
 
 - BM25 spends 3.97 on **"who"** and rates **"suffered"** top, because df=8 makes it rare. Rare is not the same as important
 
 - SPLADE zeroes the stopwords and puts **"heart"** first. It read the sentence
+    - Stopwords are also contextual. SPLADE is smarter than BM25
+    - `To be or to not be`
 
 - And it adds `cardiac`, which is the only reason a `cardiac arrest` query finds this at all
 
@@ -341,6 +362,8 @@ def encode_query_inference_free(tokenizer, query: str):
 - One tokenizer call, then one sparse dot product
 
 - Every weight is 1.0. There is nothing to learn at query time
+  - Except a **lookup**: OS ships `idf.json`, so `the` gets 0.135 and `cardiac` 6.533. Still zero model calls
+  - But you cannot bolt that onto naver's model. Grafting OS's table on **loses 1.21**
 
 </v-clicks>
 
@@ -348,6 +371,20 @@ def encode_query_inference_free(tokenizer, query: str):
 Worth pausing on: this is the entire query side. If someone asks how it can
 possibly work, the answer is on the next slide, the doc encoder was trained
 knowing this is all it would get.
+
+The sub-bullets pre-empt the obvious question, "surely you would at least use
+idf?". OS does exactly that and ships the table in the repo. But I tested every
+way of adding weights to naver's uniform model, holding its document vectors
+fixed so only the query weighting changed, and all of them lost:
+
+  uniform 1.0                                60.04
+  idf computed from the corpus itself        59.04   -1.01
+  OS's shipped idf.json, grafted on          58.83   -1.21
+  two-round idf from the top-100 returned    52.52   -7.53
+
+splade-v3-doc was trained expecting exactly 1.0, so its document weights are
+calibrated to that. Reweighting the query afterwards hands the document encoder
+a distribution it never saw during training.
 -->
 
 ---

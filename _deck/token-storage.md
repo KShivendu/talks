@@ -237,7 +237,7 @@ ratio: 4.5 / 2.0 = ~2.25x
 
 ## Does the napkin math hold?
 
-<iframe :src="chart('ratio')" class="w-full border-0 mt-3" style="height: 388px"
+<iframe :src="chart('ratio')" class="w-full border-0 mt-3" style="height: 338px"
         title="Does the napkin math hold?" />
 
 <script setup>
@@ -267,7 +267,7 @@ brotli (2.57x) and zstd --train (2.72x) still beat raw token IDs, but cost
 
 ## Does it hold beyond English?
 
-<iframe :src="chart('corpora')" class="w-full border-0 mt-3" style="height: 388px"
+<iframe :src="chart('corpora')" class="w-full border-0 mt-3" style="height: 338px"
         title="Does it hold beyond English?" />
 
 <script setup>
@@ -434,7 +434,7 @@ The model already produced the IDs. A byte store throws them away, detokenizes
  
 ## Agent reads
 
-<iframe :src="chart('agent-read')" class="w-full border-0 mt-3" style="height: 388px"
+<iframe :src="chart('agent-read')" class="w-full border-0 mt-3" style="height: 338px"
         title="Agent and human read latency" />
 
 <script setup>
@@ -477,7 +477,7 @@ times smaller than the reader it serves.
 
 ## Agent writes
 
-<iframe :src="chart('agent-write')" class="w-full border-0 mt-3" style="height: 388px"
+<iframe :src="chart('agent-write')" class="w-full border-0 mt-3" style="height: 338px"
         title="Agent and human write latency" />
 
 <script setup>

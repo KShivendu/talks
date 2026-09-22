@@ -20,7 +20,7 @@ mount(
     xLabel="decode µs per chunk (log)"
     yLabel="compression ratio"
     xScale="log"
-    height={238}
+    height={250}
     chrome={qdrantChrome}
     series={frontier.series}
   />

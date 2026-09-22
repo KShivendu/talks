@@ -19,7 +19,7 @@ mount(
     valueUnit="×"
     valueMax={6.4}
     valueTicks={[0, 1, 2, 3, 4, 5, 6]}
-    height={243}
+    height={255}
     chrome={qdrantChrome}
     views={hindiFirst}
   />

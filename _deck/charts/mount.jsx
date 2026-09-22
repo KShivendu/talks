@@ -26,7 +26,17 @@ export function mount(element) {
   // style (components/BarChart.jsx, `style={{ margin: '1.5rem 0' }}`), and an
   // inline style beats any stylesheet rule without it.
   const reset = document.createElement('style')
-  reset.textContent = '#root > * { margin-top: 0 !important; margin-bottom: 0 !important; }'
+  //
+  // overflow:hidden on top of that, because a responsive chart plus an
+  // auto scrollbar is a feedback loop: the chart lays out at the full frame
+  // width, comes out a hair too tall, the browser adds a 15px vertical bar,
+  // the chart re-renders into the narrower box and now FITS -- but dropping
+  // the bar would make it overflow again, so the bar stays forever on a
+  // document with nothing to scroll. Clipping instead breaks the loop, and
+  // the frames on the slides are sized to the content anyway.
+  reset.textContent =
+    'html, body { overflow: hidden; }' +
+    '#root > * { margin-top: 0 !important; margin-bottom: 0 !important; }'
   document.head.appendChild(reset)
   createRoot(document.getElementById('root')).render(element)
 }

@@ -532,7 +532,7 @@ sentence-transformers path and the published one did not.
 
 ---
 
-## Where the speedup actually comes from
+## Latency breakdown
 
 <iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
         title="Query latency split into embed and search" />
@@ -561,47 +561,42 @@ removes nothing, both are a sparse dot product.
 
 ## Why does it work at all?
 
-Query `"car insurance premium"` &mdash; the document contains **none of those three words**:
+Average non-zero terms per document, BEIR scifact:
 
-> Vehicle coverage costs rose 12% for drivers under 25 last year.
-
-| term | full doc vector | **IF doc vector** |
-| --- | ---: | ---: |
-| car | 1.704 | **1.236** |
-| insurance | 1.923 | **1.546** |
-| premium | 1.233 | **0.484** |
+| model | training | doc non-zeros |
+| --- | --- | ---: |
+| [`naver/splade-v3-doc`](https://huggingface.co/naver/splade-v3-doc) | asymmetric, **inference-free** | **325** |
+| [`naver/splade-v3`](https://huggingface.co/naver/splade-v3) | asymmetric, full | 286 |
+| [`OS doc-v3-gte`](https://huggingface.co/opensearch-project/opensearch-neural-sparse-encoding-doc-v3-gte) | asymmetric, inference-free | 244 |
+| [`Splade_PP_en_v1`](https://huggingface.co/prithivida/Splade_PP_en_v1) | symmetric | 205 |
 
 <v-clicks>
 
-- BM25 scores this pair **zero**. The IF index already put all three words in the document at encode time
+- The inference-free model builds the **densest index of the four**
 
-- `splade-v3-doc` is **asymmetric**: every query term arrives at weight 1.0, so the document side carries the ranking alone
+- It is trained knowing every query term arrives at **1.0**, so the document side has to carry the ranking alone
 
-- It over-expands in **breadth**, not weight. Per term full SPLADE is *higher*; it is the term count that grows &mdash; **197** against **96** here, **325** against **286** corpus-wide
+- It expands in **breadth**, not weight: per term full SPLADE is actually *higher*
 
 </v-clicks>
 
 <!--
-Read the query and the document out loud and let the room notice there is not
-one word in common. BM25 gives this pair exactly zero. Both SPLADE models
-retrieve it, and inference-free does it with no model on the query side.
+This is the mechanism slide and the table is the evidence. The inference-free
+model has the densest documents of anything measured, 325 against full SPLADE's
+286, and that is not a defect. It is where the work went.
 
-The three rows are the whole idea. "car", "insurance" and "premium" are sitting
-in the document's vector even though the document never says them. That is the
-index doing the work a query encoder would otherwise do at search time.
+The asymmetric ones are all denser than the symmetric one at 205, and the
+inference-free asymmetric one is densest of all. The model was trained knowing
+the query would arrive as raw tokens at weight 1.0, so there is nobody else to
+do the ranking. It front-loads everything into the index.
 
-Be precise about "over-expands", because the table contradicts the lazy reading
-of it. Per term, full SPLADE is actually HIGHER: 1.704 against 1.236 on "car".
-Inference-free does not shout louder on any one word. It covers roughly twice
-as many words, 197 against 96 here. Breadth, not volume.
+Third bullet is the precision point, because "over-expands" invites the wrong
+reading. It does not shout louder on any given term. On a document where both
+models place "car", full SPLADE gives it 1.704 and inference-free 1.236. What
+grows is how MANY terms are there.
 
-Caveat if someone checks the arithmetic: 197 against 96 is about 2x, but the
-corpus average is 325 against 286, only 1.14x. This document is 11 words long
-and short documents show a much bigger relative expansion. The mechanism is the
-same, the magnitude here is flattering.
-
-Sparsity table from the post: splade-v3-doc 325, splade-v3 286, OS GTE
-244, Splade_PP 205.
+The trade in one line: you pay for it at index time and in index size, and you
+get it back on every query forever.
 -->
 
 ---

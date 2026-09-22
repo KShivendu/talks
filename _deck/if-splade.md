@@ -386,7 +386,7 @@ in the query path to be that fast at all.
 
 - Run the model **only at index time**, on documents
 
-- At query time, just tokenize: `cardiac arrest` becomes token IDs `[3684, 6295]`, each weight 1.0
+- At query time, just tokenize: `leather sofa` becomes token IDs `[5898, 10682]`, each weight 1.0
 
 - No model, no GPU, no inference on the query path
 

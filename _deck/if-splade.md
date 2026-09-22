@@ -151,6 +151,52 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 ---
 
+## Same word, two documents, zero shared expansions
+
+<div class="text-sm">
+
+```
+"He spent a month backpacking across Java and Bali."
+    adds   indonesia 1.41   trek 1.12   hike 0.98   indonesian 0.95   vacation 0.94
+
+"The service is written in Java and deployed on Kubernetes."
+    adds   deploy 1.27   language 1.26   services 1.06   azure 1.04   cloud 0.88
+```
+
+</div>
+
+<v-clicks>
+
+- The two expansion sets share **0 of 24** terms. A synonym list has one entry for `java`
+
+- `mouse` behaves the same: *rodents, rat, chew* against *battery, scroll, keyboard*
+
+- This happens at **index time**, where the model still runs &mdash; so inference-free keeps every bit of it
+
+</v-clicks>
+
+<!--
+This is the slide that earns the previous one. "Context-free expansion is
+blunt" was an assertion until now; here it is measured. Same word, two ordinary
+sentences, and the expansions do not overlap at all -- 0 of 24. A synonym
+dictionary has exactly one entry for "java" and has to pick.
+
+Take mouse if the room is less technical: rodents 1.37, rat 1.21, chew 1.29
+against battery 1.69, scroll 1.41, keyboard 0.96. One term in common, "mice",
+which is honest and a bit funny.
+
+The third bullet is the one to land, because it pre-empts the obvious worry
+about the whole talk. All of this contextual work happens on the DOCUMENT, at
+index time, where the model is still running. Inference-free changes nothing
+about it. What inference-free gives up is only the query side, and the query
+side was never doing the contextual part -- "apple pie recipe" and "apple
+battery replacement" both arrive as three raw tokens at weight 1.0 either way.
+
+Measured by research/if-splade/contextual_expansion.py.
+-->
+
+---
+
 ## SPLADE: learned tokens and weights
 
 <div class="text-xs leading-tight">

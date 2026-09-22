@@ -1,7 +1,12 @@
 # Talks by KShivendu
 
+- Inference-Free SPLADE: Neural search at BM25 latency
+  - Event: Guest lecture in Doug Turnbull's course (Virtual)
+  - [Slides](/if-splade)
+  - [Blog post](https://kshivendu.dev/blog/if-splade)
+
 - Token-Native Storage: Read and Write in Your Agent's Language
-  - [Slides](/token-storage) (Slidev, live charts) · [older Marp version](/token-storage-old)
+  - [Slides](/token-storage)
   - [Paper (arXiv 2608.02376)](https://arxiv.org/abs/2608.02376) · [Blog post](https://kshivendu.dev/blog/token-storage) · [Benchmarks](https://github.com/KShivendu/token-storage)
 
 - Qdrant: Tiered Multi-tenancy

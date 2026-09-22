@@ -75,15 +75,20 @@ kshivendu.dev/blog/if-splade
 
 $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\text{how rare}} \cdot \underbrace{\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1(1 - b + b\frac{|d|}{\text{avgdl}})}}_{\text{how often, length-normalised}} $$
 
-<v-clicks>
+<v-clicks depth="2">
 
-- Fast, no GPU, and the baseline most of this room ships
+- Fast, no GPU, and a solid baseline
 
-- But look at the sum: `t ∈ q ∩ d`. A query for `cardiac arrest` and a document saying `heart attack` share **nothing**. Score **zero**, not low
+- Only considers terms that exist in both query and doc. Notice `t ∈ q ∩ d`.
 
-- **Which terms** are in the sum buys **recall**. **What each is worth** buys **precision**
+- Users can ask for the same thing in different ways.
 
-- BM25 has excellent weights over a term set it cannot change
+    - A query for `cardiac arrest` and can never find a document saying `heart attack` 
+
+- **Weights** of those terms buys **precision/ranking** (BM25 handles only this)
+
+- **Which terms** are considered buys **recall** (wider net)
+
 
 </v-clicks>
 
@@ -104,15 +109,19 @@ when.
 
 ---
 
-## Expansion is old and powerful
+## Rewriting and expanding terms is powerful
 
-<v-clicks>
+<v-clicks depth="2">
 
 - Synonym lists, stemming, RM3 pseudo-relevance feedback: all decades old, all buy recall
 
-- All **context-free**, so all blunt. `apple` expands to `fruit` and `iphone` in the same breath, and you have bought recall by spending precision
+- All **context-free**, so all are naive. 
+    - `apple` expands into `fruit` and `iphone`
+    - You bought recall by spending precision
+    - Imagine extreme: you expand too much and return everything - it becomes brute force
 
-- The right expansion depends on **what the document is about** &mdash; which is exactly what a language model is for
+- The right expansion and weighting depends on **what the document is about**
+    - BERT/transformer models are great at understanding documents
 
 </v-clicks>
 
@@ -132,7 +141,7 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 ---
 
-## SPLADE: the same dot product, learned terms and weights
+## SPLADE: learned tokens and weights
 
 <div class="text-xs leading-tight">
 
@@ -147,23 +156,25 @@ selection problem. It has read the whole document. Let it choose the terms.
         heart        0.537   1.599    0.962   0.000  →  1.599   heart
         attack       0.000   0.000    1.133   0.000  →  1.133   attack
         cardiac      0.000   0.767    0.000   0.000  →  0.767   heart
-        stroke       0.000   0.323    0.589   0.000  →  0.589   attack
+        stroke       0.000   0.323    0.589   0.000  →  0.589   attack ---> not from heart
         disease      0.331   0.000    0.669   0.000  →  0.669   attack
           ⋮            ⋮       ⋮        ⋮       ⋮           ⋮
      words scored:     47      19       25       0      →  71 non-zero of 30,522
 
   the indexed vector, a bag of weighted words:
 
-     { heart: 1.599, attack: 1.133, die: 0.773, cardiac: 0.767, ... 71 entries }
+     { heart: 1.599, attack: 1.133, die: 0.773, cardiac: 0.767, ...
+       card: 0.568, ... ##io: 0.347, ... }            71 entries, 39 of them subwords
+                                                      card + ##io spells "cardio"
 ```
 
 </div>
 
 <v-clicks>
 
-- Not "each token proposes its own words". **Every token scores the whole vocabulary**, then each word keeps its single best score
+- **Every token scores the whole vocabulary**, then each vocab item keeps its max score
 
-- `stroke` is kept from **attack**, not `heart`. And **84% of the weight** ends up on words the text never had
+- Original tokens get get higher weight than expansions. Some are dropped
 
 </v-clicks>
 
@@ -186,6 +197,14 @@ inverted index handles it.
 Two numbers in the diagram worth pointing at: [CLS] scores 47 words, more than
 either real token, and [SEP] scores none. The summary position does its own
 expansion.
+
+The "original tokens outrank expansions" claim is measured, not an impression:
+across 40 scifact documents the single highest-weighted term is one the
+document actually contains in 40 of 40, and 91% of each top 10 is its own
+words. So expansion is genuinely additive here, it does not displace the
+literal signal. Note the two framings differ and both are true: expansions lose
+on per-term RANK but win on total MASS, 84%, because there are simply far more
+of them.
 
 Worth 20 seconds if the room is engaged: 39 of those 71 terms are subword
 fragments carrying 35% of the weight, and that is what `card` and `corona` are

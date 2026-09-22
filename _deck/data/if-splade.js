@@ -94,16 +94,23 @@ export const ifSpread = {
 
 // Distance from full SPLADE in mean NDCG@10 over those same 13 datasets.
 // Plotted as a gap rather than an absolute, because a linear bar chart has to
-// grow from zero and four bars between 0.548 and 0.634 all look identical from
+// grow from zero and four bars between 54.79 and 63.37 all look identical from
 // a zero baseline. Zero here IS full SPLADE (63.37 absolute).
+//
+// The learned-weight row is OpenSearch doc-v3-distill, NOT naver/splade-v3-lexical.
+// Verified by counting BERT forwards per query: doc-v3-distill does 0 and ships a
+// real IDF table (the 0.135, cardiac 6.533, range 0.016-15.59), while
+// splade-v3-lexical does 1. Lexical's shipped table is all 1.0 and acts as a
+// binary mask -- SparseStaticEmbedding multiplies it by the SPLADE sentence
+// embedding -- so it is full query encoding with expansion stripped, not a
+// lookup. It is not inference-free and cannot sit on this chart.
 export const nanoGap = {
-  // absolute NDCG@10 rides in the category label; the bar label is the gap only,
-  // or the two run together and spill off the right of the plot
-  categories: ['BM25  54.79', 'IF, uniform  60.04', 'IF, learned  62.65'],
-  values: [-8.58, -3.33, -0.72],
-  text: ['-8.58', '-3.33', '-0.72'],
+  categories: ['BM25  54.79', 'IF, uniform  60.04', 'IF, learned IDF  61.87'],
+  values: [-8.58, -3.33, -1.50],
+  text: ['-8.58', '-3.33', '-1.50'],
   colors: [GREY_L, GREY_D, AMARANTH],
 }
+
 
 // BM25-floor sweep. The rule from kshivendu.dev/blog/splade-bm25 applied to
 // every term a document actually contains:  w_t = max(w_splade, C * bm25).

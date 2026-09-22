@@ -9,7 +9,7 @@ mount(
   <BarChart
     orientation="horizontal"
     title="Distance from full SPLADE, mean over 13 NanoBEIR datasets"
-    subtitle="zero = naver/splade-v3 at 63.37 NDCG@10"
+    subtitle="zero = naver/splade-v3 at 63.37; learned = OpenSearch doc-v3-distill"
     valueTicks={[[-9, '-9'], [-6, '-6'], [-3, '-3'], [0, '0']]}
     valueMax={2.2}  // room for the outside bar labels, which sit right of zero
     showLegend={false}

@@ -498,7 +498,7 @@ removes nothing, both are a sparse dot product.
 
 - **Inference-free on CPU beats full SPLADE on a GPU at both ends**: 1.8 vs 7.2 at p50, 2.7 vs 7.6 at p99
 
-- `splade-v3-lexical` is **slower than the full model** on CPU. It runs BERT *and* then the table
+- `splade-v3-lexical` is **slower than the full model** on CPU, because it runs BERT and then masks. It is *not* inference-free
 
 </v-clicks>
 
@@ -516,9 +516,12 @@ Second bullet is the one to leave up. Inference-free on a CPU is faster at the
 99th percentile, 2.7ms, than full SPLADE is at the MEDIAN on a rented A10G,
 7.2ms. That is the deployment argument in one line.
 
-Third bullet is the packaging bug biting: splade-v3-lexical at 48.2ms is slower
-than the full model's 42.9ms, because it pays the BERT forward and then does
-the table lookup on top.
+Third bullet: splade-v3-lexical at 48.2ms is slower than the full model's
+42.9ms. I first read that as a packaging bug. It is not, it is the design. Its
+Router sits last and its shipped table is all 1.0, so BERT runs, then the table
+masks the output down to the query's literal terms. The paper calls this
+"removing query expansion". It belongs on a latency chart as a cautionary row,
+not as an inference-free model.
 
 Honesty note if anyone asks why this differs from the write-up: the post's
 50.0ms is about right. I earlier measured 23ms on five short hand-picked
@@ -690,7 +693,7 @@ answer, plus anything where you cannot afford a GPU at index time.
 
 <div class="text-sm opacity-80 mt-1">
 
-The inference-free penalty drops from **3.33** to **0.72** &mdash; **78% of it removed** &mdash; and the query side still runs no model.
+The inference-free penalty drops from **3.33** to **1.50** &mdash; **55% of it removed** &mdash; and the query side still runs no model.
 
 </div>
 
@@ -703,38 +706,47 @@ const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value 
 <!--
 Four systems, mean over the same thirteen datasets.
 
-BM25 54.79. Inference-free with uniform weights 60.04. Inference-free with
-learned weights 62.65. Full SPLADE 63.37.
+BM25 54.79. Inference-free with uniform weights 60.04. Inference-free with a
+learned IDF table 61.87. Full SPLADE 63.37.
 
-The gap that mattered on the previous slide, 3.33, drops to 0.72. That is
-78% of the inference-free penalty, removed by a lookup table.
+The gap that mattered on the previous slide, 3.33, drops to 1.50. That is 55%
+of the inference-free penalty, removed by a lookup table, with still zero model
+calls on the query path.
+
+Say which model, because I got this wrong the first time. The learned row is
+OpenSearch doc-v3-distill. I originally used naver/splade-v3-lexical here and
+it is NOT inference-free: it runs a BERT forward per query. Its shipped weight
+table is all 1.0 and acts as a mask, so what looks like learned weights is
+really full SPLADE query encoding with the expansion stripped off.
+
+The honest caveat: OpenSearch is a different model family from naver, so this
+comparison changes the weights AND the model. I cannot attribute the whole
++1.83 to the weight scheme alone. What I can say is that a genuinely
+inference-free model with an IDF table beats a genuinely inference-free model
+without one, by 1.83 mean, winning on 7 of 13.
 -->
 
 ---
 
-## What changed: the query terms got weights
+## What changed: the query gets IDF, still no model
 
 Query `"cardiac arrest in the elderly"`, weights the two models actually emit:
 
-| term | `splade-v3-doc` (uniform) | `splade-v3-lexical` (learned) |
+| term | `splade-v3-doc` | `opensearch doc-v3-distill` |
 | --- | ---: | ---: |
-| elderly | 1.000 | **1.881** |
-| arrest | 1.000 | **1.469** |
-| cardiac | 1.000 | **1.231** |
-| in | 1.000 | *dropped* |
-| the | 1.000 | *dropped* |
+| elderly | 1.000 | **7.009** |
+| cardiac | 1.000 | **6.533** |
+| the | 1.000 | **0.135** |
 
 <v-clicks>
 
-- Same doc encoder, same family. The query weight comes from a **vocab-sized table**, not a network
+- Both run **zero BERT forwards** on the query. Verified by counting calls
 
-- Wins on **10 of 13**: arguana +7.41, scifact +6.38, climatefever +5.38. Loses on quora (-2.83), fiqa (-1.80), nq (-0.16)
+- The weights ship in the repo: `idf.json`, a 30,522-float table, range **0.016 to 15.59**
 
-- Beats *full* SPLADE outright on dbpedia, hotpotqa, msmarco and scifact
+- Wins **7 of 13**, mean **+1.83**: fever +8.17, arguana +6.52, climatefever +6.49. Loses fiqa (-2.87)
 
-- Across the 13 datasets, query non-zeros go **76** (full) &rarr; **21** (uniform) &rarr; **16** (learned). Learned is the *sparsest* of the three
-
-- **But not inference-free as shipped.** Its `modules.json` puts the Router *last*, so `encode_query` runs BERT, discards it, then reads the table. Measured: **1 BERT forward per query**, against 0 for `splade-v3-doc`
+- Beats *full* SPLADE outright on **fever, quora, climatefever, hotpotqa**
 
 </v-clicks>
 
@@ -743,7 +755,11 @@ This is the part of the talk I would build a project on if I were in the room.
 "Inference-free" is usually explained as "throw the query encoder away and use
 raw tokens". That is only one design. The query side still gets to have
 parameters, as long as they are a table you index into rather than a network
-you run.
+you run. OpenSearch ships exactly that: idf.json, right there in the repo.
+
+Point at the last row. "the" gets 0.135 while "cardiac" gets 6.533, a 48x
+spread, and the uniform model gives both exactly 1.0. That is the entire
+difference and it costs one array lookup.
 
 The weights on the slide are measured, not illustrative:
 research/if-splade/query_weights.py runs that exact query through both models.
@@ -886,7 +902,7 @@ this audience than a fourth win.
   - correlation **+0.76**, **+0.73**, **+0.43** for the three models
   - for uniform IF: **touche2020** +6.86, **climatefever** +4.76 &mdash; exactly the two BM25 was winning
 
-- One exception worth chasing: learned-weight IF on **quora** jumps **+9.46** at C=0.31, the biggest lift anywhere, and BM25 was *behind* there
+- One exception worth chasing: `splade-v3-lexical` on **quora** jumps **+9.46** at C=0.31, the biggest lift anywhere &mdash; though that model runs BERT, so it is not an inference-free result
 
 </v-clicks>
 
@@ -896,11 +912,14 @@ lexical matching on corpora where lexical matching was the better strategy all
 along. If you already know your corpus is one of those, you did not need the
 floor, you needed BM25 or a hybrid.
 
-The quora outlier is the one I cannot explain and would say so. Note that quora
-is also the dataset where learned weights LOST the most to uniform, -2.83.
-The floor gives back +9.46 there. Something about that corpus interacts badly
-with the IDF table and BM25 term frequency repairs it. That is a real open
-question, and it is a good one to hand the room.
+The quora outlier is the one I cannot explain and would say so. It belongs to
+splade-v3-lexical, which runs BERT, so it is not an inference-free finding --
+flag that before someone else does.
+
+Worth adding: OpenSearch already applies IDF on the query side, so putting an
+idf-based BM25 floor on ITS documents partly double-counts the same signal.
+That is the model where the floor helped most (+0.52), which cuts against the
+double-counting worry rather than for it. I do not have an explanation.
 -->
 
 ---

@@ -191,43 +191,14 @@ over positions so a term counts once at its strongest.
 ReLU plus log1p is also what makes it sparse: most of the 30,522 go to exactly
 zero. Measured on scifact, 286 survive. That is 0.9%, which is why a normal
 inverted index handles it.
--->
 
----
-
-## What it is trained to do
-
-<v-clicks>
-
-- `naver/splade-v3` distills from a cross-encoder with **two** losses: KL-Div (λ=1) and MarginMSE (λ=0.05), 8 negatives per query
-
-- From the paper: *"MarginMSE (resp. KL-Div) focused more on **Recall** (resp. **Precision**)"*
-
-- The same two levers as BM25, now both learned &mdash; and tuned against each other by cross-validation
-
-- Everything after this slide is about **who computes those weights, and when**
-
-</v-clicks>
-
-<div class="text-xs opacity-60 mt-4">
-
-Lassance et al., *SPLADE-v3: New baselines for SPLADE*, arXiv:2403.06789
-
-</div>
-
-<!--
-Do not spend long here, but do land the quoted line, because it is the same
-recall/precision split from two slides ago showing up inside the loss function.
-The authors literally weight one loss for recall and another for precision and
-cross-validate the ratio. Expansion and weighting are not my framing, they are
-the training objective.
-
-If someone asks about sparsity: the SPLADE line regularizes toward sparse
-vectors, and I have the measured density (0.9%) but not the v3 regularizer
-settings in front of me. Say that rather than guess.
-
-Then the hinge into the rest of the talk: none of this says the model has to
-run at QUERY time. That is the assumption inference-free breaks.
+If anyone asks how it is trained, do not put it on a slide, just answer:
+splade-v3 distills from a cross-encoder with two losses mixed, KL-Div at
+lambda 1 and MarginMSE at lambda 0.05, 8 negatives per query. The paper says
+"MarginMSE (resp. KL-Div) focused more on Recall (resp. Precision)", so the
+two levers from the BM25 slide are literally the two terms of the loss.
+Lassance et al., SPLADE-v3, arXiv:2403.06789. I do not have the v3 sparsity
+regularizer settings, so say that rather than guess.
 -->
 
 ---

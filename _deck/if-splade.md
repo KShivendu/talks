@@ -471,9 +471,9 @@ squints at the chart.
 
 ---
 
-## The gap gets bigger at the tail
+## SPLADE vs BM25
 
-End to end through Qdrant: encode **and** search, timed together. 600 samples, top-10.
+End to end: encode **and** search, timed together. 600 samples, top-10.
 
 | | NDCG@10 | p50 | p90 | p99 | worst |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -494,7 +494,9 @@ End to end through Qdrant: encode **and** search, timed together. 600 samples, t
 
 <!--
 Everything in this table is one run, one machine, one protocol, so the rows are
-comparable to each other. That matters more than any single value.
+comparable to each other. Engine is Qdrant with float sparse scoring, but do
+not put that on the slide -- you work there and it reads as a plug. Say it only
+if someone asks what you measured on. That matters more than any single value.
 
 The headline is the second column against the fourth. At the median full SPLADE
 is 7.7x slower. At the 99th percentile it is 18.7x. The advantage GROWS as you

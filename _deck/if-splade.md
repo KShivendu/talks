@@ -527,33 +527,6 @@ sentence-transformers path and the published one did not.
 
 ---
 
-## Where the speedup actually comes from
-
-<iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
-        title="Query latency split into embed and search" />
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Point at the red segment. Query embed is 50.0ms for full SPLADE and 0.3ms for
-IF. Search barely moves, 3.6 to 7.1ms for everything on the chart.
-
-Measured search-side p99s, since the chart only shows medians: full SPLADE
-14.1ms, IF 6.1ms, BM25 5.0ms. Search has a tail too, it is just a small one.
-
-IF's 0.3ms is a tokenizer call, not a model. BM25's 0.1ms is the same kind of
-work, which is exactly why those two bars look alike.
-
-So "inference-free" removes a model relative to full SPLADE. Relative to BM25 it
-removes nothing, both are a sparse dot product.
--->
-
----
-
 ## The tail, not just the median
 
 1,000 samples, batch 1, cycling the real 300 scifact queries. Query encode only.
@@ -600,6 +573,33 @@ Honesty note if anyone asks why this differs from the write-up: the post's
 queries, which was the unrepresentative number -- those averaged 8.6 wordpieces
 against the real queries' 20.1. Longer queries, more compute. Always benchmark
 the query distribution you actually serve.
+-->
+
+---
+
+## Where the speedup actually comes from
+
+<iframe :src="chart('latency-split')" class="w-full border-0" style="height: 356px"
+        title="Query latency split into embed and search" />
+
+<script setup>
+import { useDarkMode } from '@slidev/client'
+const { isDark } = useDarkMode()
+const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
+</script>
+
+<!--
+Point at the red segment. Query embed is 50.0ms for full SPLADE and 0.3ms for
+IF. Search barely moves, 3.6 to 7.1ms for everything on the chart.
+
+Measured search-side p99s, since the chart only shows medians: full SPLADE
+14.1ms, IF 6.1ms, BM25 5.0ms. Search has a tail too, it is just a small one.
+
+IF's 0.3ms is a tokenizer call, not a model. BM25's 0.1ms is the same kind of
+work, which is exactly why those two bars look alike.
+
+So "inference-free" removes a model relative to full SPLADE. Relative to BM25 it
+removes nothing, both are a sparse dot product.
 -->
 
 ---

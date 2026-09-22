@@ -83,7 +83,7 @@ kshivendu.dev/blog/if-splade
 
 - `cardiac arrest` will not retrieve `heart attack`. missed doc
 
-- Can we somehow introduce meaning while still using keywords/tokens? 
+- Can we do better?
 
 </v-clicks>
 
@@ -105,7 +105,7 @@ $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\te
 
 - **What each one is worth**: idf and saturating term frequency
 
-- Expanding the term set buys **recall**. Better weights buy **precision**
+- Crux: Expanding the term set buys **recall**. Better weights buy **precision**
 
 - BM25 gives you excellent weights over a term set it cannot change
 
@@ -126,7 +126,7 @@ talk is about who gets to pull which lever.
 
 ---
 
-## Expansion is old. Picking the right words is the hard part
+## Expansion is old and powerful
 
 <v-clicks>
 
@@ -158,21 +158,36 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 ## SPLADE: the same dot product, learned terms and weights
 
-<div class="text-sm">
+<div class="text-xs leading-tight">
 
-$$ w_{j} = \max_{i \,\in\, \text{tokens}} \;\log\!\left(1 + \text{ReLU}\!\left(\text{MLM}(h_i)_j\right)\right), \qquad j = 1 \ldots 30{,}522 $$
+```
+       "heart attack"  through  naver/splade-v3-doc
+                     │
+                     │  wordpiece
+             ┌───────┴───────┐
+           heart           attack                2 tokens
+             │               │
+             └───── BERT ────┘                   12 layers
+                     │
+                 MLM head                        30,522 scores per token
+                     │                           the layer that guessed masked words
+              log(1 + ReLU(·))                   negatives vanish, big values squash
+                     │
+              max over tokens                    each word once, at its strongest
+                     ▼
+  ┌──────────────────────────────────────────────────────┐
+  │  heart 1.60   attack 1.13   cardiac 0.77   die 0.77  │   71 non-zero
+  │  stroke 0.59  card 0.57     corona 0.50    …         │   of 30,522
+  └──────────────────────────────────────────────────────┘
+```
 
 </div>
 
 <v-clicks>
 
-- BERT's **masked-language-model head** already scores every vocabulary word at every position. SPLADE reuses it as a term-weighter
+- One weight per **vocabulary** word, not per document word. Still a **sparse dot product**: same index, same engine as BM25
 
-- `max` over positions, `log1p` to stop frequent words dominating. Output is one weight per **vocabulary** word, not per document word
-
-- Still a **sparse dot product** at search time. Same index, same engine as BM25
-
-- Measured: **286 of 30,522** dimensions non-zero, **0.9%**
+- `ReLU` is what makes it sparse: real documents average **325 of 30,522** non-zero, about **1%**
 
 </v-clicks>
 

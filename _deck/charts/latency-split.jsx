@@ -15,8 +15,10 @@ mount(
     chrome={qdrantChrome}
     categories={latencySplit.categories}
     series={[
-      { name: 'Query embed', group: 'total', color: '#dc244c', values: latencySplit.embed },
-      { name: 'Search', group: 'total', color: '#8a9099', values: latencySplit.search },
+      // Search is the part every system pays, so it is the neutral grey; the embed
+      // segment is the thing inference-free removes, so it carries the accent.
+      { name: 'Query embed', group: 'total', color: '#8a9099', values: latencySplit.embed },
+      { name: 'Search', group: 'total', color: '#dc244c', values: latencySplit.search },
     ]}
   />
 )

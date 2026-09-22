@@ -689,7 +689,7 @@ a sparse dot product.
 
 ## Your engine matters, and it matters most here
 
-Same models, same corpus. Qdrant scores exact floats; Lucene quantizes to integers.
+Same models, same corpus. Qdrant scores exact float32; the pyserini impact index rounds weights to integers.
 
 | NDCG@10 | Qdrant | Lucene | cost |
 | --- | ---: | ---: | ---: |
@@ -699,7 +699,7 @@ Same models, same corpus. Qdrant scores exact floats; Lucene quantizes to intege
 
 <v-clicks>
 
-- **OS** and **Elasticsearch** quantize too. None of the three do exact float sparse scoring
+- Careful: **Lucene `FeatureField`** and **ES `sparse_vector`** keep **9 significant bits** (~0.4% error), *not* integers. Only pyserini’s impact index rounds to whole numbers
 
 - Both IF models pay **1.15 to 1.35**. Full SPLADE pays **0.05**. Roughly **27x** more
 
@@ -710,9 +710,27 @@ Same models, same corpus. Qdrant scores exact floats; Lucene quantizes to intege
 </v-clicks>
 
 <!--
-This is the most practically useful slide in the deck for anyone who already
-runs Elasticsearch or OpenSearch, and it is the thing the write-up buried in a
-collapsed section.
+Most practically useful slide in the deck for anyone already running
+Elasticsearch or OpenSearch.
+
+Get the precision claim right, it is easy to overstate and someone will know.
+Verified from primary sources:
+  - Lucene FeatureField: "only considers the top 9 significant bits ... stored
+    on 16 bits internally", relative precision 2^-8 = 0.39%
+  - Elasticsearch sparse_vector: same mechanism, "about 0.4%" relative error
+  - pyserini/Anserini impact index: genuinely integers, the fake-documents
+    trick, and THAT is what the Lucene column here measured
+Right sentence: "pyserini rounds to integers, Lucene and ES keep 9-bit floats,
+none of them is exact float32". An earlier version of this slide said "they
+store integers" and that was wrong.
+
+It also generates a prediction I have NOT tested: ES should lose much less than
+the 1.15 here, because a 9-bit grid is far finer than integers. Say prediction,
+not result.
+
+And I could not measure Qdrant's own uint8 sparse setting: querying the f32 and
+uint8 collections returns bit-identical scores to four decimals, so that
+comparison tests nothing.
 
 The column that matters is the last one. Full SPLADE loses 0.05 to integer
 quantization, which is nothing. Inference-free loses 1.15 to 1.55. Same

@@ -396,7 +396,7 @@ def encode_query_inference_free(tokenizer, query: str):
 
 - That is the whole query encoder. One tokenizer call, then a sparse dot product
 
-- The model runs **only at index time**, on documents. You pay once, upfront
+- The model runs **only on documents**. 
 
 - The SPLADE model is trained to have no query side model
 
@@ -478,7 +478,7 @@ squints at the chart.
 
 ## SPLADE vs BM25
 
-End to end: encode **and** search, timed together. 600 samples, top-10.
+End to end: encode **and** search, timed together. BEIR scifact, 5,183 docs, the 300 real queries run twice.
 
 | | NDCG@10 | p50 | p90 | p99 | worst |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -497,7 +497,10 @@ End to end: encode **and** search, timed together. 600 samples, top-10.
 
 <!--
 Everything in this table is one run, one machine, one protocol, so the rows are
-comparable to each other. Engine is Qdrant with float sparse scoring, but do
+comparable to each other. Full BEIR scifact, not NanoBEIR: 5,183 documents and
+the real 300-query test set, each query timed twice for 600 samples. The 13-
+dataset NanoBEIR numbers later in the deck are a different harness and the
+latencies are not comparable to these. Engine is Qdrant with float sparse scoring, but do
 not put that on the slide -- you work there and it reads as a plug. Say it only
 if someone asks what you measured on. That matters more than any single value.
 

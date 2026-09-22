@@ -55,73 +55,51 @@ kshivendu.dev/blog/if-splade
 
 ---
 
-## Topics to cover
+## What we'll cover
 
 <v-clicks>
 
-- BM25 is a good baseline
+- **BM25**, and the one thing it cannot do
 
-- What SPLADE adds, and what it costs you
+- **SPLADE**: the same inverted index, with learned terms and weights
 
-- Inference-free SPLADE: moving the model off the query path
+- **Inference-free SPLADE**: taking the model off the query path
 
-- The benchmark: six setups, two backends
-
-- The catch, and who shouldn't use this
+- What it costs, where it breaks, and who should not use it
 
 </v-clicks>
 
 ---
 
-## BM25 is a good baseline
-
-<v-clicks>
-
-- Fast, no GPU, and standard baseline
-
-- Matches **terms**, doesn't understand meaning like dense vectors do
-
-- `cardiac arrest` will not retrieve `heart attack`. missed doc
-
-- Can we do better?
-
-</v-clicks>
-
-<!--
-Set BM25 up as the thing to respect, not the strawman. Most of the room ships it.
-The gap is narrow and specific: vocabulary mismatch. Say the cardiac/heart
-example out loud, it carries the rest of the talk.
--->
-
----
-
-## BM25, and the two levers it gives you
+## BM25, and the one thing it cannot do
 
 $$ \text{score}(q,d) = \sum_{t \,\in\, q \cap d} \underbrace{\text{idf}(t)}_{\text{how rare}} \cdot \underbrace{\frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1(1 - b + b\frac{|d|}{\text{avgdl}})}}_{\text{how often, length-normalised}} $$
 
 <v-clicks>
 
-- **Which terms** are in the sum: `t ∈ q ∩ d`. Miss the word, score nothing
+- Fast, no GPU, and the baseline most of this room ships
 
-- **What each one is worth**: idf and saturating term frequency
+- But look at the sum: `t ∈ q ∩ d`. A query for `cardiac arrest` and a document saying `heart attack` share **nothing**. Score **zero**, not low
 
-- Crux: Expanding the term set buys **recall**. Better weights buy **precision**
+- **Which terms** are in the sum buys **recall**. **What each is worth** buys **precision**
 
-- BM25 gives you excellent weights over a term set it cannot change
+- BM25 has excellent weights over a term set it cannot change
 
 </v-clicks>
 
 <!--
-Write the formula out because everyone half-remembers it and the decomposition
-is the whole talk. Two levers, and BM25 only ever pulls one.
+One slide, because the formula is the explanation. Set BM25 up as the thing to
+respect, not the strawman.
 
-The sum runs over t in q intersect d. If the query says "cardiac" and the
-document says "heart", the intersection is empty and the score is zero. Not
-low. Zero. No amount of clever weighting rescues a term that is not in the sum.
+Point at the summation index. If the query says "cardiac" and the document says
+"heart", the intersection is empty and the score is zero. Not low. Zero. No
+amount of clever weighting rescues a term that is not in the sum. Say the
+cardiac/heart example out loud, it carries the rest of the talk.
 
-So: expansion changes WHICH terms are in the sum and buys recall. Weighting
-changes what each is worth and buys precision. Hold that pair, the rest of the
-talk is about who gets to pull which lever.
+Then the pair to hold for the next forty minutes: expansion changes WHICH terms
+are in the sum and buys recall. Weighting changes what each is worth and buys
+precision. Everything after this is about who gets to pull which lever, and
+when.
 -->
 
 ---
@@ -132,11 +110,9 @@ talk is about who gets to pull which lever.
 
 - Synonym lists, stemming, RM3 pseudo-relevance feedback: all decades old, all buy recall
 
-- All **context-free**. `apple` expands to `fruit` and `iphone` in the same breath
+- All **context-free**, so all blunt. `apple` expands to `fruit` and `iphone` in the same breath, and you have bought recall by spending precision
 
-- Expand wrongly and you have bought recall by spending precision
-
-- The expansion a document needs depends on **what the document is about** &mdash; which is exactly what a language model is good at
+- The right expansion depends on **what the document is about** &mdash; which is exactly what a language model is for
 
 </v-clicks>
 
@@ -187,7 +163,7 @@ selection problem. It has read the whole document. Let it choose the terms.
 
 - Not "each token proposes its own words". **Every token scores the whole vocabulary**, then each word keeps its single best score
 
-- `stroke` is kept from **attack**, not `heart`. And `[CLS]` scores **47** words, more than either real token
+- `stroke` is kept from **attack**, not `heart`. And **84% of the weight** ends up on words the text never had
 
 </v-clicks>
 
@@ -206,6 +182,17 @@ over positions so a term counts once at its strongest.
 ReLU plus log1p is also what makes it sparse: most of the 30,522 go to exactly
 zero. Measured on scifact, 286 survive. That is 0.9%, which is why a normal
 inverted index handles it.
+
+Two numbers in the diagram worth pointing at: [CLS] scores 47 words, more than
+either real token, and [SEP] scores none. The summary position does its own
+expansion.
+
+Worth 20 seconds if the room is engaged: 39 of those 71 terms are subword
+fragments carrying 35% of the weight, and that is what `card` and `corona` are
+doing further down the bag. card + ##io is cardio, corona + ##ry is coronary.
+BERT has no single token for those words so the model spells them out. If
+anyone asks why sparse vectors are less readable than the "it adds synonyms"
+story suggests, that is the answer: a third of the signal is spelling.
 
 If anyone asks how it is trained, do not put it on a slide, just answer:
 splade-v3 distills from a cross-encoder with two losses mixed, KL-Div at
@@ -277,44 +264,6 @@ knows what the sentence is about.
 BM25 numbers are real, computed against the 5,183-doc scifact corpus with
 k1=1.2 and b=0.75, so the idf is a genuine corpus statistic.
 research/if-splade/bag_of_words.py.
--->
-
----
-
-## SPLADE models
-
-<iframe :src="chart('activations')" class="w-full border-0" style="height: 356px"
-        title="SPLADE token activations for heart attack" />
-
-<div class="text-sm opacity-80 -mt-2">
-
-`naver/splade-v3-doc` on the text **"heart attack"**: 2 words in, **71 terms out**. Grey is what the document says, red is what SPLADE adds. Top 10 whole words; 39 of the 71 are subword pieces.
-
-</div>
-
-<script setup>
-import { useDarkMode } from '@slidev/client'
-const { isDark } = useDarkMode()
-const chart = (n) => `${import.meta.env.BASE_URL}charts/${n}.html${isDark.value ? '?dark' : ''}`
-</script>
-
-<!--
-Point at the two grey bars first: heart 1.60, attack 1.13. The words are still
-the top two, so this is addition, not replacement.
-
-Then the red: cardiac 0.77, stroke 0.59, chest 0.50. None of those words are in
-the document. A "cardiac arrest" query now hits this document at 0.77 on a word
-it never contained.
-
-Two numbers worth saying out loud. 84% of the weight mass is on terms the text
-never had, 14.36 against 2.73. And 39 of the 71 terms are subword fragments
-carrying 35% of the weight.
-
-That is what `card` and `corona` are doing on this chart, and it is the best
-part of the slide. card + ##io is cardio. corona + ##ry is coronary. BERT has
-30k wordpieces and no single token for those words, so the model spells them
-out. If someone asks why the vectors are less interpretable than they look,
-this is the answer: a third of the signal is spelling.
 -->
 
 ---

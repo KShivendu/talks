@@ -371,7 +371,7 @@ Measured by research/if-splade/bag_of_words_esci.py.
 
 - BM25 answers in <5ms on CPU
 
-- So you buy relevance at the cost of ~10x latency OR expensive GPUs
+- So you buy relevance at the cost of ~10x latency OR use GPUs
 
 </v-clicks>
 
@@ -383,23 +383,7 @@ in the query path to be that fast at all.
 
 ---
 
-## What if we remove model from query path?
-
-<v-clicks>
-
-- Run the model **only at index time**, on documents
-
-- At query time, just tokenize: `leather sofa` becomes token IDs `[5898, 10682]`, each weight 1.0
-
-- No model, no GPU, no inference on the query path
-
-- Pay once, upfront. Queries stay fast
-
-</v-clicks>
-
----
-
-## The whole query encoder
+## What if we remove the model from the query path?
 
 ```python
 def encode_query_inference_free(tokenizer, query: str):
@@ -410,32 +394,45 @@ def encode_query_inference_free(tokenizer, query: str):
 
 <v-clicks depth="2">
 
-- One tokenizer call, then one sparse dot product
+- That is the whole query encoder. One tokenizer call, then a sparse dot product
 
-- No model at query time
-  - `naver` models assign `weight = 1.0` to each query
-  - `os` models add `idf.json` so `the` gets 0.135 and `cardiac` 6.533. Still zero model calls
+- The model runs **only at index time**, on documents. You pay once, upfront
+
+- And remember the `mouse` slide: the contextual expansion was **all document-side**. None of it is lost here
+
+- Weights do not have to be 1.0
+  - `naver` sends every query term at exactly **1.0**
+  - `os` ships `idf.json`, so `the` gets **0.135** and `cardiac` **6.533** &mdash; still zero model calls
 
 </v-clicks>
 
 <!--
-Worth pausing on: this is the entire query side. If someone asks how it can
-possibly work, the answer is on the next slide, the doc encoder was trained
-knowing this is all it would get.
+Two slides before this one said the same thing twice: a prose description of
+the code, then the code. This is the merge. Let the function speak, it is four
+lines.
 
-The sub-bullets pre-empt the obvious question, "surely you would at least use
-idf?". OS does exactly that and ships the table in the repo. But I tested every
-way of adding weights to naver's uniform model, holding its document vectors
-fixed so only the query weighting changed, and all of them lost:
+Worth pausing on: this really is the entire query side. Tokenize, dedupe, set
+every weight to 1.0. If someone asks how that can possibly work, the answer is
+the next slide -- the document encoder was trained knowing this is all it would
+ever get.
 
-  uniform 1.0                                60.04
-  idf computed from the corpus itself        59.04   -1.01
-  OS's shipped idf.json, grafted on          58.83   -1.21
-  two-round idf from the top-100 returned    52.52   -7.53
+The third bullet is the one that defuses the obvious worry, and it is a
+callback rather than a new claim: everything clever you saw with "mouse"
+happened on the document, at index time, where the model still runs.
+
+Last bullet pre-empts "surely you would at least use idf?". OS does exactly
+that and ships the table. But I tested every way of adding weights to naver's
+uniform model, holding its document vectors fixed so only the query weighting
+changed, and all of them lost:
+
+  uniform 1.0                              60.04
+  idf computed from the corpus itself      59.04   -1.01
+  OS's shipped idf.json, grafted on        58.83   -1.21
+  two-round idf over the returned top-100  52.52   -7.53
 
 splade-v3-doc was trained expecting exactly 1.0, so its document weights are
 calibrated to that. Reweighting the query afterwards hands the document encoder
-a distribution it never saw during training.
+a distribution it never saw in training.
 -->
 
 ---
